@@ -4,6 +4,7 @@ import argparse
 from array import array
 import json
 import math
+import os
 from pathlib import Path
 import sys
 import edram
@@ -62,7 +63,7 @@ def generate(audio,output):
                     "Generated comparison signal, not decoded source audio; peak=5000 PCM; ramps=2ms.")
                 index["profiles"][name]={"components":parts,"samples":len(pcm)//2,"duration_seconds":len(pcm)/16000}
             original=(Path(path.parent.name)/p["wav"]).as_posix()
-            index["clips"][original]={"path":(Path("..")/output/name).as_posix(),"components":parts}
+            index["clips"][original]={"path":Path(os.path.relpath(output/name,audio)).as_posix(),"components":parts}
     (output/"index.json").write_text(json.dumps(index,indent=2)+"\n",encoding="utf-8")
     print(json.dumps({"reference_profiles":len(index["profiles"]),"mapped_original_clips":len(index["clips"])}))
     return index

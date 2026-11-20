@@ -17,3 +17,7 @@ These facts identify where the baseline render fails, but they do not identify a
 Repetition interpretation, potential stateful decoding, representation changes within tone blocks, and load-time transformations remain under investigation. A known working-hardware recording or EDRAM firmware would distinguish these possibilities.
 
 The source measurements, raw tone bytes and reproducible analysis are retained in tone-fft-baseline.json, tone-fft-summary.json and ../analyze_tones.py.
+
+A further menu-order anomaly occurs in fstd0ba.bin44, bank 1, phrase 16. Its four-byte pointer is aligned and the additive checksum validates, but the selected component order does not match a supported three-tone SIT. The reference generator reports this case and supplies no guessed parameters. Thus 284 source entries map to 32 documented comparison profiles; one SIT-like menu remains unsupported, in addition to the three misaligned menus already rejected by the extractor.
+
+Stateful G.726 tests seeded the decoder from the initial PCM page and tried three explicit mappings of the following codes. Their spectra were broad and inconsistent with clean SITs; no mapping corrected the representation. Results are in tone-codec-experiments.json.
