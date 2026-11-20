@@ -1,0 +1,4 @@
+Product_Release: EDRAM
+OrderCode: EDRM0001
+Version: 010
+Date: August 26, 2002  
