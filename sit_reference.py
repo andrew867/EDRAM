@@ -44,13 +44,17 @@ def generate(audio,output):
            "peak_pcm":5000,"edge_ramp_ms":2,"inter_component_gap_ms":0,
            "sources":["Bellcore SR-2275, Issue 3, December 1997, table 6-45",
                       "Nortel 297-1001-527, printed pages 4-9 through 4-11"],
-           "clips":{},"profiles":{}}
+           "clips":{},"profiles":{},"unsupported_menus":[]}
     for path in sorted(audio.glob("*/manifest.json")):
         m=json.loads(path.read_text(encoding="utf-8"))
         for p in m["phrases"]:
             if not p["wav"] or "_sit_" not in p["label"]:
                 continue
-            parts=profile(p["segments"])
+            try:
+                parts=profile(p["segments"])
+            except (ValueError, KeyError) as exc:
+                index["unsupported_menus"].append({"source":m["source"],"bank":p["bank"],"phrase":p["number"],"reason":str(exc)})
+                continue
             name="_".join(f'{x["frequency_hz"]:g}Hz_{x["duration_ms"]}ms' for x in parts)+".wav"
             if name not in index["profiles"]:
                 pcm=synthesize(parts)
