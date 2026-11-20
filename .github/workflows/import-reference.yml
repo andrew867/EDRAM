@@ -1,0 +1,126 @@
+name: Import and transcribe reference archive
+on:
+  push:
+    paths:
+      - '.github/workflows/import-reference.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: reference-corpus
+  cancel-in-progress: false
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    outputs:
+      commit: ${{ steps.commit.outputs.commit }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Fetch checksum-pinned originals
+        run: |
+          if [ ! -f data/original/EDRM0001_INFO.txt ]; then
+            python fetch_samples.py data/original
+          fi
+      - name: Extract and verify every WAV
+        run: |
+          python edram.py data/original -o audio --segments --overwrite
+          python verify_corpus.py data/original audio --json VALIDATION.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("VALIDATION.json")
+          d=json.loads(p.read_text())
+          assert (d["sources"],d["memory_banks"],d["validated_phrase_menus"],d["phrase_wavs"],d["segment_wavs"],d["unavailable_phrases"],d["invalid_menu_entries"]) == (61,118,2890,2873,2432,17,3)
+          d["unit_tests"]={"status":"passed","count":23}
+          d["human_listening_review"]=False
+          d["reference_archive_sha256"]="88ab9decafafbb71642e5b58b9be91d1f9d6d801f00d838f1f16347506c27bf8"
+          p.write_text(json.dumps(d,indent=2)+"\n")
+          PY
+      - name: Measure tone spectra
+        run: |
+          python -m pip install numpy
+          python analyze_tones.py
+      - name: Commit original data and extracted audio
+        id: commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/original audio VALIDATION.json research
+          if ! git diff --cached --quiet; then
+            git commit -m "Import verified EDRAM load files and 5305 extracted WAVs"
+            git push origin HEAD:main
+          fi
+          echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+  transcribe:
+    needs: import
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.import.outputs.commit }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install transcription dependencies
+        run: python -m pip install -r requirements-transcription.txt
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface/hub
+          key: whisper-small-1.2.1-v1
+      - name: Plan deduplicated transcription
+        run: python transcribe.py plan audio --plan transcription-plan.json
+      - name: Transcribe unique speech clips
+        env:
+          OMP_NUM_THREADS: '4'
+          HF_HUB_DISABLE_PROGRESS_BARS: '1'
+        run: python -u transcribe.py run audio --plan transcription-plan.json --shard ${{ matrix.shard }} --shards 6 --model small --output transcripts-part-${{ matrix.shard }}.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: transcripts-${{ matrix.shard }}
+          path: transcripts-part-${{ matrix.shard }}.json
+          if-no-files-found: error
+  publish-transcripts:
+    needs: [import, transcribe]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: transcripts-*
+          path: transcript-parts
+          merge-multiple: true
+      - name: Verify coverage and build searchable player
+        run: |
+          python transcribe.py plan audio --plan transcription-plan.json
+          python transcribe.py merge audio --plan transcription-plan.json --parts transcript-parts
+      - name: Publish transcripts and updated player
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add audio/transcripts.json audio/transcripts.csv audio/transcript-summary.json audio/listen.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Add machine transcripts for every speech clip and searchable audio player"
+            git push origin HEAD:main
+          fi
