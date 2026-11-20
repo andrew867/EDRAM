@@ -8,6 +8,7 @@ import csv
 import hashlib
 import html
 import json
+import signal
 from pathlib import Path
 import sys
 import wave
@@ -75,6 +76,10 @@ def make_plan(root):
             "counts": dict(Counter(c["content"] for c in clips))}
 
 
+def clip_timeout(signum, frame):
+    raise TimeoutError("recognition exceeded the per-clip time limit")
+
+
 def run_shard(root, plan_path, output, shard, shards, model_size):
     from faster_whisper import WhisperModel
     plan = json.loads(plan_path.read_text(encoding="utf-8"))
@@ -84,6 +89,9 @@ def run_shard(root, plan_path, output, shard, shards, model_size):
     else:
         results = {}
     model = WhisperModel(model_size, device="cpu", compute_type="int8", cpu_threads=4, num_workers=1)
+    bounded = hasattr(signal, "SIGALRM")
+    if bounded:
+        signal.signal(signal.SIGALRM, clip_timeout)
     print(json.dumps({"shard": shard, "tasks": len(tasks), "resumed": len(results)}), flush=True)
     for i, task in enumerate(tasks):
         key = task["pcm_sha256"]
@@ -93,7 +101,10 @@ def run_shard(root, plan_path, output, shard, shards, model_size):
         if hashlib.sha256(read_pcm(path)).hexdigest() != key:
             raise ValueError(f"audio changed after plan: {path}")
         try:
-            segments, info = model.transcribe(str(path), beam_size=5, vad_filter=True,
+            if bounded:
+                signal.alarm(90)
+            segments, info = model.transcribe(str(path), beam_size=5, temperature=0.0,
+                max_new_tokens=128, vad_filter=True,
                 vad_parameters={"min_silence_duration_ms": 300, "speech_pad_ms": 200},
                 condition_on_previous_text=False, word_timestamps=False)
             parts = [{"start": s.start, "end": s.end, "text": s.text.strip(),
@@ -106,10 +117,18 @@ def run_shard(root, plan_path, output, shard, shards, model_size):
                       "language_probability": info.language_probability, "segments": parts,
                       "review_recommended": review, "status": "transcribed" if text else "no_speech_detected",
                       "model": model_size, "engine": "faster-whisper 1.2.1", "speaker": None,
-                      "human_verified": False}
+                      "human_verified": False,
+                      "decoding": {"beam_size": 5, "temperature": 0, "max_new_tokens": 128,
+                                   "clip_timeout_seconds": 90 if bounded else None}}
+        except TimeoutError as exc:
+            result = {"status": "model_timeout", "text": "", "review_recommended": True,
+                      "error": str(exc), "human_verified": False, "speaker": None}
         except Exception as exc:
             result = {"status": "error", "text": "", "review_recommended": True, "error": str(exc),
                       "human_verified": False, "speaker": None}
+        finally:
+            if bounded:
+                signal.alarm(0)
         results[key] = result
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(json.dumps({"shard": shard, "shards": shards, "results": results}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
