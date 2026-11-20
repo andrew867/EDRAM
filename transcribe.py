@@ -80,7 +80,7 @@ def clip_timeout(signum, frame):
     raise TimeoutError("recognition exceeded the per-clip time limit")
 
 
-def run_shard(root, plan_path, output, shard, shards, model_size):
+def run_shard(root, plan_path, output, shard, shards, model_size, resume_parts=None):
     from faster_whisper import WhisperModel
     plan = json.loads(plan_path.read_text(encoding="utf-8"))
     tasks = [t for i, t in enumerate(plan["tasks"]) if i % shards == shard]
@@ -88,6 +88,16 @@ def run_shard(root, plan_path, output, shard, shards, model_size):
         results = json.loads(output.read_text(encoding="utf-8"))["results"]
     else:
         results = {}
+    if resume_parts:
+        for checkpoint in sorted(resume_parts.glob("transcripts-part-*.json")):
+            results.update(json.loads(checkpoint.read_text(encoding="utf-8"))["results"])
+    keys = {t["pcm_sha256"] for t in tasks}
+    results = {key: value for key, value in results.items() if key in keys}
+    if all(t["pcm_sha256"] in results and results[t["pcm_sha256"]]["status"] != "error" for t in tasks):
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(json.dumps({"shard": shard, "shards": shards, "results": results}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        print(json.dumps({"shard": shard, "tasks": len(tasks), "resumed": len(results), "complete": True}), flush=True)
+        return
     model = WhisperModel(model_size, device="cpu", compute_type="int8", cpu_threads=4, num_workers=1)
     bounded = hasattr(signal, "SIGALRM")
     if bounded:
@@ -229,6 +239,7 @@ def main():
     parser.add_argument("--shard", type=int, default=0)
     parser.add_argument("--shards", type=int, default=1)
     parser.add_argument("--model", default="small")
+    parser.add_argument("--resume-parts", type=Path)
     args = parser.parse_args()
     if not 0 <= args.shard < args.shards:
         parser.error("shard index must be within shard count")
@@ -237,7 +248,7 @@ def main():
         args.plan.write_text(json.dumps(plan, indent=2) + "\n", encoding="utf-8")
         print(json.dumps({"clips": len(plan["clips"]), "unique_speech": len(plan["tasks"]), "content": plan["counts"]}))
     elif args.command == "run":
-        run_shard(args.root, args.plan, args.output, args.shard, args.shards, args.model)
+        run_shard(args.root, args.plan, args.output, args.shard, args.shards, args.model, args.resume_parts)
     else:
         merge(args.root, args.plan, args.parts)
 

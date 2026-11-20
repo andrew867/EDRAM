@@ -1,0 +1,102 @@
+name: Resume bounded speech transcription
+on:
+  push:
+    paths: ['.github/workflows/resume-transcripts.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: write
+    outputs:
+      resume: ${{ steps.prepare.outputs.resume }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Preserve checkpoints before resuming slow workers
+        id: prepare
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python .github/scripts/prepare_transcription_resume.py
+  resume:
+    needs: prepare
+    if: needs.prepare.outputs.resume == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -r requirements-transcription.txt
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 44833302073
+          github-token: ${{ github.token }}
+          pattern: transcripts-*
+          path: checkpoints
+          merge-multiple: true
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface/hub
+          key: whisper-small-1.2.1-v1
+      - run: python transcribe.py plan audio --plan transcription-plan.json
+      - name: Process remaining clips with bounded decoding
+        env:
+          OMP_NUM_THREADS: '4'
+          HF_HUB_DISABLE_PROGRESS_BARS: '1'
+        run: python -u transcribe.py run audio --plan transcription-plan.json --resume-parts checkpoints --shard ${{ matrix.shard }} --shards 6 --model small --output transcripts-part-${{ matrix.shard }}.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: resumed-transcripts-${{ matrix.shard }}
+          path: transcripts-part-${{ matrix.shard }}.json
+          if-no-files-found: error
+  publish:
+    needs: [prepare, resume]
+    if: needs.prepare.outputs.resume == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m unittest discover -s tests -v
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: resumed-transcripts-*
+          path: transcript-parts
+          merge-multiple: true
+      - name: Verify complete coverage and render player
+        run: |
+          python transcribe.py plan audio --plan transcription-plan.json
+          python transcribe.py merge audio --plan transcription-plan.json --parts transcript-parts
+      - name: Publish complete transcript index
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add audio/transcripts.json audio/transcripts.csv audio/transcript-summary.json audio/listen.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Publish complete machine transcripts and searchable EDRAM player"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
