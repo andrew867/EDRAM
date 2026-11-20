@@ -77,3 +77,7 @@ Archive SHA-256: 88ab9decafafbb71642e5b58b9be91d1f9d6d801f00d838f1f16347506c27bf
 Nortel reference: [297-1001-527, DRAM and EDRAM Guide](https://www.gbppr.net/bsp/297-1001-527.pdf), Standard 13.06, August 1999, printed pages 2-8 and 4-7 through 4-11.
 
 The converter is a new Python implementation. Joe's C code, proprietary firmware and Nortel source code are not incorporated. The MIT license covers the new code, tests and documentation only; original load files and recordings retain their respective ownership.
+
+## SIT comparison signals
+
+The [waveform and FFT comparison](research/sit-waveform-fft.svg) shows the stored baseline beside an explicitly generated Bellcore reference. The player offers a separate Standard SIT reference button for supported menus. [Reference documentation](references/README.md) records the frequencies, durations and generation settings. Stored WAVs are preserved; the tone byte interpretation remains an open issue.

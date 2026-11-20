@@ -30,6 +30,8 @@ def is_silence(pcm):
 
 def make_plan(root):
     clips = []
+    reference_path = root.parent / "references" / "sit" / "index.json"
+    references = json.loads(reference_path.read_text(encoding="utf-8"))["clips"] if reference_path.exists() else {}
     tone_hashes = set()
     annotation_path = root.parent / "annotations.json"
     annotations = json.loads(annotation_path.read_text(encoding="utf-8")) if annotation_path.exists() else {}
@@ -62,6 +64,7 @@ def make_plan(root):
                               "seconds": len(pcm) / 16000, "content": "silence" if silent else "speech",
                               "description": annotation.get("label", ""), "annotation_provenance": annotation.get("provenance")})
     for clip in clips:
+        clip["reference_wav"] = references.get(clip["path"], {}).get("path")
         if clip["pcm_sha256"] in tone_hashes:
             clip["content"] = "tone"
     tasks = {}
@@ -124,10 +127,12 @@ def write_player(root, clips):
         review = "Review" if t.get("review_recommended") else ""
         title = f"{clip['source']} / bank {clip['bank']} / {clip['label']}"
         url = html.escape(clip["path"], quote=True)
+        reference = clip.get("reference_wav")
+        compare = f'<button data-src="{html.escape(reference, quote=True)}" data-reference="true">Standard SIT reference</button>' if reference else ""
         rows.append(f'<tr data-kind="{clip["kind"]}" data-review="{str(bool(review)).lower()}"><td>{html.escape(title)}'
                     f'<small>{clip["kind"]}, {clip["seconds"]:.3f}s, {html.escape(t.get("language") or clip["content"])}</small></td>'
                     f'<td class="transcript">{html.escape(text)}<small class="review">{review}</small></td>'
-                    f'<td><button data-src="{url}">Play</button> <a href="{url}" download>WAV</a></td></tr>')
+                    f'<td><button data-src="{url}">Play stored audio</button> <a href="{url}" download>WAV</a> {compare}</td></tr>')
     page = '''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
 <title>EDRAM announcement player and transcripts</title><style>
 body{max-width:1400px;margin:1rem auto;padding:0 1rem;font:16px system-ui;background:#101820;color:#edf4f9}a{color:#7ad8ff}
@@ -136,7 +141,7 @@ input,select,button{font:inherit;padding:.4rem}input{width:min(650px,80%)}audio{
 table{width:100%;border-collapse:collapse}td{padding:.65rem;border-bottom:1px solid #334452}td:first-child{width:31%}small{display:block;color:#a5bac9}.review{color:#ffc46b}
 #now{margin:.5rem 0;color:#9ee5ff}#words{white-space:pre-wrap}.transcript{max-width:650px}button{cursor:pointer}
 @media(max-width:700px){td{display:block}td:first-child{width:auto}header p{font-size:13px}}
-</style><header><h1>EDRAM announcement archive</h1><p>Machine transcripts, not yet reviewed by a person. Tone and silence labels come from the audio/menu classification. Speaker identities are unassigned.</p>
+</style><header><h1>EDRAM announcement archive</h1><p>Machine transcripts, not yet reviewed by a person. Tone and silence labels come from the audio/menu classification. Speaker identities are unassigned. Stored SIT decoding is under investigation; Standard SIT reference plays a separately generated comparison signal.</p>
 <input id="q" aria-label="Search transcripts" placeholder="Search words, source or phrase ID">
 <select id="kind" aria-label="Clip type"><option value="">All clips</option><option value="announcement" selected>Announcements</option><option value="segment">Speech and tone fragments</option></select>
 <label><input type="checkbox" id="review" style="width:auto">Needs review</label><span id="count"></span>
@@ -146,7 +151,7 @@ const player=document.querySelector('#player'), rows=[...document.querySelectorA
 function filter(){let n=0;const q=document.querySelector('#q').value.toLowerCase(),k=document.querySelector('#kind').value,r=document.querySelector('#review').checked;
 rows.forEach(row=>{row.hidden=!(row.textContent.toLowerCase().includes(q)&&(!k||row.dataset.kind===k)&&(!r||row.dataset.review==='true'));if(!row.hidden)n++;});document.querySelector('#count').textContent=' '+n+' clips';}
 document.querySelectorAll('input,select').forEach(e=>e.addEventListener('input',filter));filter();
-document.addEventListener('click',e=>{if(e.target.dataset.src){const row=e.target.closest('tr');player.src=e.target.dataset.src;player.play();document.querySelector('#now').textContent=row.cells[0].textContent;document.querySelector('#words').textContent=row.cells[1].textContent;}});
+document.addEventListener('click',e=>{if(e.target.dataset.src){const row=e.target.closest('tr');player.src=e.target.dataset.src;player.play();document.querySelector('#now').textContent=(e.target.dataset.reference?'GENERATED STANDARD REFERENCE: ':'STORED AUDIO: ')+row.cells[0].textContent;document.querySelector('#words').textContent=row.cells[1].textContent;}});
 </script></html>'''.replace("ROWS", "\n".join(rows))
     (root / "listen.html").write_text(page, encoding="utf-8")
 
