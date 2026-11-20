@@ -31,12 +31,15 @@ def is_silence(pcm):
 def make_plan(root):
     clips = []
     tone_hashes = set()
+    annotation_path = root.parent / "annotations.json"
+    annotations = json.loads(annotation_path.read_text(encoding="utf-8")) if annotation_path.exists() else {}
     for path in sorted(root.glob("*/manifest.json")):
         m = json.loads(path.read_text(encoding="utf-8"))
         source = Path(m["source"]).stem
         tone_segments = set()
         for p in m["phrases"]:
-            if "_sit_" in p["label"]:
+            annotation = annotations.get((Path(source) / p["wav"]).as_posix(), {}) if p["wav"] else {}
+            if "_sit_" in p["label"] or annotation.get("content") == "tone":
                 tone_segments.update((p["bank"], s["page"], s["pages"]) for s in p["segments"])
             elif all(s["page"] in (13, 14, 15, 16) and s["pages"] == 1 for s in p["segments"]):
                 tone_segments.update((p["bank"], s["page"], s["pages"]) for s in p["segments"])
@@ -48,14 +51,16 @@ def make_plan(root):
                 pcm = read_pcm(root / relative)
                 digest = hashlib.sha256(pcm).hexdigest()
                 silent = is_silence(pcm)
-                tone = ("_sit_" in p.get("label", "") or
+                annotation = annotations.get(relative, {})
+                tone = (annotation.get("content") == "tone" or "_sit_" in p.get("label", "") or
                         (kind == "segment" and (p["bank"], p["page"], p["pages"]) in tone_segments) or
                         (kind == "announcement" and all(s["page"] in (13, 14, 15, 16) and s["pages"] == 1 for s in p["segments"])))
                 if tone and not silent:
                     tone_hashes.add(digest)
                 clips.append({"path": relative, "source": source, "kind": kind, "bank": p["bank"],
                               "label": p.get("label", Path(p["wav"]).stem), "pcm_sha256": digest,
-                              "seconds": len(pcm) / 16000, "content": "silence" if silent else "speech"})
+                              "seconds": len(pcm) / 16000, "content": "silence" if silent else "speech",
+                              "description": annotation.get("label", ""), "annotation_provenance": annotation.get("provenance")})
     for clip in clips:
         if clip["pcm_sha256"] in tone_hashes:
             clip["content"] = "tone"
@@ -115,7 +120,7 @@ def write_player(root, clips):
     rows = []
     for clip in clips:
         t = clip["transcript"]
-        text = t["text"] or ("[Silence]" if clip["content"] == "silence" else "[Tone sequence or component]" if clip["content"] == "tone" else "[No speech detected, review]")
+        text = t["text"] or (clip.get("description") or ("[Silence]" if clip["content"] == "silence" else "[Tone sequence or component]" if clip["content"] == "tone" else "[No speech detected, review]"))
         review = "Review" if t.get("review_recommended") else ""
         title = f"{clip['source']} / bank {clip['bank']} / {clip['label']}"
         url = html.escape(clip["path"], quote=True)
@@ -156,8 +161,11 @@ def merge(root, plan_path, parts):
             raise ValueError(f"duplicate shard results: {len(overlap)}")
         results.update(data)
     expected = {t["pcm_sha256"] for t in plan["tasks"]}
-    if results.keys() != expected:
-        raise ValueError(f"transcription coverage mismatch: {len(expected - results.keys())} missing, {len(results.keys() - expected)} extra")
+    tonal_hashes = {c["pcm_sha256"] for c in plan["clips"] if c["content"] != "speech"}
+    missing = expected - results.keys()
+    extra = results.keys() - expected
+    if missing or extra - tonal_hashes:
+        raise ValueError(f"transcription coverage mismatch: {len(missing)} missing, {len(extra - tonal_hashes)} unrelated extra")
     errors = 0
     for clip in plan["clips"]:
         if clip["content"] == "speech":
@@ -171,7 +179,8 @@ def merge(root, plan_path, parts):
     summary = {"wav_files": len(plan["clips"]), "unique_speech_pcm": len(expected),
                "content_counts": plan["counts"], "status_counts": dict(Counter(c["transcript"]["status"] for c in plan["clips"])),
                "review_recommended": sum(c["transcript"].get("review_recommended", False) for c in plan["clips"]),
-               "human_listening_review": False, "speaker_identities_assigned": False}
+               "human_listening_review": False, "speaker_identities_assigned": False,
+               "unused_results_reclassified_as_non_speech": len(extra)}
     (root / "transcripts.json").write_text(json.dumps({"summary": summary, "clips": plan["clips"]}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     (root / "transcript-summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     with (root / "transcripts.csv").open("w", newline="", encoding="utf-8") as file:
