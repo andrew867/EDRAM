@@ -1,0 +1,5426 @@
+{
+  "notice": "Generated Bellcore comparison signals, not recovered EDRAM sample decoding.",
+  "peak_pcm": 5000,
+  "edge_ramp_ms": 2,
+  "inter_component_gap_ms": 0,
+  "sources": [
+    "Bellcore SR-2275, Issue 3, December 1997, table 6-45",
+    "Nortel 297-1001-527, printed pages 4-9 through 4-11"
+  ],
+  "clips": {
+    "astd0ab/bank_00/phrase_08_sit_01.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_09_sit_02.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_10_sit_03.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_11_sit_04.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_12_sit_05.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_13_sit_06.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_14_sit_07.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_15_sit_08.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_16_sit_09.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_17_sit_10.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_18_sit_11.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_19_sit_12.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_20_sit_13.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_21_sit_14.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_22_sit_15.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_23_sit_16.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_24_sit_17.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_25_sit_18.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_26_sit_19.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_27_sit_20.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_28_sit_21.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_29_sit_22.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_30_sit_23.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_31_sit_24.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_32_sit_25.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_33_sit_26.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_34_sit_27.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_35_sit_28.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_36_sit_29.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_37_sit_30.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_38_sit_31.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_00/phrase_39_sit_32.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_08_sit_01.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_09_sit_02.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_10_sit_03.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_11_sit_04.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_12_sit_05.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_13_sit_06.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_14_sit_07.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_15_sit_08.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_16_sit_09.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_17_sit_10.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_18_sit_11.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_19_sit_12.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_20_sit_13.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_21_sit_14.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_22_sit_15.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_23_sit_16.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_24_sit_17.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_25_sit_18.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_26_sit_19.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_27_sit_20.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_28_sit_21.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_29_sit_22.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_30_sit_23.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_31_sit_24.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_32_sit_25.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_33_sit_26.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_34_sit_27.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_35_sit_28.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_36_sit_29.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_37_sit_30.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_38_sit_31.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "astd0ab/bank_01/phrase_39_sit_32.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_08_sit_01.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_09_sit_02.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_10_sit_03.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_11_sit_04.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_12_sit_05.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_13_sit_06.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_14_sit_07.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_15_sit_08.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_16_sit_09.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_17_sit_10.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_18_sit_11.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_19_sit_12.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_20_sit_13.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_21_sit_14.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_22_sit_15.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_23_sit_16.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_24_sit_17.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_25_sit_18.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_26_sit_19.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_27_sit_20.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_28_sit_21.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_29_sit_22.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_30_sit_23.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_31_sit_24.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_32_sit_25.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_33_sit_26.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_34_sit_27.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_35_sit_28.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_36_sit_29.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_37_sit_30.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_38_sit_31.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "edrmtone/bank_00/phrase_39_sit_32.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_08_sit_01.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_09_sit_02.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_10_sit_03.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_11_sit_04.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_12_sit_05.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_13_sit_06.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_14_sit_07.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_15_sit_08.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_16_sit_09.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_17_sit_10.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_18_sit_11.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_19_sit_12.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_20_sit_13.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_21_sit_14.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_22_sit_15.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_23_sit_16.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_24_sit_17.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_25_sit_18.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_26_sit_19.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_27_sit_20.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_28_sit_21.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_29_sit_22.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_30_sit_23.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_31_sit_24.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_32_sit_25.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_33_sit_26.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_34_sit_27.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_35_sit_28.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_36_sit_29.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_37_sit_30.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_38_sit_31.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_00/phrase_39_sit_32.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_08_sit_01.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_09_sit_02.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_10_sit_03.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_11_sit_04.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_12_sit_05.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_13_sit_06.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_14_sit_07.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_15_sit_08.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_16_sit_09.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_17_sit_10.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_18_sit_11.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_19_sit_12.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_20_sit_13.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_21_sit_14.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_22_sit_15.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_23_sit_16.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_24_sit_17.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_25_sit_18.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_26_sit_19.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_27_sit_20.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_28_sit_21.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_29_sit_22.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_30_sit_23.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_31_sit_24.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_32_sit_25.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_33_sit_26.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_34_sit_27.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_35_sit_28.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_36_sit_29.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_37_sit_30.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_38_sit_31.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "emccs0ca/bank_01/phrase_39_sit_32.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_08_sit_01.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_09_sit_02.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_10_sit_03.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_11_sit_04.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_12_sit_05.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_13_sit_06.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_14_sit_07.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_15_sit_08.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_16_sit_09.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_17_sit_10.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_18_sit_11.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_19_sit_12.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_20_sit_13.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_21_sit_14.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_22_sit_15.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_23_sit_16.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_24_sit_17.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_25_sit_18.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_26_sit_19.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_27_sit_20.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_28_sit_21.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_29_sit_22.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_30_sit_23.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_31_sit_24.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_32_sit_25.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_33_sit_26.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_34_sit_27.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_35_sit_28.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_36_sit_29.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_37_sit_30.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_38_sit_31.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "estd0aa/bank_00/phrase_39_sit_32.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_08_sit_01.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_09_sit_02.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_10_sit_03.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_11_sit_04.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_12_sit_05.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_13_sit_06.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_14_sit_07.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_15_sit_08.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_16_sit_09.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_17_sit_10.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_18_sit_11.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_19_sit_12.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_20_sit_13.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_21_sit_14.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_22_sit_15.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_23_sit_16.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_24_sit_17.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_25_sit_18.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_26_sit_19.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_27_sit_20.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_28_sit_21.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_29_sit_22.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_30_sit_23.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_31_sit_24.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_32_sit_25.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_33_sit_26.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_34_sit_27.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_35_sit_28.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_36_sit_29.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_37_sit_30.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_38_sit_31.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_00/phrase_39_sit_32.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_09_sit_02.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_10_sit_03.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_12_sit_05.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_13_sit_06.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_14_sit_07.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_15_sit_08.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_17_sit_10.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_18_sit_11.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_19_sit_12.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_21_sit_14.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_22_sit_15.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_23_sit_16.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_24_sit_17.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_25_sit_18.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_26_sit_19.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_27_sit_20.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_28_sit_21.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_29_sit_22.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_30_sit_23.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_31_sit_24.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_32_sit_25.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_33_sit_26.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_34_sit_27.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_35_sit_28.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_36_sit_29.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_37_sit_30.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_38_sit_31.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "fstd0ba/bank_01/phrase_39_sit_32.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_08_sit_01.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_09_sit_02.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_10_sit_03.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_11_sit_04.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_12_sit_05.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_13_sit_06.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_14_sit_07.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_15_sit_08.wav": {
+      "path": "../references/sit/913.8Hz_274ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_16_sit_09.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_17_sit_10.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_18_sit_11.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_19_sit_12.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_20_sit_13.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_21_sit_14.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_22_sit_15.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_23_sit_16.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_24_sit_17.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_25_sit_18.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_26_sit_19.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_27_sit_20.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_28_sit_21.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_29_sit_22.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_30_sit_23.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_31_sit_24.wav": {
+      "path": "../references/sit/985.2Hz_274ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_32_sit_25.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_33_sit_26.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_34_sit_27.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_35_sit_28.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1370.6Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_36_sit_29.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_37_sit_30.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_274ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_38_sit_31.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_380ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
+    "mwttone/bank_00/phrase_39_sit_32.wav": {
+      "path": "../references/sit/985.2Hz_380ms_1428.5Hz_380ms_1776.7Hz_380ms.wav",
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ]
+    }
+  },
+  "profiles": {
+    "913.8Hz_274ms_1370.6Hz_274ms_1776.7Hz_274ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ],
+      "samples": 6576,
+      "duration_seconds": 0.822
+    },
+    "913.8Hz_274ms_1370.6Hz_274ms_1776.7Hz_380ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ],
+      "samples": 7424,
+      "duration_seconds": 0.928
+    },
+    "913.8Hz_274ms_1370.6Hz_380ms_1776.7Hz_274ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ],
+      "samples": 7424,
+      "duration_seconds": 0.928
+    },
+    "913.8Hz_274ms_1370.6Hz_380ms_1776.7Hz_380ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ],
+      "samples": 8272,
+      "duration_seconds": 1.034
+    },
+    "913.8Hz_274ms_1428.5Hz_274ms_1776.7Hz_274ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ],
+      "samples": 6576,
+      "duration_seconds": 0.822
+    },
+    "913.8Hz_274ms_1428.5Hz_274ms_1776.7Hz_380ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ],
+      "samples": 7424,
+      "duration_seconds": 0.928
+    },
+    "913.8Hz_274ms_1428.5Hz_380ms_1776.7Hz_274ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ],
+      "samples": 7424,
+      "duration_seconds": 0.928
+    },
+    "913.8Hz_274ms_1428.5Hz_380ms_1776.7Hz_380ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ],
+      "samples": 8272,
+      "duration_seconds": 1.034
+    },
+    "913.8Hz_380ms_1370.6Hz_274ms_1776.7Hz_274ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ],
+      "samples": 7424,
+      "duration_seconds": 0.928
+    },
+    "913.8Hz_380ms_1370.6Hz_274ms_1776.7Hz_380ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ],
+      "samples": 8272,
+      "duration_seconds": 1.034
+    },
+    "913.8Hz_380ms_1370.6Hz_380ms_1776.7Hz_274ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ],
+      "samples": 8272,
+      "duration_seconds": 1.034
+    },
+    "913.8Hz_380ms_1370.6Hz_380ms_1776.7Hz_380ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ],
+      "samples": 9120,
+      "duration_seconds": 1.14
+    },
+    "913.8Hz_380ms_1428.5Hz_274ms_1776.7Hz_274ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ],
+      "samples": 7424,
+      "duration_seconds": 0.928
+    },
+    "913.8Hz_380ms_1428.5Hz_274ms_1776.7Hz_380ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ],
+      "samples": 8272,
+      "duration_seconds": 1.034
+    },
+    "913.8Hz_380ms_1428.5Hz_380ms_1776.7Hz_274ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ],
+      "samples": 8272,
+      "duration_seconds": 1.034
+    },
+    "913.8Hz_380ms_1428.5Hz_380ms_1776.7Hz_380ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ],
+      "samples": 9120,
+      "duration_seconds": 1.14
+    },
+    "985.2Hz_274ms_1370.6Hz_274ms_1776.7Hz_274ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ],
+      "samples": 6576,
+      "duration_seconds": 0.822
+    },
+    "985.2Hz_274ms_1370.6Hz_274ms_1776.7Hz_380ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ],
+      "samples": 7424,
+      "duration_seconds": 0.928
+    },
+    "985.2Hz_274ms_1370.6Hz_380ms_1776.7Hz_274ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ],
+      "samples": 7424,
+      "duration_seconds": 0.928
+    },
+    "985.2Hz_274ms_1370.6Hz_380ms_1776.7Hz_380ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ],
+      "samples": 8272,
+      "duration_seconds": 1.034
+    },
+    "985.2Hz_274ms_1428.5Hz_274ms_1776.7Hz_274ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ],
+      "samples": 6576,
+      "duration_seconds": 0.822
+    },
+    "985.2Hz_274ms_1428.5Hz_274ms_1776.7Hz_380ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ],
+      "samples": 7424,
+      "duration_seconds": 0.928
+    },
+    "985.2Hz_274ms_1428.5Hz_380ms_1776.7Hz_274ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ],
+      "samples": 7424,
+      "duration_seconds": 0.928
+    },
+    "985.2Hz_274ms_1428.5Hz_380ms_1776.7Hz_380ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ],
+      "samples": 8272,
+      "duration_seconds": 1.034
+    },
+    "985.2Hz_380ms_1370.6Hz_274ms_1776.7Hz_274ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ],
+      "samples": 7424,
+      "duration_seconds": 0.928
+    },
+    "985.2Hz_380ms_1370.6Hz_274ms_1776.7Hz_380ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ],
+      "samples": 8272,
+      "duration_seconds": 1.034
+    },
+    "985.2Hz_380ms_1370.6Hz_380ms_1776.7Hz_274ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ],
+      "samples": 8272,
+      "duration_seconds": 1.034
+    },
+    "985.2Hz_380ms_1370.6Hz_380ms_1776.7Hz_380ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ],
+      "samples": 9120,
+      "duration_seconds": 1.14
+    },
+    "985.2Hz_380ms_1428.5Hz_274ms_1776.7Hz_274ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ],
+      "samples": 7424,
+      "duration_seconds": 0.928
+    },
+    "985.2Hz_380ms_1428.5Hz_274ms_1776.7Hz_380ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ],
+      "samples": 8272,
+      "duration_seconds": 1.034
+    },
+    "985.2Hz_380ms_1428.5Hz_380ms_1776.7Hz_274ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ],
+      "samples": 8272,
+      "duration_seconds": 1.034
+    },
+    "985.2Hz_380ms_1428.5Hz_380ms_1776.7Hz_380ms.wav": {
+      "components": [
+        {
+          "frequency_hz": 985.2,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1428.5,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 380
+        }
+      ],
+      "samples": 9120,
+      "duration_seconds": 1.14
+    }
+  },
+  "unsupported_menus": [
+    {
+      "source": "fstd0ba.bin44",
+      "bank": 1,
+      "phrase": 16,
+      "reason": "menu does not match the supported SIT component structure"
+    }
+  ]
+}
