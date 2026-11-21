@@ -5,7 +5,7 @@ from pathlib import Path
 import subprocess
 import numpy as np
 import edram
-from analyze_tones import expand, measure
+from archive.analyze_tones import expand, measure
 
 
 def ffmpeg(args, data):
@@ -43,7 +43,7 @@ def main():
             region["candidates"]["g726_"+mapping]={"whole":measure(y),"sustain":measure(y[256:]),
                 "blocks_rms":[float(np.sqrt(np.mean(z*z))) for z in np.array_split(y[256:],8)]}
         report["experiments"][str(attack)]=region
-    Path("research/tone-codec-experiments.json").write_text(json.dumps(report,indent=2)+"\n")
+    Path("archive/measurements/tone-codec-experiments.json").write_text(json.dumps(report,indent=2)+"\n")
     print(json.dumps({k:{n:round(c["sustain"]["peak_hz"],2) for n,c in v["candidates"].items()} for k,v in report["experiments"].items()},indent=2))
 
 

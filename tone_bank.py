@@ -39,10 +39,6 @@ RECORDED_TONES = {
 }
 
 # The archived Spanish busy cue has a full-scale glitch in its lead-in.
-RECORDED_LEAD_REPAIRS = {
-    "0e21722e474cbc19fc795a8fc4e38506dbe49f5523ed69187e8d64f051473113": 513,
-}
-
 SHARED_START = 0x2100
 SHARED_END = 0x5E94
 EXTRA_START = 0x5E9E
@@ -177,14 +173,6 @@ def records(image):
             yield info, raw
 
 
-def repair_samples(entry, raw):
-    # A sign-bit error in the shared record is confirmed by EDRMTONE record 18.
-    if entry["index"] == 1:
-        entry["sample_repair"] = {"sample_index": 3, "original_code": 0x94, "replacement_code": 0x54}
-        return raw[:3] + b"\x54" + raw[4:]
-    return raw
-
-
 def bank_clips(manifest):
     source = Path(manifest["source"]).stem
     for entry in manifest.get("tone_bank", []):
@@ -197,10 +185,17 @@ def bank_clips(manifest):
             }
 
 
+def record_ranges(entries):
+    return [(entry["header_address"], entry["sample_address"] + entry["samples"]) for entry in entries]
+
+
+def overlaps_records(start, size, regions):
+    return any(start < end and first < start + size for first, end in regions)
+
+
 def raw_bank_paths(manifest, bank_size, page_size):
     """Find generic WAV exports that expand tone-bank records as phrase pages."""
-    regions = [(tone["header_address"], tone["sample_address"] + tone["samples"])
-               for tone in manifest.get("tone_bank", ())]
+    regions = record_ranges(manifest.get("tone_bank", ()))
     if not regions:
         return set()
     source = Path(manifest["source"]).stem
@@ -211,8 +206,7 @@ def raw_bank_paths(manifest, bank_size, page_size):
         base = entry["bank"] * bank_size
         for segment in entry.get("segments", (entry,)):
             start = base + segment["page"] * page_size
-            end = start + segment["pages"] * page_size
-            if any(start < region_end and region_start < end for region_start, region_end in regions):
+            if overlaps_records(start, segment["pages"] * page_size, regions):
                 paths.add((Path(source) / entry["wav"]).as_posix())
                 break
     return paths

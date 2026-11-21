@@ -1,6 +1,6 @@
 # Generated SIT comparison signals
 
-The sit/ WAV files are generated reference signals, not recovered EDRAM sample audio. They interpret validated menus' low/high and short/long selections using Bellcore's North American SIT parameters. The stored-audio WAVs remain unchanged in ../audio/.
+The sit/ WAV files are generated reference signals, not recovered EDRAM sample audio. They interpret validated menus' low/high and short/long selections using Bellcore's North American SIT parameters. The current stored-audio exports are in ../../audio/.
 
 Bellcore SR-2275, Issue 3, December 1997, table 6-45, specifies first-component frequencies of 913.8 or 985.2 Hz, second-component frequencies of 1370.6 or 1428.5 Hz, and a third-component frequency of 1776.7 Hz. Short and long durations are 274 and 380 ms. Nortel's guide lists the same EDRAM timing and frequencies.
 

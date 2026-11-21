@@ -2,12 +2,12 @@ from pathlib import Path
 import sys
 import unittest
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 import edram
-import tone_playback
+from archive import tone_playback
 
 
-ORIGINALS = Path(__file__).resolve().parents[1] / "data" / "original"
+ORIGINALS = Path(__file__).resolve().parents[2] / "data" / "original"
 
 
 class TonePlaybackTests(unittest.TestCase):

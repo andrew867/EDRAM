@@ -15,31 +15,37 @@ ORIGINALS = Path(__file__).resolve().parents[1] / "data" / "original"
 
 
 class ToneBankTests(unittest.TestCase):
-    def test_known_cue_and_shifted_waveform_render_identically(self):
-        rendered = []
-        for name in ("eacts0ae.bin44", "jpdmct00.bin44"):
-            image = edram.Image.read(ORIGINALS / name)
-            phrase = next(p for p in image.phrases(strict=False) if p.bank == 0 and p.number == 1)
-            pcm, _, tone = edram.render_export(image, phrase, "alaw-unmasked", "")
-            self.assertEqual(tone["rendering"], "nortel-cue")
-            self.assertEqual(len(pcm), 2560)
-            values = struct.unpack("<1280h", pcm)
-            self.assertGreater(max(values[-250:]), 4900)
-            rendered.append(pcm)
-        self.assertEqual(*rendered)
+    def test_eight_bit_750_hz_waveform_and_menu_repeats(self):
+        source = ORIGINALS / "estd0aa.bin44"
+        image = edram.Image.read(source)
+        self.assertEqual(image.read_bytes(0x104, 8), bytes.fromhex("0e000102 0f000103"))
+        attack = image.read_bytes(0x0E00, 256)
+        sustain = image.read_bytes(0x0F00, 256)
+        period = bytes.fromhex("0284868787840204060604818486878682040607070482848686840104060706")
+        self.assertEqual(sustain[-128:], period * 4)
+        samples = struct.unpack("<32h", edram.decode(period))
+        self.assertEqual(sum(a <= 0 < b for a, b in zip(samples, samples[1:] + samples[:1])), 3)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest = edram.export(source, root, "alaw-unmasked")
+            entry = next(p for p in manifest["phrases"] if (p["bank"], p["number"]) == (0, 1))
+            self.assertEqual(entry["tone_name"], "750 Hz test tone")
+            with wave.open(str(root / source.stem / entry["wav"])) as wav:
+                self.assertEqual(wav.getnframes(), 1280)
+                self.assertEqual(wav.readframes(1280), edram.decode(attack * 2 + sustain * 3))
 
-    def test_prompt_cadence_has_three_96_ms_bursts(self):
-        image = edram.Image.read(ORIGINALS / "estd0aa.bin44")
-        phrase = next(p for p in image.phrases() if p.bank == 0 and p.number == 2)
-        pcm, _, _ = edram.render_export(image, phrase, "alaw-unmasked", "")
-        self.assertEqual(len(pcm), 2 * 7936)
-        self.assertEqual(pcm[:8192], bytes(8192))
-        for start in (4096, 5120, 6144):
-            self.assertNotEqual(pcm[2 * start:2 * (start + 768)], bytes(1536))
-            self.assertEqual(pcm[2 * (start + 768):2 * (start + 1024)], bytes(512))
-        raw, _, meta = edram.render_export(image, phrase, "alaw-unmasked", "", raw_cues=True)
-        self.assertNotEqual(raw, pcm)
-        self.assertNotIn("rendering", meta)
+    def test_sit_export_uses_source_pcm_and_menu_length(self):
+        source = ORIGINALS / "estd0aa.bin44"
+        image = edram.Image.read(source)
+        codes = b"".join(image.read_bytes(a, 256) + image.read_bytes(b, 512) * 4
+                         for a, b in ((0x1100, 0x1200), (0x1700, 0x1800), (0x1D00, 0x1E00)))
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest = edram.export(source, root, "alaw-unmasked")
+            entry = next(p for p in manifest["phrases"] if (p["bank"], p["number"]) == (0, 8))
+            self.assertEqual(entry["samples"], 3 * 2304)
+            with wave.open(str(root / source.stem / entry["wav"])) as wav:
+                self.assertEqual(wav.readframes(wav.getnframes()), edram.decode(codes))
 
     def test_length_words_extract_milliwatt_and_roh_at_known_addresses(self):
         image = edram.Image.read(ORIGINALS / "mwttone.txt80")
@@ -50,21 +56,19 @@ class ToneBankTests(unittest.TestCase):
         self.assertEqual(records[9][0]["frequencies_hz"], [1404, 2060, 2452, 2604])
         self.assertTrue(all(entry["codec"] == "mulaw-unmasked" for entry, _ in records))
 
-    def test_spanish_busy_lead_repair_preserves_the_recorded_burst(self):
+    def test_spanish_busy_preserves_lead_in(self):
         image = edram.Image.read(ORIGINALS / "scls10cj.bin44")
         phrase = next(p for p in image.phrases(strict=False) if p.bank == 1 and p.number == 7)
-        raw, _ = edram.render(image, phrase)
-        pcm, _, info = edram.render_export(image, phrase, "alaw-unmasked", "")
-        self.assertEqual(info["silenced_lead_samples"], 513)
-        self.assertEqual(pcm[:1026], bytes(1026))
-        self.assertEqual(pcm[1026:], raw[1026:])
-        self.assertNotEqual(pcm, raw)
+        pcm, _ = edram.render(image, phrase)
+        info = edram.tone_metadata(image, phrase, pcm, "alaw-unmasked")
+        self.assertIn("tone_name", info)
+        self.assertTrue(any(pcm[:1026]))
 
     def test_second_bank_has_two_dtmf_sets_and_exports_real_samples(self):
         source = ORIGINALS / "edrmtone.txt80"
         stored = list(tone_bank.records(edram.Image.read(source)))
         self.assertEqual(len(stored), 64)
-        self.assertEqual(tone_bank.repair_samples(stored[0][0], stored[0][1]), stored[17][1])
+        self.assertEqual((stored[0][1][3], stored[17][1][3]), (0x94, 0x54))
         for start, codec in ((21, "mulaw-unmasked"), (45, "alaw-unmasked")):
             group = stored[start:start + 16]
             self.assertEqual({entry["tone_name"].split()[1].rstrip(",") for entry, _ in group},
@@ -74,6 +78,12 @@ class ToneBankTests(unittest.TestCase):
             root = Path(directory)
             manifest = edram.export(source, root, "alaw-unmasked")
             self.assertEqual(sum(bool(t["wav"]) for t in manifest["tone_bank"]), 62)
+            phrase = next(p for p in manifest["phrases"] if (p["bank"], p["number"]) == (0, 41))
+            self.assertIsNone(phrase["wav"])
+            self.assertIn("overlaps standalone tone records", phrase["reason"])
+            original = manifest["tone_bank"][0]
+            with wave.open(str(root / source.stem / original["wav"])) as wav:
+                self.assertEqual(wav.readframes(wav.getnframes()), edram.decode(stored[0][1], original["codec"]))
             entry = manifest["tone_bank"][8]
             with wave.open(str(root / source.stem / entry["wav"])) as wav:
                 pcm = wav.readframes(wav.getnframes())

@@ -17,7 +17,6 @@ import wave
 
 from edram import BANK_SIZE, PAGE_SIZE
 from tone_bank import bank_clips, raw_bank_paths
-from tone_playback import ARCHIVE_INDEX
 
 NORTEL_CATALOG = Path(__file__).resolve().parent / "references" / "nortel-phrases.csv"
 NORTEL_GUIDE = "https://www.gbppr.net/bsp/297-1001-527.pdf"
@@ -38,41 +37,39 @@ def is_silence(pcm):
     return not samples or max(abs(s) for s in samples) <= 8
 
 
-TONE_FIELDS = ("rendering", "sit_components", "source_pcm_sha256", "tone_name", "tone_components", "frequencies_hz")
+TONE_FIELDS = ("tone_name", "tone_components", "frequencies_hz")
+OLD_TONE_FIELDS = ("rendering", "sit_components", "source_pcm_sha256", "reference_wav")
 
 
 def tone_clip_fields(entry):
     return {key: entry[key] for key in TONE_FIELDS if key in entry}
 
 
-def sit_references(root):
-    path = root.parent / "references" / "sit" / "index.json"
-    return json.loads(path.read_text(encoding="utf-8"))["clips"] if path.exists() else {}
-
-
 def refresh_tone_clips(root, clips):
-    references = sit_references(root)
     entries = {}
+    available = {}
     for path in root.glob("*/manifest.json"):
         manifest = json.loads(path.read_text(encoding="utf-8"))
+        available[path.parent.name] = {
+            (Path(path.parent.name) / p["wav"]).as_posix()
+            for p in chain(manifest["phrases"], manifest["segments"]) if p["wav"]
+        }
         entries.update({(Path(path.parent.name) / p["wav"]).as_posix(): p for p in manifest["phrases"]
                         if p["wav"] and ("_sit_" in p["label"] or p.get("tone_name"))})
-    changed = False
+    kept = [clip for clip in clips if clip["source"] not in available or clip["path"] in available[clip["source"]]]
+    changed = len(kept) != len(clips)
+    clips[:] = kept
     for clip in clips:
         entry = entries.get(clip["path"])
         if entry is None:
             continue
         fields = tone_clip_fields(entry)
         fields.update(seconds=entry["duration_seconds"], pcm_sha256=entry["pcm_sha256"])
-        if fields.get("rendering") in ("nortel-sit", "nortel-cue"):
-            fields["reference_wav"] = None
-        else:
-            fields["reference_wav"] = references.get(clip["path"], {}).get("path")
-        for key in TONE_FIELDS:
+        for key in TONE_FIELDS + OLD_TONE_FIELDS:
             if key in clip and key not in fields:
                 del clip[key]
                 changed = True
-        if entry.get("tone_name") and clip["content"] != "tone":
+        if clip["content"] != "tone":
             clip["asr_before_tone_identification"] = clip["transcript"]
             clip["transcript"] = {"text": "", "status": "tone", "review_recommended": False,
                                   "human_verified": False, "speaker": None}
@@ -85,7 +82,6 @@ def refresh_tone_clips(root, clips):
 
 def make_plan(root):
     clips = []
-    references = sit_references(root)
     tone_hashes = set()
     annotation_path = root.parent / "annotations.json"
     annotations = json.loads(annotation_path.read_text(encoding="utf-8")) if annotation_path.exists() else {}
@@ -119,8 +115,6 @@ def make_plan(root):
                               "description": annotation.get("label", ""), "annotation_provenance": annotation.get("provenance"),
                               **tone_clip_fields(p)})
     for clip in clips:
-        clip["reference_wav"] = (None if clip.get("rendering") in ("nortel-sit", "nortel-cue")
-                                 else references.get(clip["path"], {}).get("path"))
         if clip["pcm_sha256"] in tone_hashes:
             clip["content"] = "tone"
     tasks = {}
@@ -262,8 +256,6 @@ def apply_nortel_transcripts(clips, catalog):
 
 
 def write_player(root, clips, *, catalog_path=NORTEL_CATALOG):
-    index = root / ARCHIVE_INDEX
-    restored_tones = json.loads(index.read_text(encoding="utf-8"))["clips"] if index.is_file() else {}
     catalog = load_nortel_catalog(catalog_path)
     stored_tones = []
     raw_paths = set()
@@ -303,45 +295,20 @@ def write_player(root, clips, *, catalog_path=NORTEL_CATALOG):
             if t.get("text_source"):
                 words += '<small>Catalog-checked transcript</small>'
         url = html.escape(clip["path"], quote=True)
-        restored = restored_tones.get(clip["path"])
-        reference = clip.get("reference_wav")
-        rendering = clip.get("rendering")
-        if rendering in ("nortel-sit", "nortel-cue"):
-            primary = url
-            label = "Nortel SIT" if rendering == "nortel-sit" else "tone"
-            play = f'<button data-src="{url}" data-playback="{label}">Play {label}</button> '
-            direct = ""
-            restored = None
-            parts = clip["sit_components"] if rendering == "nortel-sit" else clip["tone_components"]
-            spec = " / ".join(
-                f'{part["frequency_hz"]:g} Hz × {part["duration_ms"]} ms' if part["frequency_hz"]
-                else f'{part["duration_ms"]} ms silence' for part in parts)
-            words = f'{words}<small>{spec}</small>'
-        elif reference:
-            primary = html.escape(reference, quote=True)
-            play = f'<button data-src="{primary}" data-playback="Generated standard reference">Standard SIT reference</button> '
-            direct = f' <button data-src="{url}" data-playback="Direct A-law">Direct A-law</button>'
+        if clip["kind"] == "tone-bank":
+            play = f'<button data-src="{url}">Play stored tone</button>'
         else:
-            primary = url
+            play = f'<button data-src="{url}">Play stored audio</button>'
+        if clip.get("frequencies_hz"):
+            details = ", ".join(f"{freq:g} Hz" for freq in clip["frequencies_hz"])
             if clip["kind"] == "tone-bank":
-                play = f'<button data-src="{url}" data-playback="Tone bank">Play tone</button> '
-            elif restored:
-                play = f'<button data-src="{url}" data-playback="Direct A-law">Direct A-law</button> '
-            else:
-                play = f'<button data-src="{url}">Play stored audio</button> '
-            direct = ""
-            if clip.get("frequencies_hz"):
-                spec = ", ".join(f"{freq:g} Hz" for freq in clip["frequencies_hz"])
-                if clip["kind"] == "tone-bank":
-                    spec += f' / sample address 0x{clip["sample_address"]:x} / {clip["codec"]}'
-                words = f'{words}<small>{spec}</small>'
-        compare = (f' <button data-src="{html.escape(restored, quote=True)}" data-playback="Loop experiment">Loop experiment</button>'
-                   if restored else "")
-        flag = ' data-comparison="true"' if rendering or restored or reference or clip.get("tone_name") else ""
+                details += f' / sample address 0x{clip["sample_address"]:x} / {clip["codec"]}'
+            words = f'{words}<small>{details}</small>'
+        flag = ' data-tone="true"' if clip["content"] == "tone" else ""
         rows.append(f'<tr data-kind="{clip["kind"]}" data-review="{str(bool(review)).lower()}"{flag}><td>{html.escape(title)}'
                     f'<small>{clip["kind"]}, {clip["seconds"]:.3f}s, {html.escape(t.get("language") or clip["content"])}</small></td>'
                     f'<td class="transcript">{words}<small class="review">{review}</small></td>'
-                    f'<td>{play}<a href="{primary}" download>WAV</a>{direct}{compare}</td></tr>')
+                    f'<td>{play} <a href="{url}" download>WAV</a></td></tr>')
     page = '''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
 <title>EDRAM announcement player and transcripts</title><style>
 body{max-width:1400px;margin:1rem auto;padding:0 1rem;font:16px system-ui;background:#101820;color:#edf4f9}a{color:#7ad8ff}
@@ -354,13 +321,13 @@ table{width:100%;border-collapse:collapse}td{padding:.65rem;border-bottom:1px so
 @media(max-width:700px){td{display:block}td:first-child{width:auto}header p{font-size:13px}}
 </style><header><h1>EDRAM announcement archive</h1><p>Catalog-checked transcripts include Nortel phrase names and intonation. Use Tone banks for individual MWTTONE and EDRMTONE records.</p>
 <input id="q" aria-label="Search the archive" placeholder="Search transcripts, tone names, loads or phrase IDs">
-<select id="kind" aria-label="Clip type"><option value="">All clips</option><option value="announcement" selected>Announcements</option><option value="segment">Speech and tone fragments</option><option value="tone-bank">Tone banks</option><option value="comparison">Tones and comparisons</option></select>
+<select id="kind" aria-label="Clip type"><option value="">All clips</option><option value="announcement" selected>Announcements</option><option value="segment">Speech and tone fragments</option><option value="tone-bank">Tone banks</option><option value="tone">Tones</option></select>
 <label><input type="checkbox" id="review" style="width:auto">Needs review</label><span id="count"></span>
 <audio controls id="player"></audio><div id="now">Select a recording</div><div id="words"></div></header>
 <table><tbody>ROWS</tbody></table><script>
 const player=document.querySelector('#player'), rows=[...document.querySelectorAll('tr')];
 function filter(){let n=0;const q=document.querySelector('#q').value.toLowerCase(),k=document.querySelector('#kind').value,r=document.querySelector('#review').checked;
-rows.forEach(row=>{const type=k==='comparison'?row.dataset.comparison==='true':!k||row.dataset.kind===k;row.hidden=!(row.textContent.toLowerCase().includes(q)&&type&&(!r||row.dataset.review==='true'));if(!row.hidden)n++;});document.querySelector('#count').textContent=' '+n+' clips';}
+rows.forEach(row=>{const type=k==='tone'?row.dataset.tone==='true':!k||row.dataset.kind===k;row.hidden=!(row.textContent.toLowerCase().includes(q)&&type&&(!r||row.dataset.review==='true'));if(!row.hidden)n++;});document.querySelector('#count').textContent=' '+n+' clips';}
 document.querySelectorAll('input,select').forEach(e=>e.addEventListener('input',filter));filter();
 document.addEventListener('click',e=>{if(e.target.dataset.src){const row=e.target.closest('tr');player.src=e.target.dataset.src;player.play();document.querySelector('#now').textContent=(e.target.dataset.playback||'Stored audio')+': '+row.cells[0].textContent;document.querySelector('#words').textContent=(row.querySelector('.words')||row.cells[1]).textContent;}});
 </script></html>'''.replace("ROWS", "\n".join(rows))

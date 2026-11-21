@@ -10,10 +10,9 @@ import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
 import struct
-from sit_reference import archived_profile, synthesize
 import tone_bank
 
-VERSION = "0.1.0"
+VERSION = "0.2.0"
 RATE = 8000
 BANK_SIZE = 0x40000
 PAGE_SIZE = 256
@@ -23,6 +22,10 @@ MAX_PHRASE_SAMPLES = RATE * 600
 
 class FormatError(ValueError):
     """An invalid container, table, or reference."""
+
+
+class ToneBankOverlap(FormatError):
+    """A phrase page range contains standalone tone-bank records."""
 
 
 @dataclass(frozen=True)
@@ -245,36 +248,16 @@ def render(image: Image, phrase: Phrase, codec="alaw-unmasked"):
     return b"".join(chunks), implicit
 
 
-def render_export(image, phrase, codec, source_hash, *, raw_sit=False, raw_cues=False):
-    pcm, implicit = render(image, phrase, codec)
-    if not raw_sit and "_sit_" in phrase_name(phrase):
-        try:
-            parts, profile_source = archived_profile((asdict(s) for s in phrase.segments),
-                                                     source_hash=source_hash, bank=phrase.bank, phrase=phrase.number)
-        except ValueError:
-            pass
-        else:
-            info = {"rendering": "nortel-sit", "sit_components": parts, "sit_profile_source": profile_source,
-                    "menu_samples": len(pcm) // 2, "source_pcm_sha256": hashlib.sha256(pcm).hexdigest()}
-            return synthesize(parts, rate=RATE), implicit, info
+def tone_metadata(image, phrase, pcm, codec):
+    """Identify known tones for display without changing their PCM."""
     if cue := tone_bank.cue_profile(image, phrase, BANK_SIZE, PAGE_SIZE):
         name, parts = cue
-        info = {"tone_name": name, "frequencies_hz": [750], "tone_components": parts}
-        if not raw_cues:
-            info.update(rendering="nortel-cue", menu_samples=len(pcm) // 2,
-                        source_pcm_sha256=hashlib.sha256(pcm).hexdigest())
-            return synthesize(parts, rate=RATE), implicit, info
-        return pcm, implicit, info
+        return {"tone_name": name, "frequencies_hz": [750], "tone_components": parts}
     if codec == "alaw-unmasked" and len(pcm) <= 2 * RATE * 2:
-        digest = hashlib.sha256(pcm).hexdigest()
-        if recorded := tone_bank.RECORDED_TONES.get(digest):
+        if recorded := tone_bank.RECORDED_TONES.get(hashlib.sha256(pcm).hexdigest()):
             name, frequencies = recorded
-            info = {"tone_name": name, "frequencies_hz": list(frequencies)}
-            if not raw_cues and (lead := tone_bank.RECORDED_LEAD_REPAIRS.get(digest)):
-                info.update(rendering="repaired-tone", source_pcm_sha256=digest, silenced_lead_samples=lead)
-                pcm = bytes(2 * lead) + pcm[2 * lead:]
-            return pcm, implicit, info
-    return pcm, implicit, {}
+            return {"tone_name": name, "frequencies_hz": list(frequencies)}
+    return {}
 
 
 def chunk(tag: bytes, data: bytes) -> bytes:
@@ -299,7 +282,14 @@ def phrase_name(phrase: Phrase):
     return f"phrase_{phrase.number:02d}"
 
 
-def export(path: Path, output: Path, codec: str, segments=False, overwrite=False, *, raw_sit=False, raw_tones=False):
+def check_voice_ranges(bank, segments, tone_ranges):
+    for segment in segments:
+        start = bank * BANK_SIZE + segment.page * PAGE_SIZE
+        if tone_bank.overlaps_records(start, segment.pages * PAGE_SIZE, tone_ranges):
+            raise ToneBankOverlap(f"page range at 0x{start:x} overlaps standalone tone records")
+
+
+def export(path: Path, output: Path, codec: str, segments=False, overwrite=False):
     image = Image.read(path)
     phrases = image.phrases(strict=False)
     folder = output / path.stem
@@ -309,7 +299,7 @@ def export(path: Path, output: Path, codec: str, segments=False, overwrite=False
     manifest = {"converter_version": VERSION, "source": path.name,
                 "source_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
                 "codec": codec, "sample_rate": RATE, "sample_width_bits": 16,
-                "codec_status": "legacy-compatible A-law expansion; hardware equivalence unverified",
+                "playback_model": "stored codes and whole-block repetition; card equivalence unverified",
                 "timing_status": "256 addressed samples per page at nominal 8000 Hz",
                 "record_count": len(image.records), "addressed_bytes": sum(image.coverage),
                 "overwrite_policy": "records applied in file order; later writes replace earlier bytes",
@@ -317,6 +307,8 @@ def export(path: Path, output: Path, codec: str, segments=False, overwrite=False
                 "invalid_phrases": image.invalid_phrases,
                 "zero_fill_policy": "unaddressed portions of referenced segments are zero codes; wholly absent non-silence segments are unavailable",
                 "phrases": [], "segments": []}
+    standalone = list(tone_bank.records(image))
+    tone_ranges = tone_bank.record_ranges(entry for entry, _ in standalone)
     available = {}
     for phrase in phrases:
         entry = asdict(phrase)
@@ -325,26 +317,12 @@ def export(path: Path, output: Path, codec: str, segments=False, overwrite=False
         entry["wav"] = None
         entry["label"] = phrase_name(phrase)
         try:
-            pcm, implicit, tone = render_export(image, phrase, codec, manifest["source_sha256"],
-                                                raw_sit=raw_sit or raw_tones, raw_cues=raw_tones)
+            pcm, implicit = render(image, phrase, codec)
+            check_voice_ranges(phrase.bank, phrase.segments, tone_ranges)
             relative = Path(f"bank_{phrase.bank:02d}") / (phrase_name(phrase) + ".wav")
-            rendering = tone.get("rendering")
-            if rendering == "nortel-sit":
-                manifest["sit_rendering"] = "nortel-sit"
-                write_wav(folder / relative, pcm, f"Nortel EDRAM SIT {phrase.number - 7}",
-                          "Sine synthesis from Nortel 297-1001-527 Table 4-2; 274/380 ms; peak PCM 5000.")
-            elif rendering == "nortel-cue":
-                manifest["cue_rendering"] = "nortel-cue"
-                write_wav(folder / relative, pcm, tone["tone_name"],
-                          "Measured 750 Hz; cadence from source phrase menu; peak PCM 5000.")
-            elif rendering == "repaired-tone":
-                manifest["cue_rendering"] = "nortel-cue"
-                write_wav(folder / relative, pcm, tone["tone_name"],
-                          f"Stored tone with {tone['silenced_lead_samples']} lead-in samples silenced.")
-            else:
-                write_wav(folder / relative, pcm, f"{path.stem} bank {phrase.bank} phrase {phrase.number}",
-                          f"source_sha256={manifest['source_sha256']}; codec={codec}; menu=0x{phrase.menu_address:x}")
-            entry.update(tone, samples=len(pcm) // 2, duration_seconds=len(pcm) / (2 * RATE))
+            write_wav(folder / relative, pcm, f"{path.stem} bank {phrase.bank} phrase {phrase.number}",
+                      f"source_sha256={manifest['source_sha256']}; codec={codec}; menu=0x{phrase.menu_address:x}")
+            entry.update(tone_metadata(image, phrase, pcm, codec))
             entry.update(wav=relative.as_posix(), implicit_zero_samples=implicit,
                          pcm_sha256=hashlib.sha256(pcm).hexdigest(), status="exported")
         except FormatError as exc:
@@ -357,6 +335,7 @@ def export(path: Path, output: Path, codec: str, segments=False, overwrite=False
             entry = {"bank": bank, "page": page, "pages": pages, "wav": None}
             try:
                 data, implicit = image.segment_bytes(bank, segment)
+                check_voice_ranges(bank, (segment,), tone_ranges)
                 relative = Path("segments") / f"bank_{bank:02d}_page_{page:04x}_pages_{pages:03d}.wav"
                 write_wav(folder / relative, decode(data, codec), f"{path.stem} bank {bank} page {page:04x}",
                           f"codec={codec}; repeats=1; implicit_zero_samples={implicit}")
@@ -364,10 +343,8 @@ def export(path: Path, output: Path, codec: str, segments=False, overwrite=False
             except FormatError as exc:
                 entry.update(status="unavailable", reason=str(exc))
             manifest["segments"].append(entry)
-    for entry, payload in tone_bank.records(image):
+    for entry, payload in standalone:
         if entry["wav"]:
-            if not raw_tones:
-                payload = tone_bank.repair_samples(entry, payload)
             pcm = decode(payload, entry["codec"])
             write_wav(folder / entry["wav"], pcm, entry["tone_name"],
                       f"Stored EDRAM tone bank waveform; codec={entry['codec']}.")
@@ -396,9 +373,8 @@ def write_browser(output: Path, manifests):
             name = f"{source} / bank {phrase['bank']} / {phrase['label']}"
             if phrase.get("tone_name"):
                 name += f' / {phrase["tone_name"]}'
-            play = "Play Nortel SIT" if phrase.get("rendering") == "nortel-sit" else "Play"
             rows.append(f'<tr><td>{html.escape(name)}</td><td>{phrase["duration_seconds"]:.3f}s</td>'
-                        f'<td><button data-src="{html.escape(url, quote=True)}">{play}</button> '
+                        f'<td><button data-src="{html.escape(url, quote=True)}">Play stored audio</button> '
                         f'<a href="{html.escape(url, quote=True)}" download>WAV</a></td></tr>')
         for clip in tone_bank.bank_clips(manifest):
             name = f"{source} / tone bank / {clip['label']} / {clip['tone_name']}"
@@ -412,7 +388,7 @@ a{color:#7ad8ff} input{font:inherit;padding:.6rem;width:95%} table{width:100%;bo
 td{padding:.55rem;border-bottom:1px solid #334452} button{padding:.35rem 1rem;cursor:pointer}
 header{position:sticky;top:0;background:#101820;padding:1rem 0} audio{width:100%;margin:1rem 0}
 </style><header><h1>EDRAM announcement archive</h1>
-<p>8 kHz, 16-bit mono PCM. Recognized SITs use Nortel's EDRAM frequencies and timing. IDs are bank-local.</p>
+<p>8 kHz, 16-bit mono PCM. WAVs expand the stored sample bytes at the addressed locations. IDs are bank-local.</p>
 <input id="filter" aria-label="Filter recordings" placeholder="Filter by source, tone name or phrase ID">
 <audio id="player" controls></audio><div id="playing">Select an announcement</div></header>
 <table><tbody>ROWS</tbody></table><script>
@@ -446,8 +422,7 @@ def main(argv=None):
     parser.add_argument("-o", "--output", type=Path, default=Path("edram-wav"))
     parser.add_argument("--inspect", action="store_true", help="validate and list tables without writing files")
     parser.add_argument("--codec", choices=tuple(PCM_TABLES), default="alaw-unmasked")
-    parser.add_argument("--raw-sit", action="store_true", help="expand SIT sample bytes with the selected codec")
-    parser.add_argument("--raw-tones", action="store_true", help="expand phrase tone bytes without sine synthesis")
+    parser.add_argument("--raw-sit", "--raw-tones", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--segments", action="store_true", help="also export each referenced segment without repeats")
     parser.add_argument("--overwrite", action="store_true", help="allow replacing outputs in existing source folders")
     parser.add_argument("--version", action="version", version=VERSION)
@@ -463,8 +438,7 @@ def main(argv=None):
                                   "invalid_phrases": image.invalid_phrases,
                                   "tone_bank": [entry for entry, _ in tone_bank.records(image)]}))
             else:
-                manifest = export(path, args.output, args.codec, args.segments, args.overwrite,
-                                  raw_sit=args.raw_sit, raw_tones=args.raw_tones)
+                manifest = export(path, args.output, args.codec, args.segments, args.overwrite)
                 manifests.append(manifest)
                 count = sum(p["status"] == "exported" for p in manifest["phrases"])
                 print(f"{path.name}: {count}/{len(manifest['phrases'])} phrases exported")

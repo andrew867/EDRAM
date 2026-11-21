@@ -7,17 +7,17 @@ import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from sit_reference import generate
+from archive.sit_reference import generate
 import edram
 
 
 def main():
-    generate(Path("audio"),Path("references/sit"))
+    generate(Path("audio"),Path("archive/examples/sit"))
     image=edram.Image.read(Path("data/original/estd0aa.bin44"))
     phrase=next(p for p in image.phrases() if p.bank==0 and p.number==9)
     raw,_=edram.render(image,phrase)
     a=np.frombuffer(raw,dtype="<i2").astype(float)
-    refs=json.loads(Path("references/sit/index.json").read_text())
+    refs=json.loads(Path("archive/examples/sit/index.json").read_text())
     ref=refs["clips"]["estd0aa/bank_00/phrase_09_sit_02.wav"]["path"]
     with wave.open(str(Path("audio")/ref)) as w:
         b=np.frombuffer(w.readframes(w.getnframes()),dtype="<i2").astype(float)
@@ -43,8 +43,8 @@ def main():
         axes[2].plot(freq,sp,label=label,linewidth=1)
     axes[2].set(xlim=(500,2300),ylim=(-110,0),xlabel="Frequency (Hz)",ylabel="Amplitude (dBFS), Hann gain corrected",title="Attack and sustain spectra on the same scale")
     axes[2].legend()
-    fig.savefig("research/sit-waveform-fft.svg")
-    fig.savefig("research/sit-waveform-fft.png",dpi=150)
+    fig.savefig("archive/measurements/sit-waveform-fft.svg")
+    fig.savefig("archive/measurements/sit-waveform-fft.png",dpi=150)
 
 
 if __name__=="__main__":

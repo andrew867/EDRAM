@@ -101,7 +101,7 @@ def generate(audio,output):
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("audio",type=Path)
-    parser.add_argument("--output",type=Path,default=Path("references/sit"))
+    parser.add_argument("--output",type=Path,default=Path("archive/examples/sit"))
     args=parser.parse_args()
     generate(args.audio,args.output)
 

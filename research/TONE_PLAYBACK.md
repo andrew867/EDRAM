@@ -1,75 +1,46 @@
-# EDRAM tone playback
+# EDRAM tone bytes and playback
 
-The default converter and the WAVs in the source bank folders render recognized SITs as three sine waves. The validated menu identifies each tone's pitch and short or long duration. The rendered tones use the EDRAM timings in [Nortel's Table 4-2](https://www.gbppr.net/bsp/297-1001-527.pdf#page=59). The [Appendix A table beginning at PDF page 288](https://www.gbppr.net/bsp/297-1001-527.pdf#page=288) lists the same pitches with the 288 and 384 ms DRAM timings.
+The factory loads contain companded waveform samples. The 750 Hz cue supplies a direct byte-level example. Its sustain holds repeated samples that already follow a 750 Hz carrier when expanded as A-law. The standalone banks store individual waveforms with a length header, including DTMF pairs and a pre-mixed receiver-off-hook howler. These bytes need no oscillator frequency to recover a waveform.
 
-| Component | Low | High |
-| --- | ---: | ---: |
-| First | 913.8 Hz | 985.2 Hz |
-| Second | 1370.6 Hz | 1428.5 Hz |
-| Third | 1776.7 Hz | |
+## Phrase tones from menu to WAV
 
-Each EDRAM component is 274 ms or 2,192 frames when short, and 380 ms or 3,040 frames when long. The WAVs use 8 kHz mono PCM with a peak value of 5,000, a 2 ms taper at each edge, and adjacent components. Level in dBm depends on the playback path. `--raw-sit` retains direct codec expansion for byte-level analysis.
+All offsets below refer to the reconstructed image after applying the transport records in file order.
 
-In `fstd0ba.bin44` bank 1 phrase 16, the valid-checksum pointer starts one four-byte slot early and omits the final sustain. The renderer recognizes the archived file hash and the exact anomalous menu. It uses bank 0's SIT 9 sequence, corroborated by Nortel, with 913.8 Hz for 380 ms followed by 1370.6 Hz and 1776.7 Hz for 274 ms each.
+| ESTD0AA bank 0 | Bytes | Meaning |
+| --- | --- | --- |
+| Phrase 1 at `0x0004` | `04 01 02 D5` | Submenu offset `0x0104`, two entries, checksum `D5` |
+| Submenu at `0x0104` | `0E 00 01 02` | Page 14 at `0x0E00`, one page, repeat twice |
+| Submenu at `0x0108` | `0F 00 01 03` | Page 15 at `0x0F00`, one page, repeat three times |
 
-The SIT export contains 285 WAVs and all 32 pitch and duration profiles. An FFT audit of the 855 components measured each peak within 0.01 Hz of its specified pitch. Every component contained exactly 2,192 or 3,040 frames, including its edge tapers.
+The last 128 bytes of page 15 are four exact copies of this 32-byte pattern.
 
-## Cues in the phrase tables
+~~~text
+02 84 86 87 87 84 02 04 06 06 04 81 84 86 87 86
+82 04 06 07 07 04 82 84 86 86 84 01 04 06 07 06
+~~~
 
-The test cue is a single 160 ms sine at 750 Hz. The prompt has 512 ms of silence, three 96 ms bursts with two 32 ms gaps, and 128 ms of trailing silence. This reproduces the 992 ms sequence described in [US6442246B1, Table 1](https://patents.google.com/patent/US6442246B1/en). Some Nortel catalog rows say 760 Hz. The shared sample bytes have a 750 Hz carrier, including the variant stored one byte before the nominal address. The archive contains 120 test cues and 120 prompt cues rendered at the measured pitch and the menu cadence.
+Unmasked A-law expands the block to 32 signed samples with three rising zero crossings in a circular traversal. That is three cycles in 4 ms, or **750 Hz**. A 32-byte period is evidence of a waveform table. The submenu supplies addresses, range lengths and repeat counts. The WAVE export repeats the 256-byte attack twice and the 256-byte sustain three times, for 1,280 frames (160 ms). It uses each page from its addressed location, including in banks where the recognizable cue bytes begin one byte earlier.
 
-Recorded cues retain the original waveform wherever the encoded samples already carry the signal. These include the ACTS alert (350 + 440 Hz followed by 480 + 620 Hz, four repeats), variants of the calling-card bong (941 + 1477 Hz onset and 350 + 440 Hz decay), and approximately 400 Hz CLASS prompts. The Spanish CLASS busy cue in `scls10cj` bank 1 phrase 7 has a full-scale glitch before the 480 + 620 Hz waveform. The repair zeros the first 513 samples and keeps the stored busy burst and total duration.
+SIT phrase 8 uses attack/sustain pairs with byte addresses `0x1100 / 0x1200`, `0x1700 / 0x1800`, and `0x1D00 / 0x1E00`. Each pair plays one attack page and four copies of a two-page sustain, giving 288 ms per component in the offline model. Page 24 has a repeated 64-byte period with an 11-cycle carrier (1,375 Hz). Nortel Table 4-2 lists 288/384 ms for legacy DRAM and 274/380 ms for EDRAM. The menu's 288 ms short and 384 ms long component lengths match the legacy DRAM column. The carryover is consistent with reused announcement data. It cannot establish how the EDRAM path produces the published timing. [ESTD0AA export manifest](../audio/estd0aa/manifest.json) · [Nortel DRAM and EDRAM Guide, Table 4-2](https://www.gbppr.net/bsp/297-1001-527.pdf#page=59)
 
-## MWTTONE and EDRMTONE
+At 8 kHz with unmasked A-law, the last 96 samples of the 750 Hz attack measure about 3,648 PCM RMS after removing the DC mean. The last 32 samples of the sustain measure 89 PCM RMS, about 32 dB quieter. Several SIT sustains are also roughly 33 dB below their attacks, while others have a quiet onset and a sustain near the attack level. Full-block replay preserves these differences. [Archived measurements](../archive/measurements/tone-fft-summary.json)
 
-Nortel documents the use of `MWTTONE` for both 102 milliwatt test trunks and receiver-off-hook service. In these archived S-records, the tone bank follows the announcement data at `0x2100`. Record lengths are big-endian counts of 16-bit words. Two companded 8-bit samples follow per word. Zero padding separates the first 17 records. The supplemental bank in `EDRMTONE` starts at `0x5e9e` and its 47 records are contiguous.
+## Standalone records
 
-| Record | Waveform address | Samples | Measured carrier or mixture |
-| --- | --- | ---: | --- |
-| 9 | `0x37a0` | 996 | 1004 Hz milliwatt |
-| 10 | `0x3bcc` | 2,000 | 1404 + 2060 + 2452 + 2604 Hz receiver off hook |
-| 11 | `0x43e4` | 996 | 948 Hz test carrier |
-| 22 to 37 | `0x6b28` through `0x825c` | 394 each | All 16 DTMF combinations, first set |
-| 46 to 61 | `0xc8b8` through `0xdfec` | 394 each | All 16 DTMF combinations, second set |
+`MWTTONE` and `EDRMTONE` share 17 records. `EDRMTONE` adds 47 records, including two DTMF sets and two constant-fill records. The two-byte big-endian count at the start of each record is the number of 16-bit words of payload. Each payload word holds two eight-bit sample codes. The exporter checks the archived regions and their record boundaries, then expands samples with the region's identified companding law. In these images, records with headers below `0xB5EA` use unmasked μ-law, and the rest use unmasked A-law. The law assignment comes from the archived waveform analysis. The header has no codec selector.
 
-Tone records before the header at `0xb5ea` fit unmasked G.711 mu-law best as a group. Those from `0xb5ea` onward fit unmasked A-law. For example, the 850 Hz carrier in the common bank has 1.33% RMS residual after a sine fit with mu-law and 4.70% with A-law. Its quieter supplemental counterpart has 1.24% with A-law and 5.36% with mu-law. The DTMF sets use a 394-sample period. Their measured pitches correspond to integer cycle counts in that period. The two constant-fill records are indexed without audio.
+| Record | Header address | Header bytes | Sample bytes | What decodes |
+| --- | --- | --- | --- | --- |
+| Shared record 9 | `0x379E` | `01 F2` | 996 | 1004 Hz milliwatt carrier |
+| Shared record 10 | `0x3BCA` | `03 E8` | 2,000 | Four-frequency receiver-off-hook howler |
+| EDRMTONE record 47 | `0xCA42` | `00 C5` | 394 | DTMF 1, second set, approximately 690 and 1218 Hz |
 
-In both files, record 1 differs from the copy in `EDRMTONE` record 18 by one sign bit at sample index 3. The WAV uses the matching copy's code `0x54` in place of `0x94`. The manifest records the edit and the hash of the original encoded record. `--raw-tones` retains the original code.
+The 394 samples in a DTMF record can represent whole cycles of both carriers. For DTMF 1, 34 and 60 cycles in 394 samples give about 690.4 and 1,218.3 Hz. The short WAVs contain the stored blocks. Service cadence and level are properties of playback on the card. `EDRMTONE` phrase 41 spans many standalone records. The converter flags that overlap and gives each record its own WAV. Record 1 retains code `0x94` at sample index 3, while the later copy in record 18 contains `0x54` there. [EDRMTONE manifest](../audio/edrmtone/manifest.json) · [MWTTONE manifest](../audio/mwttone/manifest.json)
 
-The 124.5 ms milliwatt and 250 ms howler WAVs preserve the stored samples. The switch supplies trunk cadence and output level.
+## What remains on the card
 
-[Nortel DRAM and EDRAM Guide, chapter 14](https://www.gbppr.net/bsp/297-1001-527.pdf#page=179) · [Stored MWTTONE WAVs](../audio/mwttone/tone-bank) · [EDRMTONE record index](../audio/edrmtone/manifest.json)
+Northern Telecom's patent describes prerecorded tones alongside words and silence in NT1X80AA memory. The Nortel guide names `MWTTONE.AA01` as the data file for the milliwatt and receiver-off-hook feature, with separate PM firmware: `EDRMAE01` or later for NT1X80AA, or `ED16AA01` or later for NT1X80BA. The announcement/tone archive supplies the data files. For SIT specifically, Nortel documents that SITLOAD downloads voice-file data into announcement RAM and that OFCENG.PM_PCM_PROTOCOL_SELECTION selects the coding law. Capture a SIT from the normal call-treatment path as well as through manual announcement playback. The paths may handle the same load differently. These sources establish what gets loaded and what the waveform bytes carry. They leave open whether firmware or dedicated logic applies the repeats, adjusts gain, or changes the phase, sample selection or cadence. [US6442246B1, description of Fig. 2](https://patents.google.com/patent/US6442246B1/en) · [Nortel DRAM and EDRAM Guide, Tone feature and chapter 14](https://www.gbppr.net/bsp/297-1001-527.pdf)
 
-## Earlier loop experiment
+A discriminating test uses the same low-level, asymmetric PCM block two ways: one page with repeat count three, and three consecutive copies with repeat count one. Capture both over a digital PRI with the same path settings and align them to a single-play control. Compare sample count, level, phase and restart position. A two-page pattern with different markers distinguishes whole-range repetition (`ABAB`) from page repetition (`AABB`). Repeat the comparison for the factory 750 Hz sustain and a silence page. A difference between repeated and explicitly duplicated pages isolates a playback effect of the repeat byte. A matching PM load and circuit-pack identification would support a separate firmware trace.
 
-In the archived text loads, all 22,036 addressed bytes of `mwttone.txt80` match the same addresses in `edrmtone.txt80` except the identifier byte at `0x0677`. Thus the shared tone region is byte-identical. Chapter 14 describes a distinct use of the NT1X80 to provide milliwatt and receiver-off-hook services, including test-trunk card emulation. The timing and output coding of those services require hardware characterization. A build of a voice load carries through the stored template tones verbatim.
-
-The phrase menus specify byte-page addresses and repeats. This experiment uses the same menu-derived duration as the direct A-law export and models each recognized tone as an attack followed by a steady loop. It keeps the first attack page, takes a whole-cycle waveform from the stored loop, and fits loop phase and gain against the final 96 samples of the attack. A 1 ms release taper reduces clicks at transitions. This is a reconstruction from stored data. Native EDRAM hardware behavior remains unverified.
-
-| Stored tone | Standard bank offset of loop | Measured frequency | Loop fit gain |
-| --- | ---: | ---: | ---: |
-| Test cue | `0x0f00` | 750 Hz | +32.14 dB |
-| First SIT, low | `0x1200` | 921.875 Hz | +32.90 dB |
-| First SIT, high | `0x1500` | 984.375 Hz | +32.59 dB |
-| Second SIT, low | `0x1800` | 1375 Hz | +33.44 dB |
-| Second SIT, high | `0x1b00` | 1437.5 Hz | 0 dB |
-| Third SIT | `0x1e00` | 1781.25 Hz | 0 dB |
-
-The six loop-to-attack correlations are at least 0.981. The first three SIT rows in the table sustain the expected frequency at roughly 33 dB below their attack. The two zero-gain SIT loops contain a quieter onset before their steady section. Repeating either full loop reintroduces the onset periodically, which adds sidebands and makes the third tone rougher. The experimental renderer repeats the steady waveform at the phase where the attack ends. The tone region is identical in `estd0aa.bin44` and `edrmtone.txt80` over addresses `0x0e00` through `0x1fff`.
-
-The 750 Hz cue also has a separate addressing issue. Across 118 banks, its 512-byte attack and loop occur at `0x0e00` in 95 banks and precisely one byte earlier in 23 banks. The renderer adjusts that address only when all 512 candidate bytes match the standard cue fingerprint. The standard SIT components use the page addresses listed above.
-
-| Example | Direct A-law | Restored loop | Menu duration |
-| --- | --- | --- | ---: |
-| SIT 2, `estd0aa`, bank 0, phrase 09 | [Historical WAV](https://github.com/andrew867/EDRAM/blob/c7933d2/audio/estd0aa/bank_00/phrase_09_sit_02.wav) | [WAV](tone-demos/sit-02-restored.wav) | 288 + 288 + 384 ms |
-| 750 Hz test, `eacts0ae`, bank 0, phrase 01 | [WAV](../audio/eacts0ae/bank_00/phrase_01.wav) | [WAV](tone-demos/test-750-restored.wav) | 160 ms |
-| Shifted 750 Hz test, `jpdmct00`, bank 0, phrase 01 | [WAV](../audio/jpdmct00/bank_00/phrase_01.wav) | [WAV](tone-demos/test-750-restored.wav) | 160 ms |
-
-Both restored 750 Hz examples have identical PCM. The test and three-pulse prompt menu timings correspond to the 160 ms and 992 ms cues in [US6442246B1, Table 1](https://patents.google.com/patent/US6442246B1/en). The separate [Bellcore comparison](../references/README.md) uses nominal standard timings of 274 + 274 + 380 ms for SIT 2.
-
-```sh
-python tone_playback.py data/original/estd0aa.bin44 compare/estd0aa
-python tone_playback.py data/original/jpdmct00.bin44 compare/jpdmct00
-```
-
-The experiment exports paired WAVs and JSON with addresses, durations, phase fits, gains, and skipped menus. Across the 61 reference loads it generates 524 pairs, including 284 SIT menus with the original page timings. The French pointer anomaly is omitted from the loop experiment. The `eaabs0hc` operator bong uses its stored waveform, including the fade, in the [main player](../audio/listen.html).
+Historical sine references and the phase/gain-fitting experiment remain in the [archive](../archive/README.md).

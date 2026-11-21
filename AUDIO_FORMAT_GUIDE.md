@@ -26,11 +26,11 @@ Take `EAOSS0AF`, bank 1, phrase 4. Nortel calls this phrase `AVRE08`, “Has bee
 | Read the submenu | `BF 02 39 01` means page `0x02BF`, 57 pages, play once. |
 | Read and decode | The range starts at `0x6BF00`. It covers 14,592 sample codes and plays for 1.824 seconds. |
 
-Speech uses unmasked G.711 A-law in these files. XOR each stored byte with `0x55` before passing it to a standard A-law decoder. The manifest tracks zero-fill for sparse regions. A wholly absent speech segment is flagged as unavailable. Recorded cues such as the calling-card bong also use phrase ranges. [Sample addressing and sparse data](FORMAT.md#menus) · [Recorded cue examples](research/TONE_PLAYBACK.md#cues-in-the-phrase-tables)
+Speech uses unmasked G.711 A-law in these files. XOR each stored byte with `0x55` before passing it to a standard A-law decoder. The manifest tracks zero-fill for sparse regions. A wholly absent speech segment is flagged as unavailable. Recorded cues such as the calling-card bong also use phrase ranges. [Sample addressing and sparse data](FORMAT.md#menus) · [Recorded cue examples](research/TONE_PLAYBACK.md#phrase-tones-from-menu-to-wav)
 
 ## SITs and the 750 Hz cues use phrase menus too
 
-The factory SIT menus reuse short attack and sustain ranges. In `ESTD0AA`, bank 0, phrase 8, the first component plays page 17 once, followed by four repetitions of the two-page range starting at page 18. Similar pairs select the other two pitches. Expanding those pages directly gives 288 ms per component. For the default WAV, the converter recognizes the menu and renders SIT 1 at 913.8, 1370.6, and 1776.7 Hz, each for 274 ms, using Nortel’s EDRAM timing. The recognized 750 Hz test and prompt cues also use waveform synthesis in the default export. [ESTD0AA manifest](audio/estd0aa/manifest.json) · [Nortel Table 4-2](https://www.gbppr.net/bsp/297-1001-527.pdf#page=59) · [Playback measurements](research/TONE_PLAYBACK.md)
+In ESTD0AA bank 0 phrase 8, the first SIT component plays page 17 once, then the two-page range starting at page 18 four times. Two more attack/sustain pairs supply the other pitches. That is 288 ms per component at 8 kHz. The converter expands those bytes, including their level differences. In the 750 Hz cue, the last 128 bytes of page 15 contain four identical 32-byte blocks. Each decodes to three cycles at 8 kHz. [Byte walk-through and playback measurements](research/TONE_PLAYBACK.md)
 
 ## Standalone tone banks have their own record boundaries
 

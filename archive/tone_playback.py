@@ -12,7 +12,7 @@ import struct
 from tempfile import TemporaryDirectory
 
 import edram
-import sit_reference
+from archive import sit_reference
 from tone_bank import CUE_SHA256, PROMPT_MENU, TEST_MENU
 
 

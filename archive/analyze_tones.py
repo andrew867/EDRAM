@@ -35,7 +35,7 @@ def measure(y):
 
 def main():
     root=Path("data/original")
-    output=Path("research")
+    output=Path("archive/measurements")
     output.mkdir(exist_ok=True)
     report={"status":"baseline measurement, not corrected playback","files":{}}
     for name in ("estd0aa","astd0ab","fstd0ba","edrmtone","mwttone","eaabs0hc"):

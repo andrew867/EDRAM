@@ -85,7 +85,7 @@ class TranscriptTests(unittest.TestCase):
             transcribe.write_player(root, [dict(clip, pcm_sha256="replacement")], catalog_path=catalog)
             self.assertNotIn("<code>NAME</code>", (root / "listen.html").read_text(encoding="utf-8"))
 
-    def test_player_links_all_three_sit_versions(self):
+    def test_player_links_only_stored_sit(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root / "tone-restoration.json").write_text(json.dumps({"clips": {"pack/sit.wav": "tones/restored.wav"}}))
@@ -93,12 +93,12 @@ class TranscriptTests(unittest.TestCase):
                     "label": "phrase_09_sit_02", "seconds": 0.96, "content": "tone",
                     "reference_wav": "../references/sit/example.wav", "transcript": {"text": ""}}
             transcribe.write_player(root, [clip])
-            page = (root / "listen.html").read_text()
-            self.assertIn('data-comparison="true"', page)
-            self.assertIn('data-src="tones/restored.wav" data-playback="Loop experiment"', page)
-            self.assertIn('href="../references/sit/example.wav" download', page)
-            self.assertIn('data-src="pack/sit.wav" data-playback="Direct A-law"', page)
-            self.assertIn('data-src="../references/sit/example.wav"', page)
+            page = (root / "listen.html").read_text(encoding="utf-8")
+            self.assertIn('data-tone="true"', page)
+            self.assertIn('data-src="pack/sit.wav"', page)
+            self.assertIn('href="pack/sit.wav" download', page)
+            self.assertNotIn("restored.wav", page)
+            self.assertNotIn("example.wav", page)
 
     def test_players_use_decoded_tones_instead_of_raw_bank_pages(self):
         with tempfile.TemporaryDirectory() as directory:

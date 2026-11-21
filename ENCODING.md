@@ -31,7 +31,7 @@ python encode_edram.py LABTONE.bin44 --phrase 40 greeting-8k.wav \
 | `dtmf:5` or `dtmf:5:2` | Key 5 from either archived DTMF set. Keys 0 through 9, A through D, star, and pound are available. Set 1 is the default. |
 | `mwttone:11` or `edrmtone:62` | Any playable record by its one-based number in the Tone banks view. |
 
-Synthetic tones use a short edge taper and a combined PCM peak limit of 5,000 before quantization. Archived A-law records retain their codes. Archived mu-law records are decoded and requantized to the announcement load's A-law format. Each stored record contributes its recorded samples, so the switch's tone-service cadence and output level are outside this encoding path.
+For a new user-specified tone, the encoder writes generated samples. They use a short edge taper and a combined PCM peak limit of 5,000 before quantization. Archived A-law records retain their codes. Archived mu-law records are decoded and requantized to the announcement load's A-law format. Each stored record contributes its recorded samples, so the switch's tone-service cadence and output level are outside this encoding path.
 
 The output uses regular announcement phrase playback in either `.bin44` or `.txt80` format. The factory tone and SIT slots below 40 are retained. Use [Tone playback notes](research/TONE_PLAYBACK.md) for record measurements and hardware status.
 

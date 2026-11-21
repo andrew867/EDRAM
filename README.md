@@ -2,13 +2,13 @@
 
 Extract individual announcements and reusable audio segments from DMS-100 / SL-100 EDRAM load files. Supports binary bin44 G-records and ASCII Motorola S-record txt80 files. Python 3.10 or newer; the converter itself has no dependencies.
 
-Speech extraction uses Joe Z's unmasked A-law mapping. Recognized SIT menus render as three synthesized sine waves using Nortel's documented EDRAM frequencies and durations. [Tone playback notes](research/TONE_PLAYBACK.md) describe the menu interpretation and earlier waveform experiments.
+The converter expands stored samples for speech, SITs, cue tones, and standalone tone banks. Phrase WAVs use the page order and repeat counts in the load. The exact output of the NT1X80 card still requires a bench comparison. [Tone byte layouts and measurements](research/TONE_PLAYBACK.md)
 
 ## Listen and search
 
 The reference import workflow writes original files under [data/original](data/original), all extracted WAVs under [audio](audio), and a searchable player at [audio/listen.html](audio/listen.html). Download or clone the repository and open that HTML file locally; GitHub's source preview does not execute its audio player.
 
-Choose **Tone banks** for individual `MWTTONE` and `EDRMTONE` waveforms, including the receiver-off-hook howler, milliwatt carriers, and both `EDRMTONE` DTMF sets. **Tones and comparisons** also includes SIT, the corrected 750 Hz cues, and recorded alert and calling-card tones. Page dumps that overlap tone-bank records are kept in the source exports for inspection. One example is `EDRMTONE` bank 0 phrase 41, which reads across both DTMF sets.
+Choose **Tone banks** for individual `MWTTONE` and `EDRMTONE` waveforms, including the receiver-off-hook howler, milliwatt carriers and both DTMF sets. The **Tones** view includes SITs, 750 Hz cues and recorded alerts. When a phrase or segment crosses standalone tone records, the manifest records the page reference and the player offers the individual tone WAVs.
 
 The transcription workflow uses multilingual Whisper small through faster-whisper, with voice activity detection, identical-PCM deduplication, six independent processing shards, per-segment timestamps and review flags. It processes announcements and reusable speech fragments. Known tone components and silence receive descriptive labels. JSON and CSV transcripts accompany the HTML player.
 
@@ -27,7 +27,7 @@ python verify_corpus.py samples decoded --json VALIDATION.json
 
 To use an existing archive, supply --archive /path/to/edram.tar.gz to fetch_samples.py. To inspect menus without writing audio, use python edram.py samples/estd0aa.bin44 --inspect.
 
-Output is 8 kHz, 16-bit mono PCM WAV with source and codec metadata. Every source has its own folder, every bank its own subfolder. Manifests retain source hashes, addresses, checksums, segment order and repetition counts, implicit zero-fill counts, ordered memory rewrites, invalid menus and unavailable references. `--segments` exports each referenced segment once without repeats. `--raw-sit` bypasses SIT synthesis. `--raw-tones` expands all phrase tone bytes directly. Recognized standalone tone bank records export to a `tone-bank/` subfolder with their measured companding law.
+Output is 8 kHz, 16-bit mono PCM WAV with source and codec metadata. Every source has its own folder, every bank its own subfolder. Manifests retain source hashes, addresses, checksums, segment order and repetition counts, implicit zero-fill counts, ordered memory rewrites, invalid menus and unavailable references. `--segments` exports each referenced segment once without repeats. Recognized standalone tone bank records export to a `tone-bank/` subfolder with their measured companding law.
 
 Existing output folders require explicit --overwrite. Prefer a new directory when changing settings; overwrite does not delete obsolete or unrelated files.
 
@@ -46,12 +46,13 @@ Existing output folders require explicit --overwrite. Prefer a new directory whe
 | Load files | 61 |
 | Memory banks | 118 |
 | Valid nonempty phrase menus | 2,890 |
-| Announcement WAVs | 2,873 |
-| Segment WAVs | 2,432 |
+| Announcement WAVs | 2,872 |
+| Segment WAVs | 2,426 |
 | Missing phrase payloads, skipped | 17 |
+| References overlapping standalone records, skipped | 7 |
 | Structurally invalid menus, flagged | 3 |
 
-The 2,873 announcement WAVs include 285 SIT renders covering 32 sequences and 240 corrected 750 Hz cues. The standalone banks add 79 waveform WAVs, with 17 records common to both files.
+The standalone banks add 79 waveform WAVs, with 17 records common to both files. The WAVs preserve source-code differences between copies.
 
 The two txt80 tone files contain menus referencing speech absent from those files. Those announcements are unavailable instead of fabricated as silence. In fstd0ba.bin44, bank 1, phrases 8, 11 and 20 have misaligned pointers; their raw entries and reasons remain in invalid_phrases.
 
@@ -63,7 +64,7 @@ The default alaw-unmasked expansion is byte-for-byte equivalent to standard G.71
 
 The older DRAM architecture is documented as using four-bit ADPCM. That alone does not establish a standard packed G.726 or IMA stream in these particular EDRAM files. No ADPCM decoder is currently implemented. A local G.726 trial failed to recover the speech that the unmasked G.711 expansions recovered.
 
-SIT attack pages and repeated pages have markedly different levels under direct byte expansion. The default SIT renderer interprets the menu and generates the specified tones at a fixed digital level. Original hardware gain and sample-byte playback remain unverified. [SIT derivation and measurements](research/TONE_PLAYBACK.md)
+Some SIT sustain blocks decode roughly 33 dB below their attacks. The stored waveforms and menu timing differ from parts of Nortel's published SIT table. The export preserves both the levels and the timing derived from the load. [Tone playback measurements](research/TONE_PLAYBACK.md)
 
 [T7316 ringer synthesis](ringer/README.md) implements four measured BCM set ringer patterns as a small C99 DSP renderer.
 
@@ -92,13 +93,12 @@ Nortel reference: [297-1001-527, DRAM and EDRAM Guide](https://www.gbppr.net/bsp
 
 The converter is a new Python implementation. Joe's C code, proprietary firmware and Nortel source code are not incorporated. The MIT license covers the new code, tests and documentation only; original load files and recordings retain their respective ownership.
 
-## SIT comparison signals
-
-The [waveform and FFT comparison](research/sit-waveform-fft.svg) shows the direct A-law baseline beside the documented sine synthesis. [Reference documentation](references/README.md) records the frequencies, durations and generation settings. Re-export the archive and rebuild the player using the existing transcripts with these commands.
+## Rebuild the player
 
 ~~~sh
 python edram.py data/original -o audio --segments --overwrite
-python tone_playback.py data/original audio --archive
 python transcribe.py index audio
 python verify_corpus.py data/original audio
 ~~~
+
+The index command reuses the checked-in transcripts and refreshes the metadata for decoded tones. The [archive](archive/README.md) retains earlier synthetic SIT references and loop-restoration experiments.

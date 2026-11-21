@@ -58,10 +58,9 @@ def stored_tone(component, banks):
         banks[source] = list(tone_bank.records(image))
     for entry, raw in banks[source]:
         if selector in (entry["index"], entry["tone_name"]) and entry["wav"]:
-            repaired = tone_bank.repair_samples(entry, raw)
             if entry["codec"] == "alaw-unmasked":
-                return repaired
-            pcm = edram.decode(repaired, entry["codec"])
+                return raw
+            pcm = edram.decode(raw, entry["codec"])
             return bytes(alaw_encode(value) for value, in struct.iter_unpack("<h", pcm))
     raise ValueError(f"no playable stored tone: {component!r}")
 

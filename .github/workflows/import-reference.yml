@@ -17,6 +17,7 @@ jobs:
       contents: write
     outputs:
       commit: ${{ steps.commit.outputs.commit }}
+      has_transcripts: ${{ steps.reindex.outputs.has_transcripts }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -38,29 +39,34 @@ jobs:
           from pathlib import Path
           p=Path("VALIDATION.json")
           d=json.loads(p.read_text())
-          assert (d["sources"],d["memory_banks"],d["validated_phrase_menus"],d["phrase_wavs"],d["segment_wavs"],d["unavailable_phrases"],d["invalid_menu_entries"]) == (61,118,2890,2873,2432,17,3)
-          d["unit_tests"]={"status":"passed","count":23}
+          assert (d["sources"],d["memory_banks"],d["validated_phrase_menus"],d["phrase_wavs"],d["segment_wavs"],d["unavailable_phrases"],d["invalid_menu_entries"]) == (61,118,2890,2872,2426,17,3)
+          assert (d["tone_bank_wavs"],d["tone_bank_overlaps"]) == (79,7)
+          d["unit_tests"]={"status":"passed"}
           d["human_listening_review"]=False
           d["reference_archive_sha256"]="88ab9decafafbb71642e5b58b9be91d1f9d6d801f00d838f1f16347506c27bf8"
           p.write_text(json.dumps(d,indent=2)+"\n")
           PY
-      - name: Measure tone spectra
+      - name: Refresh the searchable player from existing transcripts
+        id: reindex
         run: |
-          python -m pip install numpy
-          python analyze_tones.py
+          if [ -f audio/transcripts.json ]; then
+            python transcribe.py index audio
+            echo "has_transcripts=true" >> "$GITHUB_OUTPUT"
+          fi
       - name: Commit original data and extracted audio
         id: commit
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/original audio VALIDATION.json research
+          git add data/original audio VALIDATION.json
           if ! git diff --cached --quiet; then
-            git commit -m "Import verified EDRAM load files and 5305 extracted WAVs"
+            git commit -m "Import verified EDRAM load files and decoded audio"
             git push origin HEAD:main
           fi
           echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
   transcribe:
     needs: import
+    if: github.event_name == 'workflow_dispatch' || needs.import.outputs.has_transcripts != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 180
     strategy:

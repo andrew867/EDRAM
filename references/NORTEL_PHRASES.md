@@ -11,7 +11,7 @@
 | `catalog_note` | Short summary or component label based on the manual |
 | `printed_page` | Page number printed in the manual |
 | `pdf_page` | One-based PDF viewer page in the linked copy |
-| `pcm_sha256` | SHA-256 of the direct codec expansion's PCM frames. SIT metadata retains that hash when the player uses synthesized audio. |
+| `pcm_sha256` | SHA-256 of the exported PCM frames from the stored codes. |
 | `catalog_duration_seconds` | Total duration published by Nortel, or the sole printed duration |
 | `component_durations_seconds` | Individually listed component durations, separated by pipes |
 | `catalog_kind` | Speech, tone, silence, reserved, or unspecified |
