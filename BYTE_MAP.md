@@ -45,7 +45,7 @@ In the two standalone tone loads, the area at `0x2100` instead contains the comm
 
 ## Follow a real spoken announcement
 
-`EAOSS0AF` bank 1, phrase 4 (`AVRE08`) is a one-segment example. The records below are the records that supply the shown bytes.
+`EAOSS0AF` bank 1, phrase 4 (`AVRE08`) is a one-segment example. The file offsets below point to the start of the records that supply the shown bytes.
 
 | Step | Image address | File offset | What the bytes mean |
 | --- | --- | --- | --- |
@@ -55,6 +55,55 @@ In the two standalone tone loads, the area at `0x2100` instead contains the comm
 | Read the sample range | `0x6BF00–0x6F7FF` | Across multiple records | `57 × 256` gives 14,592 sample codes, or 1.824 seconds at 8 kHz. |
 
 The converter finds five holes within that sample range, totaling 288 unwritten addresses. It fills those with zero codes and records the count. Speech uses unmasked G.711 A-law, equivalent to XOR with `0x55` before standard A-law expansion. The decoded WAV uses 16-bit mono PCM. [Phrase manifest](audio/eaoss0af/manifest.json) · [AVRE08 WAV](audio/eaoss0af/bank_01/phrase_04.wav)
+
+## Follow real tone data
+
+### 750 Hz test tone in ESTD0AA bank 0, phrase 1
+
+This cue goes through the same phrase directory and submenu as speech. The repeat byte controls how many times the decoder plays the entire referenced page range. The file offsets in this table point to the first byte shown inside each `G0` or `G2` record.
+
+| Step | Image address | File offset in `estd0aa.bin44` | Bytes and meaning |
+| --- | --- | --- | --- |
+| Find phrase 1 | `0x0004` | `0x0000A` | `04 01 02 D5` points to submenu `0x0104` with two entries and checksum byte `D5`. |
+| Read the attack entry | `0x0104` | `0x00142` | `0E 00 01 02` selects page `0x0E`, one page, play twice. |
+| Read the sustain entry | `0x0108` | `0x00146` | `0F 00 01 03` selects page `0x0F`, one page, play three times. |
+| Read the attack page | `0x0E00` to `0x0EFF` | First stored byte at `0x0081A` | The first 96 addresses are unwritten. The converter supplies zero codes for them. Stored bytes begin at image address `0x0E60`. |
+| Read the sustain page | `0x0F00` to `0x0FFF` | First byte at `0x008DA` | Starts with stored samples `83 87 89 8A 8A 87 81 03`. |
+| Inspect the repeating part of the sustain | `0x0F80` to `0x0FFF` | First copy at `0x0097A` | Four identical copies of the 32-byte block below. |
+
+~~~text
+02 84 86 87 87 84 02 04 06 06 04 81 84 86 87 86
+82 04 06 07 07 04 82 84 86 86 84 01 04 06 07 06
+~~~
+
+Unmasked A-law expands the first eight codes of that block to `-40, 72, 104, 120, 120, 72, -40, -72`. The full block contains three cycles in 32 samples. At 8 kHz that gives `3 × 8000 / 32 = 750 Hz`. The WAV uses both full pages and the submenu's repeat counts, so it has `(2 + 3) × 256 = 1,280` frames, or 160 ms. [ESTD0AA source](data/original/estd0aa.bin44) · [750 Hz test WAV](audio/estd0aa/bank_00/phrase_01.wav)
+
+**SIT uses the same fields.** In phrase 8, the directory entry at image `0x0020` (file `0x00026`) is `34 01 06 20`. Its first two submenu entries at image `0x0134` (file `0x0017A`) are `11 00 01 01` and `12 00 02 04`. That plays page `0x11` once, then the whole `0x12` to `0x13` range four times. The remaining entries use the same pattern with pages `0x17` and `0x18` to `0x19`, then `0x1D` and `0x1E` to `0x1F`. Each component contributes `(1 + 2 × 4) × 256 = 2,304` frames, or 288 ms in the offline export. [SIT WAV](audio/estd0aa/bank_00/phrase_08_sit_01.wav) · [Playback measurements](research/TONE_PLAYBACK.md#phrase-tones-from-menu-to-wav)
+
+### Receiver off-hook howler in MWTTONE and EDRMTONE
+
+The standalone tone bank has its own boundaries. An `S2` line describes a write to the image. Inside that image, a tone record starts with a two-byte big-endian count of payload **words**. Each word holds two eight-bit sample codes. The howler length and sample bytes are identical in both loads. File offsets below are zero-based positions of the first ASCII hex character for the indicated byte. Line numbers start at 1. An `S2` line's payload begins after 10 ASCII characters. From there, advance two characters per image byte.
+
+| Step | Image address | Location in both `.txt80` files | Bytes and meaning |
+| --- | --- | --- | --- |
+| Read the tone length | `0x3BCA` to `0x3BCB` | Line 558, file byte `0x082E7`. The line writes from `0x3BB4`. | `03 E8` gives 1,000 words, or 2,000 sample bytes. |
+| Read the first samples | `0x3BCC` | Line 559, file byte `0x08306`. The line writes from `0x3BCC`. | Starts `D2 C1 49 E8 DC 76 65 F3`. |
+| Stop at the calculated boundary | `0x439A` to `0x439B` | Line 642, file byte `0x096CB`. The line writes from `0x4394`. | Last two sample codes are `69 61`. The next address, `0x439C`, is outside the waveform. |
+
+The first four codes expand with unmasked μ-law to `4604, 2108, -3132, 12412`. The four peaks in the 2,000-sample PCM block are 1404, 2060, 2452 and 2604 Hz. All four are already mixed into that one waveform, which lasts 250 ms at 8 kHz. The exporter derives the display label from the identified record. The WAV comes from expanding its sample codes. [MWTTONE source](data/original/mwttone.txt80) · [Howler WAV](audio/mwttone/tone-bank/tone_10.wav)
+
+### DTMF digit 1 in both EDRMTONE sets
+
+The same digit occurs twice. Both records have header `00 C5`, or 197 words. Each yields 394 frames (49.25 ms). The decoder selects the companding law by verified bank region. The word count carries only the length.
+
+| Record | Header location in `edrmtone.txt80` | Sample range | First codes and expansion |
+| --- | --- | --- | --- |
+| 23, first DTMF set | Image `0x6CB2`, line 1084, file byte `0x0FF59` | `0x6CB4` to `0x6E3D` | `71 75 68 D7` expands as unmasked μ-law to `-17788, -21884, -12412, 5884`. |
+| 47, second DTMF set | Image `0xCA42`, line 2083, file byte `0x1ED34` | `0xCA44` to `0xCBCD` | `5C 62 58 08` expands as unmasked A-law to `-7296, -9472, -6272, -136`. |
+
+Both decoded blocks have their strongest spectral peaks at 34 and 60 cycles per block, about 690.4 and 1218.3 Hz at 8 kHz. In the second set, `0xCA44 + 394 = 0xCBCE` lands on the next record's `00 C5` header. [EDRMTONE source](data/original/edrmtone.txt80) · [First-set digit 1 WAV](audio/edrmtone/tone-bank/tone_23.wav) · [Second-set digit 1 WAV](audio/edrmtone/tone-bank/tone_47.wav)
+
+**Why phrase 41 spans multiple tones.** At image `0x00A4` (line 7), `1C 05 05 9F` points to five entries at `0x051C` (lines 55 and 56). Two of those entries are `6A 00 56 01` and `C0 00 55 01`, selecting `0x6A00` to `0xBFFF` and `0xC000` to `0x114FF`. Each span cuts across multiple headers and sample payloads, including the DTMF records above. The exporter flags phrase 41 as unavailable for phrase playback. The player's **Tone banks** view uses the individual record WAVs. Switch cadence, gain and selection between the DTMF sets still need card measurements. [EDRMTONE manifest](audio/edrmtone/manifest.json) · [Bench status](BENCH_STATUS.md#tone-playback-test)
 
 ## Why the file and the image have different amounts of space
 
