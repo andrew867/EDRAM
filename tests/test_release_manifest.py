@@ -21,9 +21,9 @@ class ReleaseManifestTests(unittest.TestCase):
             output = base / "manifests"
             release_manifest.build("LABANN", output, [info, voice])
             loads = output / "LABANN.loads"
-            self.assertEqual(loads.read_bytes(), b"LABANN_INFO\r\nLABANN\r\n")
+            self.assertEqual(loads.read_bytes(), b"LABANN_INFO\nLABANN\n")
             self.assertEqual(loads.with_suffix(".chksum").read_bytes(),
-                             b"LABANN_INFO.txt 00001 1 NEW\r\nLABANN.bin44 1 2 NEW\r\n")
+                             b"LABANN_INFO.txt 00001 1 NEW\nLABANN.bin44 1 2 NEW\n")
             self.assertEqual(release_manifest.verify(loads, base), (2, []))
             with self.assertRaises(FileExistsError):
                 release_manifest.build("LABANN", output, [voice])

@@ -44,7 +44,7 @@ def build(name, output, paths):
         for path, lines in manifests:
             with path.open("xb") as stream:
                 created.append(path)
-                stream.write(("\r\n".join(lines) + "\r\n").encode("ascii"))
+                stream.write(("\n".join(lines) + "\n").encode("ascii"))
     except OSError:
         for path in created:
             path.unlink()
