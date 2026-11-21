@@ -1,10 +1,12 @@
 from pathlib import Path
 import sys
+import tempfile
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import edram
 import encode_edram
+import tone_bank
 
 
 class EncoderTests(unittest.TestCase):
@@ -41,6 +43,53 @@ class EncoderTests(unittest.TestCase):
                 else:
                     footer = int(data.splitlines()[-1][4:12], 16)
                 self.assertEqual(footer, encode_edram.word_checksum(r.data for r in records))
+
+    def test_tone_sequence_combines_generated_and_archived_audio(self):
+        codes = encode_edram.read_tone("350+440@100,silence@32,dtmf:5:2")
+        self.assertEqual(len(codes), 800 + 256 + 394)
+        self.assertGreater(len(set(codes[:800])), 20)
+        self.assertEqual(codes[800:1056], bytes(256))
+        image = edram.Image.read(encode_edram.TEMPLATE.with_name("edrmtone.txt80"))
+        dtmf = next(raw for entry, raw in tone_bank.records(image) if entry["tone_name"] == "DTMF 5, set 2")
+        self.assertEqual(codes[1056:], dtmf)
+
+    def test_howler_is_requantized_to_voice_format(self):
+        image = edram.Image.read(encode_edram.TEMPLATE.with_name("mwttone.txt80"))
+        raw = next(raw for entry, raw in tone_bank.records(image) if entry["index"] == 10)
+        nearest = edram.decode(encode_edram.read_tone("howler"))
+        original = edram.decode(raw, "mulaw-unmasked")
+        self.assertEqual(len(nearest), 4000)
+        self.assertNotEqual(nearest, original)
+        self.assertEqual(encode_edram.read_tone("mwttone:10"), encode_edram.read_tone("howler"))
+
+    def test_tone_cli_mixes_with_speech_in_both_transports(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            wav = root / "input.wav"
+            edram.write_wav(wav, b"\x00\x01" * 500, "Speech fixture", "")
+            for extension in ("bin44", "txt80"):
+                with self.subTest(extension=extension):
+                    output = root / f"LABTONE.{extension}"
+                    encode_edram.main([str(output), "--phrase", "40", str(wav),
+                                       "--tone", "41", "750@160", "--tone", "42", "dtmf:5"])
+                    image = edram.Image.read(output)
+                    phrases = {phrase.number: phrase for phrase in image.phrases()}
+                    for slot, codes in ((40, encode_edram.read_voice(wav)),
+                                        (41, encode_edram.read_tone("750@160")),
+                                        (42, encode_edram.read_tone("dtmf:5"))):
+                        pcm, holes = edram.render(image, phrases[slot])
+                        padded = codes.ljust((len(codes) + 255) // 256 * 256, b"\0")
+                        self.assertEqual((pcm, holes), (edram.decode(padded), 0))
+
+    def test_invalid_tone_specs_and_duplicate_ids(self):
+        for spec in ("", "4000@10", "750@0", "750@1.5", "silence@31713", "edrmtone:45", "dtmf:5:3"):
+            with self.subTest(spec=spec), self.assertRaises(ValueError):
+                encode_edram.read_tone(spec)
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "LABTONE.bin44"
+            with self.assertRaises(SystemExit):
+                encode_edram.main([str(output), "--tone", "40", "750@160", "--tone", "40", "howler"])
+            self.assertFalse(output.exists())
 
     def test_rejects_reserved_ids_and_exhausted_bank(self):
         with self.assertRaisesRegex(ValueError, "40 to 63"):

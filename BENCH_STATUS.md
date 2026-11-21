@@ -6,7 +6,7 @@ The converter, manifest generator, and SLM image writer have passed offline chec
 
 - `LABANN.tap` contains one named voice entry. Extraction reproduced the 18,216-byte `LABANN.bin44` byte for byte. The entry has 414 logical records of 44 bytes in 36 tape data blocks.
 - The original `EDRM0001.loads` was reproduced byte for byte. The companion `.chksum` uses a 16-bit BSD rotating checksum and 512-byte block counts. All 61 voice and tone payload checksums matched. The SLM release procedure restores the named voice file to disk. The sidecars are host-side inventories in the documented workflow.
-- The encoder currently targets one factory-style PROM bank based on `ESTD0AA`. It preserves the built-in tone and silence data and writes new speech into phrase slots 40 through 63. The voice area holds 31.712 seconds including per-phrase page padding.
+- The encoder currently targets one factory-style PROM bank based on `ESTD0AA`. It preserves the built-in tone and silence data and writes new speech and tone phrases into slots 40 through 63. The voice area holds 31.712 seconds including per-phrase page padding.
 
 [Encoder and datafill procedure](ENCODING.md) · [Tape layout and release manifests](SLM_TAPE.md) · [Offline corpus results](VALIDATION.json)
 
