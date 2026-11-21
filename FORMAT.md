@@ -1,5 +1,7 @@
 # Recovered EDRAM format
 
+See the [byte map](BYTE_MAP.md) for a file-to-image walkthrough, an annotated spoken phrase, and the archive coverage audit.
+
 This describes the examined EDRM0001 version 010 files, not every historical DRAM/EDRAM format.
 
 ## G-record transport
