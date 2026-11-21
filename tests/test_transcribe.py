@@ -64,6 +64,27 @@ class TranscriptTests(unittest.TestCase):
             self.assertIn("&lt;script&gt;alert(1)&lt;/script&gt;", page)
             self.assertNotIn("<script>alert(1)</script>", page)
 
+    def test_player_joins_catalog_only_to_the_matching_announcement(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            catalog = root / "catalog.csv"
+            catalog.write_text(
+                "load,bank,phrase,nortel_name,catalog_note,printed_page,pdf_page,pcm_sha256\n"
+                "pack,0,4,NAME,<catalog text>,17-35,285,original\n",
+                encoding="utf-8",
+            )
+            clip = {"path": "pack/test.wav", "source": "pack", "kind": "announcement",
+                    "bank": 0, "label": "phrase_04_sit_01", "seconds": 1, "content": "speech",
+                    "pcm_sha256": "original", "transcript": {"text": "Existing transcription"}}
+            transcribe.write_player(root, [clip], catalog_path=catalog)
+            page = (root / "listen.html").read_text(encoding="utf-8")
+            self.assertIn("<code>NAME</code>", page)
+            self.assertIn("#page=285", page)
+            self.assertIn("&lt;catalog text&gt;", page)
+            self.assertIn('<span class="words">Existing transcription</span>', page)
+            transcribe.write_player(root, [dict(clip, pcm_sha256="replacement")], catalog_path=catalog)
+            self.assertNotIn("<code>NAME</code>", (root / "listen.html").read_text(encoding="utf-8"))
+
     def test_player_links_all_three_sit_versions(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

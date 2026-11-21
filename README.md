@@ -12,6 +12,8 @@ Choose **Tone comparisons** in the player to browse SIT, the 750 Hz test, and th
 
 The transcription workflow uses multilingual Whisper small through faster-whisper, with voice activity detection, identical-PCM deduplication, six independent processing shards, per-segment timestamps and review flags. It processes announcements and reusable speech fragments. Known tone components and silence receive descriptive labels instead of invented dialogue. Transcripts are machine generated and not human verified. JSON and CSV transcripts accompany the HTML player.
 
+Search the player by a Nortel mnemonic such as `plsdep` or browse source pages from the [phrase catalog](references/NORTEL_PHRASES.md). The player shows documented names and catalog summaries above the machine transcript.
+
 A listener identified eaabs0hc.bin44, bank 0, phrase 4 as the calling-card / operator bong with fade. Tone FFT measurements are recorded in [research](research).
 
 ## Convert

@@ -8,12 +8,16 @@ import csv
 import hashlib
 import html
 import json
+import re
 import signal
 from pathlib import Path
 import sys
 import wave
 
 from tone_playback import ARCHIVE_INDEX
+
+NORTEL_CATALOG = Path(__file__).resolve().parent / "references" / "nortel-phrases.csv"
+NORTEL_GUIDE = "https://www.gbppr.net/bsp/297-1001-527.pdf"
 
 
 def read_pcm(path):
@@ -150,15 +154,41 @@ def run_shard(root, plan_path, output, shard, shards, model_size, resume_parts=N
         output.write_text(json.dumps({"shard": shard, "shards": shards, "results": results}), encoding="utf-8")
 
 
-def write_player(root, clips):
+def load_nortel_catalog(path):
+    if not path.is_file():
+        return {}
+    with path.open(encoding="utf-8", newline="") as file:
+        rows = {}
+        for row in csv.DictReader(file):
+            key = (row["load"].casefold(), int(row["bank"]), int(row["phrase"]), row["pcm_sha256"])
+            if key in rows:
+                raise ValueError(f"duplicate Nortel catalog key: {key[:3]}")
+            rows[key] = row
+    return rows
+
+
+def write_player(root, clips, *, catalog_path=NORTEL_CATALOG):
     index = root / ARCHIVE_INDEX
     restored_tones = json.loads(index.read_text(encoding="utf-8"))["clips"] if index.is_file() else {}
+    catalog = load_nortel_catalog(catalog_path)
     rows = []
     for clip in clips:
         t = clip["transcript"]
         text = t["text"] or (clip.get("description") or ("[Silence]" if clip["content"] == "silence" else "[Tone sequence or component]" if clip["content"] == "tone" else "[No speech detected, review]"))
         review = "Review" if t.get("review_recommended") else ""
         title = f"{clip['source']} / bank {clip['bank']} / {clip['label']}"
+        words = html.escape(text)
+        phrase = re.match(r"phrase_(\d+)(?:_|$)", clip["label"]) if clip["kind"] == "announcement" else None
+        key = (clip["source"].casefold(), clip["bank"], int(phrase[1]), clip.get("pcm_sha256")) if phrase else None
+        entry = catalog.get(key)
+        if entry:
+            name, note = html.escape(entry["nortel_name"]), html.escape(entry["catalog_note"])
+            page = html.escape(entry["printed_page"])
+            source = f'{NORTEL_GUIDE}#page={int(entry["pdf_page"])}'
+            heading = f' <code>{name}</code>' if name else ""
+            description = f'<small>{note}</small>' if note else ""
+            details = f'<div class="catalog">Nortel catalog{heading} <a href="{source}">p. {page}</a>{description}</div>'
+            words = f'{details}<span class="words">{words}</span>'
         url = html.escape(clip["path"], quote=True)
         restored = restored_tones.get(clip["path"])
         reference = clip.get("reference_wav")
@@ -176,7 +206,7 @@ def write_player(root, clips):
         flag = ' data-comparison="true"' if restored or reference else ""
         rows.append(f'<tr data-kind="{clip["kind"]}" data-review="{str(bool(review)).lower()}"{flag}><td>{html.escape(title)}'
                     f'<small>{clip["kind"]}, {clip["seconds"]:.3f}s, {html.escape(t.get("language") or clip["content"])}</small></td>'
-                    f'<td class="transcript">{html.escape(text)}<small class="review">{review}</small></td>'
+                    f'<td class="transcript">{words}<small class="review">{review}</small></td>'
                     f'<td>{play}<a href="{primary}" download>WAV</a>{direct}{compare}</td></tr>')
     page = '''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
 <title>EDRAM announcement player and transcripts</title><style>
@@ -185,9 +215,10 @@ header{position:sticky;top:0;background:#101820;padding:.6rem 0;border-bottom:1p
 input,select,button{font:inherit;padding:.4rem}input{width:min(650px,80%)}audio{width:100%;height:38px}
 table{width:100%;border-collapse:collapse}td{padding:.65rem;border-bottom:1px solid #334452}td:first-child{width:31%}small{display:block;color:#a5bac9}.review{color:#ffc46b}
 #now{margin:.5rem 0;color:#9ee5ff}#words{white-space:pre-wrap}.transcript{max-width:650px}button{cursor:pointer}
+.catalog{margin-bottom:.35rem;color:#a5bac9;font-size:.86rem}.catalog code{color:#edf4f9}.catalog a{margin-left:.2rem}
 @media(max-width:700px){td{display:block}td:first-child{width:auto}header p{font-size:13px}}
-</style><header><h1>EDRAM announcement archive</h1><p>Machine transcripts await human review. Standard SIT references use documented EDRAM timing. Direct A-law and the loop experiment play alternate interpretations of the load bytes.</p>
-<input id="q" aria-label="Search transcripts" placeholder="Search words, source or phrase ID">
+</style><header><h1>EDRAM announcement archive</h1><p>Nortel catalog names and summaries appear above the machine transcripts when available. Standard SIT references use documented EDRAM timing.</p>
+<input id="q" aria-label="Search the archive" placeholder="Search catalog names, transcripts, loads or phrase IDs">
 <select id="kind" aria-label="Clip type"><option value="">All clips</option><option value="announcement" selected>Announcements</option><option value="segment">Speech and tone fragments</option><option value="comparison">Tone comparisons</option></select>
 <label><input type="checkbox" id="review" style="width:auto">Needs review</label><span id="count"></span>
 <audio controls id="player"></audio><div id="now">Select a recording</div><div id="words"></div></header>
@@ -196,7 +227,7 @@ const player=document.querySelector('#player'), rows=[...document.querySelectorA
 function filter(){let n=0;const q=document.querySelector('#q').value.toLowerCase(),k=document.querySelector('#kind').value,r=document.querySelector('#review').checked;
 rows.forEach(row=>{const type=k==='comparison'?row.dataset.comparison==='true':!k||row.dataset.kind===k;row.hidden=!(row.textContent.toLowerCase().includes(q)&&type&&(!r||row.dataset.review==='true'));if(!row.hidden)n++;});document.querySelector('#count').textContent=' '+n+' clips';}
 document.querySelectorAll('input,select').forEach(e=>e.addEventListener('input',filter));filter();
-document.addEventListener('click',e=>{if(e.target.dataset.src){const row=e.target.closest('tr');player.src=e.target.dataset.src;player.play();document.querySelector('#now').textContent=(e.target.dataset.playback||'Stored audio')+': '+row.cells[0].textContent;document.querySelector('#words').textContent=row.cells[1].textContent;}});
+document.addEventListener('click',e=>{if(e.target.dataset.src){const row=e.target.closest('tr');player.src=e.target.dataset.src;player.play();document.querySelector('#now').textContent=(e.target.dataset.playback||'Stored audio')+': '+row.cells[0].textContent;document.querySelector('#words').textContent=(row.querySelector('.words')||row.cells[1]).textContent;}});
 </script></html>'''.replace("ROWS", "\n".join(rows))
     (root / "listen.html").write_text(page, encoding="utf-8")
 
