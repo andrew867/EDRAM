@@ -56,6 +56,39 @@ In the two standalone tone loads, the area at `0x2100` instead contains the comm
 
 The converter finds five holes within that sample range, totaling 288 unwritten addresses. It fills those with zero codes and records the count. Speech uses unmasked G.711 A-law, equivalent to XOR with `0x55` before standard A-law expansion. The decoded WAV uses 16-bit mono PCM. [Phrase manifest](audio/eaoss0af/manifest.json) · [AVRE08 WAV](audio/eaoss0af/bank_01/phrase_04.wav)
 
+## Why the file and the image have different amounts of space
+
+The `44` in `.bin44` is the logical **record length**. Nortel’s FTP naming convention uses a numeric suffix for record length, so `.bin99` would describe a different record size in that convention. An EDRAM load carries addressed writes, and its last data record can stop inside a logical bank. In this archive, 56 of the 59 binary loads do. For example, `SMRG101C` ends just before address `0x39C00`, leaving `0x39C00–0x3FFFF` unwritten in its logical bank. Nortel describes the NT1X80 EDRAM announcement data as downloadable, with RAM used for phrase storage. The loader’s treatment of unsent addresses remains unverified. [Nortel EIU User Guide, Appendix C](https://www.gbppr.net/bsp/297-8991-910.pdf) · [Nortel DRAM and EDRAM Guide, chapters 3 and 12](https://www.gbppr.net/bsp/297-1001-527.pdf)
+
+`ESTD0AA` illustrates how a file can be larger than its logical bank even with holes.
+
+| Quantity | Bytes | What they represent |
+| --- | ---: | --- |
+| On-disk `.bin44` file length | 356,092 | All binary records, including the final `G6`. |
+| Addressed payload in those records | 290,792 | Includes 31,696 bytes written to addresses already seen. |
+| Data-record framing plus `G6` | 64,780 | Eight framing bytes per data record, plus the 44-byte footer. |
+| Padding in short data records | 520 | Bytes carried on disk that do not write to the image. |
+| Logical image bank extent | 262,144 | `0x00000–0x3FFFF`. |
+| Distinct image addresses actually written | 259,096 | Payload coverage after accounting for overlapping writes. |
+| Unwritten image addresses | 3,048 | No record supplies those addresses. The offline converter fills holes with zero codes where needed to render a phrase. |
+
+The 501 bytes from the coverage audit are another quantity. They were explicitly loaded, have values other than `00` and `FF`, and fall outside the structures the audit marked. That count excludes record padding and all unwritten addresses.
+
+`ESTD0AA` has 12 inactive phrase slots, while valid phrases already reference every sample page from `0x21` to `0x3FF`. Adding an announcement needs a directory slot, submenu space, and sample pages. The encoder makes room by rebuilding the custom-phrase area from `0x2100`, using the template’s reserved entries and tone pages. [Encoder layout](ENCODING.md) · [Loaded-byte coverage audit](#where-the-map-is-still-incomplete)
+
+## Why a page can be missing from `segments`
+
+`--segments` exports one single-pass WAV for each distinct referenced `(bank, starting page, page count)` range. In `bank_00_page_0012_pages_002.wav`, `0012` is **hexadecimal**, and `002` is a **decimal page count**. That file contains pages `0x12` and `0x13` together. Repeat counts live in the phrase submenus and are applied when building the full phrase. [ESTD0AA segment WAVs](audio/estd0aa/segments) · [Segment and phrase manifest](audio/estd0aa/manifest.json)
+
+| Page in `ESTD0AA`, bank 0 | Image range | Reason for the export result |
+| --- | --- | --- |
+| `0x0A`, decimal 10 | `0x0A00–0x0AFF` | Unwritten, with no phrase reference. |
+| `0x0D`, decimal 13 | `0x0D00–0x0DFF` | Unwritten, but referenced as silence. The exporter writes a one-page silence segment with 256 zero-filled sample codes. |
+| `0x10`, decimal 16 | `0x1000–0x10FF` | Unwritten, with no phrase reference. This is the missing `page_0010` in the listing. |
+| `0x13`, decimal 19 | `0x1300–0x13FF` | Written and used by ranges that start at `0x12`. No segment begins at `0x13`. |
+
+Page `0x10` has different uses in other loads. `EAOSS0AF` references it as silence, and `EMCCS0CA` stores two submenus at the start of that page. The filename list reflects each load’s actual phrase references. [EAOSS0AF manifest](audio/eaoss0af/manifest.json) · [EMCCS0CA manifest](audio/emccs0ca/manifest.json)
+
 ## Where the map is still incomplete
 
 The coverage audit counted distinct addresses actually supplied by the 61 archive files across 118 parsed banks. It marked the phrase directories, validated submenus, 16-byte identifier areas, the sample ranges referenced by valid phrases, and recognized tone records. An address matched by two structures was counted once. Unwritten addresses and file framing were outside the tally.

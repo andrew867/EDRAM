@@ -28,23 +28,31 @@ The txt80 files contain S2 ASCII data with standard byte count, 24-bit address a
 
 ## Menus
 
-The examined bank spacing is 0x40000 bytes. A 64-entry, 256-byte phrase menu begins each bank.
+Each `0x40000`-byte bank begins with a 256-byte phrase directory. The **phrase number is the slot index**, so its four-byte entry starts at `bank_base + 4 × phrase_number`. The entry gives a byte offset to the first submenu word and how many words to read in order.
 
-| Relative offset | Length | Meaning |
+| Offset in the directory entry | Width | Meaning |
 | --- | ---: | --- |
-| 0 | 2 | Little-endian submenu offset, relative to bank |
-| 2 | 1 | Submenu entry count |
-| 3 | 1 | Phrase checksum |
+| `0` | 2 bytes | Little-endian submenu byte offset relative to the bank base |
+| `2` | 1 byte | Number of four-byte submenu entries |
+| `3` | 1 byte | Checksum byte |
 
-All-ff and all-zero entries are inactive. An active menu's four bytes plus every referenced submenu byte sum to zero modulo 256. Some inactive zero-filled table regions are omitted from transport. Active submenu bytes must be present.
+All-`FF` and all-`00` directory entries are inactive. For an active slot, the four directory bytes plus all `4 × count` selected submenu bytes sum to zero modulo 256. The submenu bytes must be present in the address records. The submenu area usually begins at `0x0100`. `EMCCS0CA` has two submenus at `0x1000–0x1027`, beyond the identifier near `0x0670`.
 
-Most submenus start at 0x100; emccs0ca extends two into 0x1000 through 0x1027. Do not assume that submenus end at the filename around 0x670.
+### Submenu entry layout
 
-Each submenu entry has a little-endian two-byte page number, one-byte page count and one-byte repetition count. The baseline interpretation reads at bank * 0x40000 + page * 256, takes page_count * 256 sample codes, and repeats that whole segment repeat_count times. This interpretation still requires hardware confirmation for tones.
+| Offset in the submenu entry | Width | Meaning |
+| --- | ---: | --- |
+| `0` | 2 bytes | Little-endian starting sample page |
+| `2` | 1 byte | Number of consecutive pages in this range |
+| `3` | 1 byte | Number of times to play the whole range |
 
-Pages 13 and 16 commonly supply silence. Unaddressed parts of a referenced segment are zero codes and their count is recorded. Wholly absent non-silence segments are unavailable. Sparse partial dumps cannot prove completeness.
+The converter reads `page_count × 256` sample codes starting at `bank_base + page × 0x100` and repeats that range `repeat_count` times before advancing to the next entry. At 8 kHz, 256 sample codes represent 32 ms.
 
-Standard SIT menus 8 through 39 combine attack pages 17, 20, 23, 26 and 29 with repeated two-page components beginning at 18, 21, 24, 27 and 30. IDs are bank-local; phrase 8 in another pack may contain speech. SIT labels require the corresponding menu structure rather than just the phrase number.
+For example, `ESTD0AA` bank 0 phrase 8 has directory bytes `34 01 06 20` at `0x0020`. It points to six entries starting at `0x0134`. The first two entries, `11 00 01 01` and `12 00 02 04`, say to play page `0x11` once, then play the two-page range `0x12–0x13` four times. The default SIT export interprets the resulting menu using Nortel’s documented timing. Hardware handling of the raw tone samples remains a bench question. [Worked speech offsets](BYTE_MAP.md#follow-a-real-spoken-announcement) · [SIT playback notes](research/TONE_PLAYBACK.md)
+
+Pages 13 and 16 in decimal commonly supply silence. Unaddressed parts of a referenced segment are supplied as zero codes and counted in the manifest. The converter flags a wholly absent non-silence segment as unavailable. [Page filenames and unwritten ranges](BYTE_MAP.md#why-a-page-can-be-missing-from-segments)
+
+Standard SIT menus 8 through 39 combine attack pages 17, 20, 23, 26 and 29 with repeated two-page components beginning at 18, 21, 24, 27 and 30. IDs are bank-local, and phrase 8 in another pack may contain speech. SIT labels require the corresponding menu structure.
 
 ## Standalone tone banks
 
