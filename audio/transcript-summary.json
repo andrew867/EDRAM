@@ -9,11 +9,12 @@
   "status_counts": {
     "silence": 618,
     "tone": 899,
-    "transcribed": 3503,
-    "no_speech_detected": 285
+    "transcribed": 3516,
+    "no_speech_detected": 272
   },
   "review_recommended": 1599,
   "human_listening_review": false,
   "speaker_identities_assigned": false,
-  "unused_results_reclassified_as_non_speech": 0
+  "unused_results_reclassified_as_non_speech": 0,
+  "catalog_checked_transcripts": 797
 }

@@ -197,11 +197,56 @@ def load_nortel_catalog(path):
     with path.open(encoding="utf-8", newline="") as file:
         rows = {}
         for row in csv.DictReader(file):
+            if not row["pcm_sha256"]:
+                continue
             key = (row["load"].casefold(), int(row["bank"]), int(row["phrase"]), row["pcm_sha256"])
             if key in rows:
                 raise ValueError(f"duplicate Nortel catalog key: {key[:3]}")
             rows[key] = row
     return rows
+
+
+def catalog_entry(clip, catalog):
+    if clip["kind"] != "announcement":
+        return None
+    phrase = re.match(r"phrase_(\d+)(?:_|$)", clip["label"])
+    if not phrase:
+        return None
+    pcm_hash = clip.get("source_pcm_sha256", clip.get("pcm_sha256"))
+    return catalog.get((clip["source"].casefold(), clip["bank"], int(phrase[1]), pcm_hash))
+
+
+def apply_nortel_transcripts(clips, catalog):
+    changed = False
+    for clip in clips:
+        old = clip["transcript"]
+        entry = catalog_entry(clip, catalog) or {}
+        preferred = entry.get("transcript_text")
+        if not preferred and "catalog_page" not in old and not entry.get("intonation") and not entry.get("category"):
+            continue
+        t = old.copy()
+        t["text"] = t.pop("asr_text", t["text"])
+        t["status"] = t.pop("asr_status", t["status"])
+        for field in ("text_source", "catalog_page", "intonation", "catalog_category"):
+            t.pop(field, None)
+        if preferred and clip["content"] == "speech":
+            if preferred != t["text"]:
+                t["asr_text"] = t["text"]
+                t["text"] = preferred
+            if t["status"] == "no_speech_detected":
+                t["asr_status"] = t["status"]
+                t["status"] = "transcribed"
+            t["text_source"] = entry["transcript_basis"]
+        if entry.get("intonation"):
+            t["intonation"] = entry["intonation"]
+        if entry.get("category"):
+            t["catalog_category"] = entry["category"]
+        if preferred or entry.get("intonation") or entry.get("category"):
+            t["catalog_page"] = entry["printed_page"]
+        if t != old:
+            clip["transcript"] = t
+            changed = True
+    return changed
 
 
 def write_player(root, clips, *, catalog_path=NORTEL_CATALOG):
@@ -215,18 +260,25 @@ def write_player(root, clips, *, catalog_path=NORTEL_CATALOG):
         review = "Review" if t.get("review_recommended") else ""
         title = f"{clip['source']} / bank {clip['bank']} / {clip['label']}"
         words = html.escape(text)
-        phrase = re.match(r"phrase_(\d+)(?:_|$)", clip["label"]) if clip["kind"] == "announcement" else None
-        pcm_hash = clip.get("source_pcm_sha256", clip.get("pcm_sha256"))
-        key = (clip["source"].casefold(), clip["bank"], int(phrase[1]), pcm_hash) if phrase else None
-        entry = catalog.get(key)
+        entry = catalog_entry(clip, catalog)
         if entry:
             name, note = html.escape(entry["nortel_name"]), html.escape(entry["catalog_note"])
             page = html.escape(entry["printed_page"])
             source = f'{NORTEL_GUIDE}#page={int(entry["pdf_page"])}'
             heading = f' <code>{name}</code>' if name else ""
+            category = html.escape(entry.get("category", ""))
+            if category:
+                heading += f' ({category})'
+            intonation = html.escape(entry.get("intonation", ""))
+            if intonation and not intonation.isdecimal():
+                words += f' <span class="intonation">({intonation} intonation)</span>'
+            elif intonation:
+                words += f' <span class="intonation">(intonation {intonation})</span>'
             description = f'<small>{note}</small>' if note else ""
             details = f'<div class="catalog">Nortel catalog{heading} <a href="{source}">p. {page}</a>{description}</div>'
             words = f'{details}<span class="words">{words}</span>'
+            if t.get("text_source"):
+                words += '<small>Catalog-checked transcript</small>'
         url = html.escape(clip["path"], quote=True)
         restored = restored_tones.get(clip["path"])
         reference = clip.get("reference_wav")
@@ -263,8 +315,9 @@ input,select,button{font:inherit;padding:.4rem}input{width:min(650px,80%)}audio{
 table{width:100%;border-collapse:collapse}td{padding:.65rem;border-bottom:1px solid #334452}td:first-child{width:31%}small{display:block;color:#a5bac9}.review{color:#ffc46b}
 #now{margin:.5rem 0;color:#9ee5ff}#words{white-space:pre-wrap}.transcript{max-width:650px}button{cursor:pointer}
 .catalog{margin-bottom:.35rem;color:#a5bac9;font-size:.86rem}.catalog code{color:#edf4f9}.catalog a{margin-left:.2rem}
+.intonation{color:#a5bac9}
 @media(max-width:700px){td{display:block}td:first-child{width:auto}header p{font-size:13px}}
-</style><header><h1>EDRAM announcement archive</h1><p>Nortel catalog names and summaries appear above the machine transcripts when available. SIT WAVs play the documented EDRAM pitches and timing.</p>
+</style><header><h1>EDRAM announcement archive</h1><p>Catalog-checked transcripts include Nortel phrase names and intonation when available. SIT WAVs play the documented EDRAM pitches and timing.</p>
 <input id="q" aria-label="Search the archive" placeholder="Search catalog names, transcripts, loads or phrase IDs">
 <select id="kind" aria-label="Clip type"><option value="">All clips</option><option value="announcement" selected>Announcements</option><option value="segment">Speech and tone fragments</option><option value="comparison">Tones and comparisons</option></select>
 <label><input type="checkbox" id="review" style="width:auto">Needs review</label><span id="count"></span>
@@ -277,6 +330,24 @@ document.querySelectorAll('input,select').forEach(e=>e.addEventListener('input',
 document.addEventListener('click',e=>{if(e.target.dataset.src){const row=e.target.closest('tr');player.src=e.target.dataset.src;player.play();document.querySelector('#now').textContent=(e.target.dataset.playback||'Stored audio')+': '+row.cells[0].textContent;document.querySelector('#words').textContent=(row.querySelector('.words')||row.cells[1]).textContent;}});
 </script></html>'''.replace("ROWS", "\n".join(rows))
     (root / "listen.html").write_text(page, encoding="utf-8")
+
+
+def write_transcripts(root, summary, clips):
+    summary["status_counts"] = dict(Counter(c["transcript"]["status"] for c in clips))
+    summary["catalog_checked_transcripts"] = sum(bool(c["transcript"].get("text_source")) for c in clips)
+    payload = json.dumps({"summary": summary, "clips": clips}, ensure_ascii=False, indent=2)
+    (root / "transcripts.json").write_text(payload + "\n", encoding="utf-8")
+    (root / "transcript-summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+    with (root / "transcripts.csv").open("w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+        base_fields = ("language", "text", "status", "review_recommended", "human_verified")
+        catalog_fields = ("text_source", "intonation", "catalog_category", "catalog_page", "asr_text")
+        writer.writerow(("path", "kind", "content", *base_fields, *catalog_fields))
+        for c in clips:
+            t = c["transcript"]
+            values = [t.get(key, False if key in ("review_recommended", "human_verified") else "")
+                      for key in (*base_fields, *catalog_fields)]
+            writer.writerow((c["path"], c["kind"], c["content"], *values))
 
 
 def merge(root, plan_path, parts):
@@ -304,19 +375,13 @@ def merge(root, plan_path, parts):
         errors += clip["transcript"]["status"] == "error"
         if not (root / clip["path"]).is_file():
             raise ValueError(f"missing player target: {clip['path']}")
+    apply_nortel_transcripts(plan["clips"], load_nortel_catalog(NORTEL_CATALOG))
     summary = {"wav_files": len(plan["clips"]), "unique_speech_pcm": len(expected),
-               "content_counts": plan["counts"], "status_counts": dict(Counter(c["transcript"]["status"] for c in plan["clips"])),
+               "content_counts": plan["counts"],
                "review_recommended": sum(c["transcript"].get("review_recommended", False) for c in plan["clips"]),
                "human_listening_review": False, "speaker_identities_assigned": False,
                "unused_results_reclassified_as_non_speech": len(extra)}
-    (root / "transcripts.json").write_text(json.dumps({"summary": summary, "clips": plan["clips"]}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    (root / "transcript-summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
-    with (root / "transcripts.csv").open("w", newline="", encoding="utf-8") as file:
-        writer = csv.writer(file)
-        writer.writerow(("path", "kind", "content", "language", "text", "status", "review_recommended", "human_verified"))
-        for c in plan["clips"]:
-            t = c["transcript"]
-            writer.writerow((c["path"], c["kind"], c["content"], t.get("language", ""), t["text"], t["status"], t.get("review_recommended", False), False))
+    write_transcripts(root, summary, plan["clips"])
     write_player(root, plan["clips"])
     print(json.dumps(summary, indent=2))
     if errors:
@@ -348,8 +413,10 @@ def main():
     else:
         path = args.root / "transcripts.json"
         transcripts = json.loads(path.read_text(encoding="utf-8"))
-        if refresh_sit_clips(args.root, transcripts["clips"]):
-            path.write_text(json.dumps(transcripts, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        changed = refresh_sit_clips(args.root, transcripts["clips"])
+        changed |= apply_nortel_transcripts(transcripts["clips"], load_nortel_catalog(NORTEL_CATALOG))
+        if changed:
+            write_transcripts(args.root, transcripts["summary"], transcripts["clips"])
         write_player(args.root, transcripts["clips"])
 
 

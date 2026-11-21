@@ -100,6 +100,23 @@ class TranscriptTests(unittest.TestCase):
             self.assertIn('data-src="pack/sit.wav" data-playback="Direct A-law"', page)
             self.assertIn('data-src="../references/sit/example.wav"', page)
 
+    def test_catalog_transcript_preserves_asr_and_checks_hash(self):
+        entry = {"transcript_text": "Zero", "transcript_basis": "catalog-checked-digit",
+                 "intonation": "falling", "printed_page": "17-49"}
+        catalog = {("pack", 1, 31, "original"): entry}
+        asr = {"text": "0", "status": "transcribed", "review_recommended": True}
+        clip = {"kind": "announcement", "source": "pack", "bank": 1, "label": "phrase_31",
+                "pcm_sha256": "original", "content": "speech", "transcript": asr}
+        other = dict(clip, pcm_sha256="different")
+        self.assertTrue(transcribe.apply_nortel_transcripts([clip, other], catalog))
+        self.assertEqual(clip["transcript"]["text"], "Zero")
+        self.assertEqual(clip["transcript"]["asr_text"], "0")
+        self.assertEqual(clip["transcript"]["intonation"], "falling")
+        self.assertEqual(other["transcript"], asr)
+        self.assertFalse(transcribe.apply_nortel_transcripts([clip, other], catalog))
+        self.assertTrue(transcribe.apply_nortel_transcripts([clip, other], {}))
+        self.assertEqual(clip["transcript"], asr)
+
 
 if __name__ == "__main__":
     unittest.main()
