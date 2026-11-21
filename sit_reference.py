@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate explicitly labelled Bellcore SIT comparison signals from validated menus."""
+"""Interpret Nortel SIT menus and synthesize the documented EDRAM tones."""
 import argparse
 from array import array
 import json
@@ -7,39 +7,67 @@ import math
 import os
 from pathlib import Path
 import sys
-import edram
-
-FREQUENCIES = {17:913.8,20:985.2,23:1370.6,26:1428.5,29:1776.7}
-DURATION_MS = {9:274,12:380}
+FREQUENCIES = {17: 913.8, 20: 985.2, 23: 1370.6, 26: 1428.5, 29: 1776.7}
+SHORT_MS = 274
+LONG_MS = 380
+FSTD0BA_SHA256 = "aeb0d58e7c4a1db4ec09bf8d5246b7e2408654f255483e80939715b0099b99cd"
 
 
 def profile(segments):
-    groups=[]
-    for s in segments:
-        if s["page"] in FREQUENCIES and s["pages"]==1 and s["repeats"]==1:
-            groups.append({"page":s["page"],"blocks":1})
-        elif groups and s["page"]==groups[-1]["page"]+1:
-            groups[-1]["blocks"]+=s["pages"]*s["repeats"]
+    return profile_from_entries(tuple((s["page"], s["pages"], s["repeats"]) for s in segments))
+
+
+def profile_from_entries(entries):
+    parts = []
+    for allowed in ((17, 20), (23, 26), (29,)):
+        if len(entries) < 2:
+            raise ValueError("missing SIT attack or sustain")
+        page = entries[0][0]
+        if page not in allowed or entries[0] != (page, 1, 1):
+            raise ValueError("unexpected SIT attack page")
+        loop = page + 1
+        if entries[1] == (loop, 2, 4):
+            duration = SHORT_MS
+            entries = entries[2:]
+        elif entries[1:3] == ((loop, 2, 5), (loop, 1, 1)):
+            duration = LONG_MS
+            entries = entries[3:]
         else:
-            raise ValueError("menu does not match the supported SIT component structure")
-    if len(groups)!=3 or groups[0]["page"] not in (17,20) or groups[1]["page"] not in (23,26) or groups[2]["page"]!=29:
-        raise ValueError("menu does not contain a valid three-component SIT")
-    return [{"frequency_hz":FREQUENCIES[g["page"]],"duration_ms":DURATION_MS[g["blocks"]]} for g in groups]
+            raise ValueError("unexpected SIT sustain pattern")
+        parts.append({"frequency_hz": FREQUENCIES[page], "duration_ms": duration})
+    if entries:
+        raise ValueError("unexpected data following the third SIT component")
+    return parts
 
 
-def synthesize(parts,peak=5000):
+def archived_profile(segments, *, source_hash, bank, phrase):
+    entries = tuple((s["page"], s["pages"], s["repeats"]) for s in segments)
+    if (source_hash, bank, phrase) == (FSTD0BA_SHA256, 1, 16):
+        # This exact image's bank 1 pointer starts one slot early. The final
+        # sustain is just beyond its span. Bank 0 and Nortel's SIT9 agree.
+        if entries == ((30, 1, 1), (17, 1, 1), (18, 2, 5), (18, 1, 1),
+                       (23, 1, 1), (24, 2, 4), (29, 1, 1)):
+            return profile_from_entries((*entries[1:], (30, 2, 4))), "fstd0ba-bank-0-sit9"
+    return profile_from_entries(entries), "menu"
+
+
+def synthesize(parts, peak=5000, *, rate=8000):
     samples=array("h")
     for p in parts:
-        count=round(p["duration_ms"]*edram.RATE/1000)
+        count = round(p["duration_ms"] * rate / 1000)
+        ramp = round(rate * 0.002)
+        step = math.tau * p["frequency_hz"] / rate
         for n in range(count):
-            envelope=min(1.0,n/16,(count-1-n)/16)
-            samples.append(round(peak*envelope*math.sin(2*math.pi*p["frequency_hz"]*n/edram.RATE)))
+            envelope = min(1.0, n / ramp, (count - 1 - n) / ramp)
+            samples.append(round(peak * envelope * math.sin(step * n)))
     if sys.byteorder!="little":
         samples.byteswap()
     return samples.tobytes()
 
 
 def generate(audio,output):
+    import edram
+
     output.mkdir(parents=True,exist_ok=True)
     index={"notice":"Generated Bellcore comparison signals, not recovered EDRAM sample decoding.",
            "peak_pcm":5000,"edge_ramp_ms":2,"inter_component_gap_ms":0,
@@ -52,7 +80,8 @@ def generate(audio,output):
             if not p["wav"] or "_sit_" not in p["label"]:
                 continue
             try:
-                parts=profile(p["segments"])
+                parts, _ = archived_profile(p["segments"], source_hash=m["source_sha256"],
+                                            bank=p["bank"], phrase=p["number"])
             except (ValueError, KeyError) as exc:
                 index["unsupported_menus"].append({"source":m["source"],"bank":p["bank"],"phrase":p["number"],"reason":str(exc)})
                 continue

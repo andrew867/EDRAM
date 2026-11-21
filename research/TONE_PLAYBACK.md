@@ -1,6 +1,20 @@
 # EDRAM tone playback
 
-Nortel's [DRAM and EDRAM Guide](https://www.gbppr.net/bsp/297-1001-527.pdf), Table 4-2, specifies 288 and 384 ms for DRAM SIT components and 274 and 380 ms for EDRAM. The menu-derived loop experiment follows the DRAM values. The main player gives the documented EDRAM reference first for supported SITs and offers the loop experiment as a comparison.
+The default converter and the WAVs in the source bank folders render recognized SITs as three sine waves. The validated menu identifies each tone's pitch and short or long duration. The rendered tones use the EDRAM timings in [Nortel's Table 4-2](https://www.gbppr.net/bsp/297-1001-527.pdf#page=59). The [Appendix A table beginning at PDF page 288](https://www.gbppr.net/bsp/297-1001-527.pdf#page=288) lists the same pitches with the 288 and 384 ms DRAM timings.
+
+| Component | Low | High |
+| --- | ---: | ---: |
+| First | 913.8 Hz | 985.2 Hz |
+| Second | 1370.6 Hz | 1428.5 Hz |
+| Third | 1776.7 Hz | |
+
+Each EDRAM component is 274 ms or 2,192 frames when short, and 380 ms or 3,040 frames when long. The WAVs use 8 kHz mono PCM with a peak value of 5,000, a 2 ms taper at each edge, and adjacent components. Level in dBm depends on the playback path. `--raw-sit` retains direct codec expansion for byte-level analysis.
+
+In `fstd0ba.bin44` bank 1 phrase 16, the valid-checksum pointer starts one four-byte slot early and omits the final sustain. The renderer recognizes the archived file hash and the exact anomalous menu. It uses bank 0's SIT 9 sequence, corroborated by Nortel, with 913.8 Hz for 380 ms followed by 1370.6 Hz and 1776.7 Hz for 274 ms each.
+
+The re-export contains 285 SIT WAVs and all 32 pitch and duration profiles. An FFT audit of the 855 components measured each peak within 0.01 Hz of its specified pitch. Every component contained exactly 2,192 or 3,040 frames, including its edge tapers.
+
+## Earlier loop experiment
 
 In the archived text loads, all 22,036 addressed bytes of `mwttone.txt80` match the same addresses in `edrmtone.txt80` except the identifier byte at `0x0677`. Thus the shared tone region is byte-identical. Chapter 14 describes a distinct use of the NT1X80 to provide milliwatt and receiver-off-hook services, including test-trunk card emulation. The timing and output coding of those services require hardware characterization. A build of a voice load carries through the stored template tones verbatim.
 
@@ -21,7 +35,7 @@ The 750 Hz cue also has a separate addressing issue. Across 118 banks, its 512-b
 
 | Example | Direct A-law | Restored loop | Menu duration |
 | --- | --- | --- | ---: |
-| SIT 2, `estd0aa`, bank 0, phrase 09 | [WAV](../audio/estd0aa/bank_00/phrase_09_sit_02.wav) | [WAV](tone-demos/sit-02-restored.wav) | 288 + 288 + 384 ms |
+| SIT 2, `estd0aa`, bank 0, phrase 09 | [Historical WAV](https://github.com/andrew867/EDRAM/blob/c7933d2/audio/estd0aa/bank_00/phrase_09_sit_02.wav) | [WAV](tone-demos/sit-02-restored.wav) | 288 + 288 + 384 ms |
 | 750 Hz test, `eacts0ae`, bank 0, phrase 01 | [WAV](../audio/eacts0ae/bank_00/phrase_01.wav) | [WAV](tone-demos/test-750-restored.wav) | 160 ms |
 | Shifted 750 Hz test, `jpdmct00`, bank 0, phrase 01 | [WAV](../audio/jpdmct00/bank_00/phrase_01.wav) | [WAV](tone-demos/test-750-restored.wav) | 160 ms |
 
@@ -32,4 +46,4 @@ python tone_playback.py data/original/estd0aa.bin44 compare/estd0aa
 python tone_playback.py data/original/jpdmct00.bin44 compare/jpdmct00
 ```
 
-The output contains paired WAVs and JSON with the selected addresses, durations, phase fits, gains, and any skipped menus. All 61 reference loads produced 524 WAV pairs, including 284 SIT menus. Each pair had the same frame count. `fstd0ba.bin44` bank 1 phrase 16 has an unsupported SIT-like component order and is skipped. The `eaabs0hc` operator bong uses a different waveform, including its original fade, and remains available in the [main player](../audio/listen.html).
+The experiment exports paired WAVs and JSON with addresses, durations, phase fits, gains, and skipped menus. Across the 61 reference loads it generates 524 pairs, including 284 SIT menus with the original page timings. The French pointer anomaly is omitted from the loop experiment. The `eaabs0hc` operator bong uses its stored waveform, including the fade, in the [main player](../audio/listen.html).

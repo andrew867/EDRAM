@@ -202,8 +202,8 @@ def export_archive(sources, root):
             if not entry:
                 raise ValueError(f"no direct export for {source.name} bank {phrase.bank} phrase {phrase.number}")
             original = (Path(source.stem) / entry["wav"]).as_posix()
-            if not (root / original).is_file() or entry["samples"] != len(pcm) // 2:
-                raise ValueError(f"missing or mismatched direct export: {original}")
+            if not (root / original).is_file() or entry.get("menu_samples", entry["samples"]) != len(pcm) // 2:
+                raise ValueError(f"missing or mismatched phrase export: {original}")
             digest = hashlib.sha256(pcm).hexdigest()
             if digest not in wavs:
                 if phrase.segments == TEST_TONE:

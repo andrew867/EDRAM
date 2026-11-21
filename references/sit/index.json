@@ -3918,6 +3918,23 @@
         }
       ]
     },
+    "fstd0ba/bank_01/phrase_16_sit_09.wav": {
+      "path": "../references/sit/913.8Hz_380ms_1370.6Hz_274ms_1776.7Hz_274ms.wav",
+      "components": [
+        {
+          "frequency_hz": 913.8,
+          "duration_ms": 380
+        },
+        {
+          "frequency_hz": 1370.6,
+          "duration_ms": 274
+        },
+        {
+          "frequency_hz": 1776.7,
+          "duration_ms": 274
+        }
+      ]
+    },
     "fstd0ba/bank_01/phrase_17_sit_10.wav": {
       "path": "../references/sit/913.8Hz_380ms_1370.6Hz_274ms_1776.7Hz_380ms.wav",
       "components": [
@@ -5415,12 +5432,5 @@
       "duration_seconds": 1.14
     }
   },
-  "unsupported_menus": [
-    {
-      "source": "fstd0ba.bin44",
-      "bank": 1,
-      "phrase": 16,
-      "reason": "menu does not match the supported SIT component structure"
-    }
-  ]
+  "unsupported_menus": []
 }

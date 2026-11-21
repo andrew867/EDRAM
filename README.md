@@ -2,13 +2,13 @@
 
 Extract individual announcements and reusable audio segments from DMS-100 / SL-100 EDRAM load files. Supports binary bin44 G-records and ASCII Motorola S-record txt80 files. Python 3.10 or newer; the converter itself has no dependencies.
 
-**Research status:** speech extraction works with Joe Z's unmasked A-law mapping. [Experimental tone playback](research/TONE_PLAYBACK.md) reconstructs the sustains of identified EDRAM tones alongside the direct A-law versions. Speaker identities are unassigned. Machine transcription does not establish voice identity or verify audio quality.
+Speech extraction uses Joe Z's unmasked A-law mapping. Recognized SIT menus render as three synthesized sine waves using Nortel's documented EDRAM frequencies and durations. [Tone playback notes](research/TONE_PLAYBACK.md) describe the menu interpretation and earlier waveform experiments.
 
 ## Listen and search
 
 The reference import workflow writes original files under [data/original](data/original), all extracted WAVs under [audio](audio), and a searchable player at [audio/listen.html](audio/listen.html). Download or clone the repository and open that HTML file locally; GitHub's source preview does not execute its audio player.
 
-Choose **Tone comparisons** in the player to browse SIT, the 750 Hz test, and the three-pulse prompt. Supported SIT rows start with a **Standard SIT reference** using Nortel's documented EDRAM frequencies and timing. Use **Direct A-law** and **Loop experiment** to audition the separate load-byte interpretations. Identical experimental renders share one WAV in [audio/tones](audio/tones).
+Choose **Tones and comparisons** to browse SIT, the 750 Hz test, and the three-pulse prompt. **Play Nortel SIT** and **WAV** both use the corrected WAV in the source bank folder. Each SIT row shows its three frequencies and durations.
 
 The transcription workflow uses multilingual Whisper small through faster-whisper, with voice activity detection, identical-PCM deduplication, six independent processing shards, per-segment timestamps and review flags. It processes announcements and reusable speech fragments. Known tone components and silence receive descriptive labels instead of invented dialogue. Transcripts are machine generated and not human verified. JSON and CSV transcripts accompany the HTML player.
 
@@ -27,7 +27,7 @@ python verify_corpus.py samples decoded --json VALIDATION.json
 
 To use an existing archive, supply --archive /path/to/edram.tar.gz to fetch_samples.py. To inspect menus without writing audio, use python edram.py samples/estd0aa.bin44 --inspect.
 
-Output is 8 kHz, 16-bit mono PCM WAV with source and codec metadata. Every source has its own folder, every bank its own subfolder. The manifests retain source hashes, addresses, checksums, segment order and repetition counts, implicit zero-fill counts, ordered memory rewrites, invalid menus and unavailable references. --segments also exports each referenced segment once without repeats.
+Output is 8 kHz, 16-bit mono PCM WAV with source and codec metadata. Every source has its own folder, every bank its own subfolder. Manifests retain source hashes, addresses, checksums, segment order and repetition counts, implicit zero-fill counts, ordered memory rewrites, invalid menus and unavailable references. `--segments` exports each referenced segment once without repeats. `--raw-sit` expands SIT sample bytes with the selected codec for diagnostic playback.
 
 Existing output folders require explicit --overwrite. Prefer a new directory when changing settings; overwrite does not delete obsolete or unrelated files.
 
@@ -49,7 +49,7 @@ Existing output folders require explicit --overwrite. Prefer a new directory whe
 | Missing phrase payloads, skipped | 17 |
 | Structurally invalid menus, flagged | 3 |
 
-The announcement WAVs total 5,454.688 seconds, approximately 90.9 minutes. Shared phrases and tone sequences occur repeatedly, so these are not counts of unique recordings.
+The 2,873 announcement WAVs include 285 SIT renders covering 32 sequences. Shared phrases and tone sequences occur repeatedly.
 
 The two txt80 tone files contain menus referencing speech absent from those files. Those announcements are unavailable instead of fabricated as silence. In fstd0ba.bin44, bank 1, phrases 8, 11 and 20 have misaligned pointers; their raw entries and reasons remain in invalid_phrases.
 
@@ -61,7 +61,7 @@ The default alaw-unmasked expansion is byte-for-byte equivalent to standard G.71
 
 The older DRAM architecture is documented as using four-bit ADPCM. That alone does not establish a standard packed G.726 or IMA stream in these particular EDRAM files. No ADPCM decoder is currently implemented. A local G.726 trial failed to recover the speech that the unmasked G.711 expansions recovered.
 
-SIT attack pages and repeated pages have markedly different levels under the baseline expansion. [The A/B samples and measurements](research/TONE_PLAYBACK.md) show the effect of restoring the stored loops at the measured phase and level. The experimental exporter uses the same menu timing as the direct extraction. Exact EDRAM hardware timing and tone interpretation remain unverified.
+SIT attack pages and repeated pages have markedly different levels under direct byte expansion. The default SIT renderer interprets the menu and generates the specified tones at a fixed digital level. Original hardware gain and sample-byte playback remain unverified. [SIT derivation and measurements](research/TONE_PLAYBACK.md)
 
 [T7316 ringer synthesis](ringer/README.md) implements four measured BCM set ringer patterns as a small C99 DSP renderer.
 
@@ -92,9 +92,10 @@ The converter is a new Python implementation. Joe's C code, proprietary firmware
 
 ## SIT comparison signals
 
-The [waveform and FFT comparison](research/sit-waveform-fft.svg) shows the direct A-law baseline beside a generated Bellcore reference. [Reference documentation](references/README.md) records the frequencies, durations and generation settings. Re-export restored WAVs and rebuild the player using the existing transcripts with these commands.
+The [waveform and FFT comparison](research/sit-waveform-fft.svg) shows the direct A-law baseline beside the documented sine synthesis. [Reference documentation](references/README.md) records the frequencies, durations and generation settings. Re-export the archive and rebuild the player using the existing transcripts with these commands.
 
 ~~~sh
+python edram.py data/original -o audio --segments --overwrite
 python tone_playback.py data/original audio --archive
 python transcribe.py index audio
 python verify_corpus.py data/original audio

@@ -10,6 +10,7 @@ import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
 import struct
+from sit_reference import archived_profile, synthesize
 
 VERSION = "0.1.0"
 RATE = 8000
@@ -243,6 +244,20 @@ def render(image: Image, phrase: Phrase, codec="alaw-unmasked"):
     return b"".join(chunks), implicit
 
 
+def render_export(image, phrase, codec, source_hash, *, raw_sit=False):
+    pcm, implicit = render(image, phrase, codec)
+    if raw_sit or "_sit_" not in phrase_name(phrase):
+        return pcm, implicit, {}
+    try:
+        parts, profile_source = archived_profile((asdict(s) for s in phrase.segments),
+                                                 source_hash=source_hash, bank=phrase.bank, phrase=phrase.number)
+    except ValueError:
+        return pcm, implicit, {}
+    info = {"rendering": "nortel-sit", "sit_components": parts, "sit_profile_source": profile_source,
+            "menu_samples": len(pcm) // 2, "source_pcm_sha256": hashlib.sha256(pcm).hexdigest()}
+    return synthesize(parts, rate=RATE), implicit, info
+
+
 def chunk(tag: bytes, data: bytes) -> bytes:
     return tag + struct.pack("<I", len(data)) + data + (b"\0" if len(data) % 2 else b"")
 
@@ -265,7 +280,7 @@ def phrase_name(phrase: Phrase):
     return f"phrase_{phrase.number:02d}"
 
 
-def export(path: Path, output: Path, codec: str, segments=False, overwrite=False):
+def export(path: Path, output: Path, codec: str, segments=False, overwrite=False, *, raw_sit=False):
     image = Image.read(path)
     phrases = image.phrases(strict=False)
     folder = output / path.stem
@@ -291,10 +306,16 @@ def export(path: Path, output: Path, codec: str, segments=False, overwrite=False
         entry["wav"] = None
         entry["label"] = phrase_name(phrase)
         try:
-            pcm, implicit = render(image, phrase, codec)
+            pcm, implicit, tone = render_export(image, phrase, codec, manifest["source_sha256"], raw_sit=raw_sit)
             relative = Path(f"bank_{phrase.bank:02d}") / (phrase_name(phrase) + ".wav")
-            write_wav(folder / relative, pcm, f"{path.stem} bank {phrase.bank} phrase {phrase.number}",
-                      f"source_sha256={manifest['source_sha256']}; codec={codec}; menu=0x{phrase.menu_address:x}")
+            if tone:
+                manifest["sit_rendering"] = "nortel-sit"
+                write_wav(folder / relative, pcm, f"Nortel EDRAM SIT {phrase.number - 7}",
+                          "Sine synthesis from Nortel 297-1001-527 Table 4-2; 274/380 ms; peak PCM 5000.")
+                entry.update(tone, samples=len(pcm) // 2, duration_seconds=len(pcm) / (2 * RATE))
+            else:
+                write_wav(folder / relative, pcm, f"{path.stem} bank {phrase.bank} phrase {phrase.number}",
+                          f"source_sha256={manifest['source_sha256']}; codec={codec}; menu=0x{phrase.menu_address:x}")
             entry.update(wav=relative.as_posix(), implicit_zero_samples=implicit,
                          pcm_sha256=hashlib.sha256(pcm).hexdigest(), status="exported")
         except FormatError as exc:
@@ -332,8 +353,9 @@ def write_browser(output: Path, manifests):
                 continue
             name = f"{source} / bank {phrase['bank']} / {phrase['label']}"
             url = (Path(Path(source).stem) / phrase["wav"]).as_posix()
+            play = "Play Nortel SIT" if phrase.get("rendering") == "nortel-sit" else "Play"
             rows.append(f'<tr><td>{html.escape(name)}</td><td>{phrase["duration_seconds"]:.3f}s</td>'
-                        f'<td><button data-src="{html.escape(url, quote=True)}">Play</button> '
+                        f'<td><button data-src="{html.escape(url, quote=True)}">{play}</button> '
                         f'<a href="{html.escape(url, quote=True)}" download>WAV</a></td></tr>')
     document = '''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
 <title>EDRAM announcement archive</title><style>
@@ -342,7 +364,7 @@ a{color:#7ad8ff} input{font:inherit;padding:.6rem;width:95%} table{width:100%;bo
 td{padding:.55rem;border-bottom:1px solid #334452} button{padding:.35rem 1rem;cursor:pointer}
 header{position:sticky;top:0;background:#101820;padding:1rem 0} audio{width:100%;margin:1rem 0}
 </style><header><h1>EDRAM announcement archive</h1>
-<p>8 kHz, 16-bit mono PCM. Legacy-compatible unmasked A-law decoding. Hardware playback equivalence and original tone amplitudes remain unverified. IDs are bank-local. No inferred transcripts.</p>
+<p>8 kHz, 16-bit mono PCM. Recognized SITs use Nortel's EDRAM frequencies and timing. IDs are bank-local.</p>
 <input id="filter" aria-label="Filter announcements" placeholder="Filter by source, bank or phrase ID">
 <audio id="player" controls></audio><div id="playing">Select an announcement</div></header>
 <table><tbody>ROWS</tbody></table><script>
@@ -376,6 +398,7 @@ def main(argv=None):
     parser.add_argument("-o", "--output", type=Path, default=Path("edram-wav"))
     parser.add_argument("--inspect", action="store_true", help="validate and list tables without writing files")
     parser.add_argument("--codec", choices=tuple(PCM_TABLES), default="alaw-unmasked")
+    parser.add_argument("--raw-sit", action="store_true", help="expand SIT sample bytes with the selected codec")
     parser.add_argument("--segments", action="store_true", help="also export each referenced segment without repeats")
     parser.add_argument("--overwrite", action="store_true", help="allow replacing outputs in existing source folders")
     parser.add_argument("--version", action="version", version=VERSION)
@@ -389,7 +412,7 @@ def main(argv=None):
                 phrases = image.phrases(strict=False)
                 print(json.dumps({"source": path.name, "records": len(image.records), "phrases": [asdict(p) for p in phrases], "invalid_phrases": image.invalid_phrases}))
             else:
-                manifest = export(path, args.output, args.codec, args.segments, args.overwrite)
+                manifest = export(path, args.output, args.codec, args.segments, args.overwrite, raw_sit=args.raw_sit)
                 manifests.append(manifest)
                 count = sum(p["status"] == "exported" for p in manifest["phrases"])
                 print(f"{path.name}: {count}/{len(manifest['phrases'])} phrases exported")

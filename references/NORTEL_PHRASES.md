@@ -11,7 +11,7 @@
 | `catalog_note` | Short summary or component label based on the manual |
 | `printed_page` | Page number printed in the manual |
 | `pdf_page` | One-based PDF viewer page in the linked copy |
-| `pcm_sha256` | SHA-256 of the archived WAV's PCM frames |
+| `pcm_sha256` | SHA-256 of the direct codec expansion's PCM frames. SIT metadata retains that hash when the player uses synthesized audio. |
 
 The catalog uses load, bank and phrase ID to match the appendix. Documented digit ranges are expanded to individual IDs. Large discrepancies between the documented and extracted duration, conflicting rows, and undocumented slots are omitted. Minor differences can occur between the documented and archived loads. The PCM hash keeps a custom replacement with the same filename and phrase ID from inheriting the stock description.
 
