@@ -1,5 +1,9 @@
 # EDRAM tone playback
 
+Nortel's [DRAM and EDRAM Guide](https://www.gbppr.net/bsp/297-1001-527.pdf), Table 4-2, specifies 288 and 384 ms for DRAM SIT components and 274 and 380 ms for EDRAM. The menu-derived loop experiment follows the DRAM values. The main player gives the documented EDRAM reference first for supported SITs and offers the loop experiment as a comparison.
+
+In the archived text loads, all 22,036 addressed bytes of `mwttone.txt80` match the same addresses in `edrmtone.txt80` except the identifier byte at `0x0677`. Thus the shared tone region is byte-identical. Chapter 14 describes a distinct use of the NT1X80 to provide milliwatt and receiver-off-hook services, including test-trunk card emulation. The timing and output coding of those services require hardware characterization. A build of a voice load carries through the stored template tones verbatim.
+
 The phrase menus specify byte-page addresses and repeats. This experiment uses the same menu-derived duration as the direct A-law export and models each recognized tone as an attack followed by a steady loop. It keeps the first attack page, takes a whole-cycle waveform from the stored loop, and fits loop phase and gain against the final 96 samples of the attack. A 1 ms release taper reduces clicks at transitions. This is a reconstruction from stored data. Native EDRAM hardware behavior remains unverified.
 
 | Stored tone | Standard bank offset of loop | Measured frequency | Loop fit gain |

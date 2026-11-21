@@ -73,9 +73,9 @@ class TranscriptTests(unittest.TestCase):
                     "reference_wav": "../references/sit/example.wav", "transcript": {"text": ""}}
             transcribe.write_player(root, [clip])
             page = (root / "listen.html").read_text()
-            self.assertIn('data-restored="true"', page)
-            self.assertIn('data-src="tones/restored.wav" data-playback="Restored tone"', page)
-            self.assertIn('href="tones/restored.wav" download', page)
+            self.assertIn('data-comparison="true"', page)
+            self.assertIn('data-src="tones/restored.wav" data-playback="Loop experiment"', page)
+            self.assertIn('href="../references/sit/example.wav" download', page)
             self.assertIn('data-src="pack/sit.wav" data-playback="Direct A-law"', page)
             self.assertIn('data-src="../references/sit/example.wav"', page)
 

@@ -8,7 +8,7 @@ Extract individual announcements and reusable audio segments from DMS-100 / SL-1
 
 The reference import workflow writes original files under [data/original](data/original), all extracted WAVs under [audio](audio), and a searchable player at [audio/listen.html](audio/listen.html). Download or clone the repository and open that HTML file locally; GitHub's source preview does not execute its audio player.
 
-Choose **Restored tones** in the player to browse the SIT, 750 Hz test and three-pulse prompt renders. Each matching row plays the restored tone first and has a **Direct A-law** comparison button. Supported SIT rows also offer the generated standard reference. Identical restorations share one WAV in [audio/tones](audio/tones).
+Choose **Tone comparisons** in the player to browse SIT, the 750 Hz test, and the three-pulse prompt. Supported SIT rows start with a **Standard SIT reference** using Nortel's documented EDRAM frequencies and timing. Use **Direct A-law** and **Loop experiment** to audition the separate load-byte interpretations. Identical experimental renders share one WAV in [audio/tones](audio/tones).
 
 The transcription workflow uses multilingual Whisper small through faster-whisper, with voice activity detection, identical-PCM deduplication, six independent processing shards, per-segment timestamps and review flags. It processes announcements and reusable speech fragments. Known tone components and silence receive descriptive labels instead of invented dialogue. Transcripts are machine generated and not human verified. JSON and CSV transcripts accompany the HTML player.
 
@@ -28,6 +28,10 @@ To use an existing archive, supply --archive /path/to/edram.tar.gz to fetch_samp
 Output is 8 kHz, 16-bit mono PCM WAV with source and codec metadata. Every source has its own folder, every bank its own subfolder. The manifests retain source hashes, addresses, checksums, segment order and repetition counts, implicit zero-fill counts, ordered memory rewrites, invalid menus and unavailable references. --segments also exports each referenced segment once without repeats.
 
 Existing output folders require explicit --overwrite. Prefer a new directory when changing settings; overwrite does not delete obsolete or unrelated files.
+
+## Encode a voice load
+
+[The voice-load encoder](ENCODING.md) builds a named single-bank `.bin44` or `.txt80` file from 8 kHz mono PCM WAVs. It uses the factory-style ESTD0AA structure and verifies the generated file locally. Switch acceptance remains untested.
 
 ## Reference extraction
 

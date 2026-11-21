@@ -16,13 +16,13 @@ Every binary record is 44 bytes.
 | remaining through 42 | variable | Padding |
 | 43 | 1 | 0x16 terminator |
 
-The sum from byte 2 through the checksum is 0xff modulo 256. Short-record checksums are not at fixed byte 42. G0 is the first data record, G2 continues loading, and G6 is a non-data footer. The four-byte wider footer value remains unexplained; only its per-record checksum is verified.
+The sum from byte 2 through the checksum is 0xff modulo 256. Short-record checksums are not at fixed byte 42. G0 is the first data record, G2 continues loading, and G6 is a non-data footer. G6 has count 1 and holds a four-byte big-endian sum starting at offset 3. Add every G0/G2 payload as unsigned big-endian 16-bit words, including records that rewrite an earlier address, and keep the low 32 bits. This verifies all 59 bin44 loads in the reference archive.
 
 Reconstruct addressed memory rather than concatenating payloads. Omitted regions are zero-filled under the factory-file policy. Apply records in order; later writes replace earlier bytes. Changed-byte rewrites occur in astd0ab, estd0aa and fstd0ba.
 
 ## S-record transport
 
-The txt80 files contain S2 ASCII data with standard byte count, 24-bit address and one's-complement checksum. Their final S6 records contain a four-byte value, not ordinary speech data. No claim is made that this is a standard S6 record count. The parser also accepts ordinary S1/S3 data and S7/S8/S9 termination framing.
+The txt80 files contain S2 ASCII data with standard byte count, 24-bit address and one's-complement checksum. Their final S6 records have count 5 and carry a four-byte value. The bin44 payload sum also verifies `edrmtone.txt80`. The observed `mwttone.txt80` footer differs from the sum of its included records, although its individual record checksums pass. Newly encoded text loads use the sum verified against `edrmtone.txt80`. The parser also accepts ordinary S1/S3 data and S7/S8/S9 termination framing.
 
 ## Menus
 
