@@ -33,7 +33,7 @@ Existing output folders require explicit --overwrite. Prefer a new directory whe
 
 ## Encode a voice load
 
-[The voice-load encoder](ENCODING.md) builds a named single-bank `.bin44` or `.txt80` file from 8 kHz mono PCM WAVs. It uses the factory-style ESTD0AA structure and verifies the generated file locally. Switch acceptance remains untested.
+[The voice-load encoder](ENCODING.md) builds a named single-bank `.bin44` or `.txt80` file from 8 kHz mono PCM WAVs and tone sequences. It uses the factory-style ESTD0AA structure and verifies the generated file locally. Switch acceptance remains untested.
 
 [The SLM tape tool](SLM_TAPE.md) lists and extracts archived tape files, appends existing entries, and builds experimental `.bin44` bench images. The documentation records the recovered labels, byte ordering, checksums, and the tape-to-disk path used before `LOADPM`.
 
@@ -80,7 +80,7 @@ The run command can resume its checkpoint. Review flags expose weak language det
 
 ## Format and provenance
 
-See [FORMAT.md](FORMAT.md) for the recovered transport and menu layout.
+Start with the [audio format guide](AUDIO_FORMAT_GUIDE.md) for worked examples of speech, SITs, and standalone tone records. See [FORMAT.md](FORMAT.md) for the byte-level reference.
 
 Prior work: [Joe Z's EDRAM investigation](http://www.dms-100.net/telephony/nortel/dms-100/edram/), including the original unmasked A-law approach and G-record observations.
 
