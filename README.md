@@ -2,7 +2,7 @@
 
 Extract individual announcements and reusable audio segments from DMS-100 / SL-100 EDRAM load files. Supports binary bin44 G-records and ASCII Motorola S-record txt80 files. Python 3.10 or newer; the converter itself has no dependencies.
 
-**Research status:** speech extraction works with Joe Z's unmasked A-law mapping. SIT playback is under investigation after a listening report identified incorrect tones. The converter preserves original sample data; no synthetic replacement tones or per-component normalization are applied. Speaker identities are unassigned. Machine transcription does not establish voice identity or verify audio quality.
+**Research status:** speech extraction works with Joe Z's unmasked A-law mapping. [Experimental tone playback](research/TONE_PLAYBACK.md) reconstructs the sustains of identified EDRAM tones alongside the direct A-law versions. Speaker identities are unassigned. Machine transcription does not establish voice identity or verify audio quality.
 
 ## Listen and search
 
@@ -51,7 +51,9 @@ The default alaw-unmasked expansion is byte-for-byte equivalent to standard G.71
 
 The older DRAM architecture is documented as using four-bit ADPCM. That alone does not establish a standard packed G.726 or IMA stream in these particular EDRAM files. No ADPCM decoder is currently implemented. A local G.726 trial failed to recover the speech that the unmasked G.711 expansions recovered.
 
-SIT attack pages and repeated pages have markedly different levels under the baseline expansion. Frequency, level and loop-boundary analysis is ongoing. Nominal timing is 256 addressed sample codes per page at 8 kHz. Exact EDRAM hardware timing and tone interpretation remain unverified.
+SIT attack pages and repeated pages have markedly different levels under the baseline expansion. [The A/B samples and measurements](research/TONE_PLAYBACK.md) show the effect of restoring the stored loops at the measured phase and level. The experimental exporter uses the same menu timing as the direct extraction. Exact EDRAM hardware timing and tone interpretation remain unverified.
+
+[T7316 ringer synthesis](ringer/README.md) implements four measured BCM set ringer patterns as a small C99 DSP renderer.
 
 ## Transcribe locally
 

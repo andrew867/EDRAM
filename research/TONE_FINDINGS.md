@@ -1,5 +1,7 @@
 # SIT baseline FFT findings
 
+For follow-up measurements and restored audio, see [EDRAM tone playback](TONE_PLAYBACK.md).
+
 The baseline unmasked A-law playback has a repeat-section level defect. These measurements reproduce across the standard, French standard and standalone tone loads.
 
 | Component | Attack frequency, Hz | Sustain frequency, Hz | Attack RMS, dBFS | Sustain RMS, dBFS |
