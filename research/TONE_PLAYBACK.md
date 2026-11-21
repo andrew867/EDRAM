@@ -21,9 +21,11 @@ The last 128 bytes of page 15 are four exact copies of this 32-byte pattern.
 
 Unmasked A-law expands the block to 32 signed samples with three rising zero crossings in a circular traversal. That is three cycles in 4 ms, or **750 Hz**. A 32-byte period is evidence of a waveform table. The submenu supplies addresses, range lengths and repeat counts. The WAVE export repeats the 256-byte attack twice and the 256-byte sustain three times, for 1,280 frames (160 ms). It uses each page from its addressed location, including in banks where the recognizable cue bytes begin one byte earlier.
 
-SIT phrase 8 uses attack/sustain pairs with byte addresses `0x1100 / 0x1200`, `0x1700 / 0x1800`, and `0x1D00 / 0x1E00`. Each pair plays one attack page and four copies of a two-page sustain, giving 288 ms per component in the offline model. Page 24 has a repeated 64-byte period with an 11-cycle carrier (1,375 Hz). Nortel Table 4-2 lists 288/384 ms for legacy DRAM and 274/380 ms for EDRAM. The menu's 288 ms short and 384 ms long component lengths match the legacy DRAM column. The EDRAM timing difference is a question for captured card output. [ESTD0AA export manifest](../audio/estd0aa/manifest.json) · [Nortel DRAM and EDRAM Guide, Table 4-2](https://www.gbppr.net/bsp/297-1001-527.pdf#page=59)
+SIT phrase 8 uses attack/sustain pairs with byte addresses `0x1100 / 0x1200`, `0x1700 / 0x1800`, and `0x1D00 / 0x1E00`. Each pair plays one attack page and four copies of a two-page sustain, giving 288 ms per component in the offline model. The last page of the low middle sustain (page 25, address `0x1900`) repeats a 64-byte block with 11 cycles, or 1,375 Hz at 8 kHz. The high middle sustain ends in page 28 (address `0x1C00`), with 23 cycles in a 128-byte block, or 1,437.5 Hz. Table 4-2 gives nominal middle carriers of 1,370.6 and 1,428.5 Hz. It gives 288/384 ms for DRAM and 274/380 ms for EDRAM, while the menus expand to 288/384 ms. A single sample-rate adjustment cannot reconcile both duration pairs. Measuring the card's treatment of the waveforms and timing requires a capture. [ESTD0AA export manifest](../audio/estd0aa/manifest.json) · [Nortel DRAM and EDRAM Guide, Table 4-2](https://www.gbppr.net/bsp/297-1001-527.pdf#page=59)
 
 At 8 kHz with unmasked A-law, the last 96 samples of the 750 Hz attack measure about 3,648 PCM RMS after removing the DC mean. The last 32 samples of the sustain measure 89 PCM RMS, about 32 dB quieter. Several SIT sustains are also roughly 33 dB below their attacks, while others have a quiet onset and a sustain near the attack level. Full-block replay preserves these differences. [Archived measurements](../archive/measurements/tone-fft-summary.json)
+
+Across all 2,890 validated phrase menus in the archive, 4,018 submenu references have a repeat count above one. Referenced silence accounts for 2,560, the 750 Hz cue pages account for 600, and SIT sustains account for 854. The remaining four are the same ACTS alert entry `10 00 04 04`, referenced by phrases 5 and 63 in both banks of EACTS0AE. It selects four pages from `0x10` and repeats the range four times, yielding 512 ms at 8 kHz. This ties the repeat field to both tones and silence in these files. [ACTS alert WAV](../audio/eacts0ae/bank_00/phrase_05.wav) · [Corpus counts](../VALIDATION.json)
 
 ## Standalone records
 
@@ -37,9 +39,95 @@ At 8 kHz with unmasked A-law, the last 96 samples of the 750 Hz attack measure a
 
 The 394 samples in a DTMF record can represent whole cycles of both carriers. For DTMF 1, 34 and 60 cycles in 394 samples give about 690.4 and 1,218.3 Hz. The short WAVs contain the stored blocks. Service cadence and level are properties of playback on the card. `EDRMTONE` phrase 41 spans many standalone records. The converter flags that overlap and gives each record its own WAV. Record 1 retains code `0x94` at sample index 3, while the later copy in record 18 contains `0x54` there. [EDRMTONE manifest](../audio/edrmtone/manifest.json) · [MWTTONE manifest](../audio/mwttone/manifest.json)
 
+## Independent waveform check
+
+This check reconstructs the factory image from the file records, follows one phrase menu and three tone headers, and uses FFmpeg's G.711 decoder. Run it with Python 3 and FFmpeg on the path from the repository root. It compares the resulting PCM with the versioned WAVs sample for sample.
+
+~~~python
+from pathlib import Path
+import struct
+import subprocess
+import wave
+
+def image(name):
+    raw = (Path("data/original") / name).read_bytes()
+    result = bytearray(0x40000)
+    if name.endswith(".bin44"):
+        for i in range(0, len(raw), 44):
+            record = raw[i:i + 44]
+            if record[:2] in (b"G0", b"G2"):
+                addr = int.from_bytes(record[3:6], "big")
+                count = record[2]
+                result[addr:addr + count] = record[6:6 + count]
+    else:
+        for line in raw.splitlines():
+            if line.startswith(b"S2"):
+                record = bytes.fromhex(line[2:].decode("ascii"))
+                addr = int.from_bytes(record[1:4], "big")
+                result[addr:addr + len(record) - 5] = record[4:-1]
+    return result
+
+def compare(codes, law, wav_path):
+    mask = {"alaw": 0x55, "mulaw": 0x7F}[law]
+    pcm = subprocess.run(
+        ["ffmpeg", "-v", "error", "-f", law, "-ar", "8000", "-i", "pipe:0",
+         "-f", "s16le", "pipe:1"],
+        input=bytes(code ^ mask for code in codes), capture_output=True, check=True,
+    ).stdout
+    with wave.open(str(Path("audio") / wav_path)) as wav:
+        assert pcm == wav.readframes(wav.getnframes()), wav_path
+        print(wav_path, wav.getnframes(), "matching frames")
+    return pcm
+
+estd = image("estd0aa.bin44")
+ptr, count, _ = struct.unpack_from("<HBB", estd, 4)
+cue = b"".join(
+    estd[256 * page:256 * (page + pages)] * repeats
+    for page, pages, repeats in struct.iter_unpack("<HBB", estd[ptr:ptr + 4 * count])
+)
+compare(cue, "alaw", "estd0aa/bank_00/phrase_01.wav")
+
+for name, address, law, clip in (
+    ("mwttone", 0x3BCA, "mulaw", 10),
+    ("edrmtone", 0x6CB2, "mulaw", 23),
+    ("edrmtone", 0xCA42, "alaw", 47),
+):
+    data = image(name + ".txt80")
+    count = 2 * int.from_bytes(data[address:address + 2], "big")
+    codes = data[address + 2:address + 2 + count]
+    compare(codes, law, f"{name}/tone-bank/tone_{clip:02d}.wav")
+~~~
+
+The frame counts are 1,280 for the cue, 2,000 for the howler, and 394 for each DTMF clip. A separate run also matched ESTD0AA SIT 1, the EDRMTONE copy of the howler, and all 32 DTMF WAVs. The four strongest bins in the howler are 351, 515, 613, and 651 of 2,000 samples, corresponding to 1404, 2060, 2452, and 2604 Hz.
+
+### What supports the DTMF law assignment
+
+For each key, measure the share of spectral power outside its two carrier bins, excluding DC and Nyquist. Across all 16 keys in each set, the decoder's selected law left less power outside the carriers than the alternate law.
+
+| 394-sample DTMF blocks | μ-law expansion | A-law expansion |
+| --- | ---: | ---: |
+| First set | 0.0107% to 0.0140% | 0.0144% to 0.0178% |
+| Second set | 0.0297% to 0.0461% | 0.0142% to 0.0249% |
+
+Either law can leave the dominant frequencies visible. The comparison supports the law assignments for these stored blocks. The card's selection between the two sets is still open.
+
+## What the encoder can reproduce
+
+An independent readback of the same five custom phrases in `.bin44` and `.txt80` found identical menus and sample codes. The reserved 750 Hz test cue, three-burst prompt, and first two SITs retained their original menus and codes in both outputs. Each newly generated submenu entry used a repeat count of one.
+
+| Test input | Observed output |
+| --- | --- |
+| `--tone 40 750@160` | 1,280 generated A-law samples. The dominant carrier was 750 Hz. |
+| `--tone 41 howler` | The 2,000 stored μ-law samples converted to A-law, followed by 48 padding codes. All four carriers were present. Against direct μ-law expansion, the conversion had a maximum difference of 132 signed PCM units and about 42.4 dB signal-to-error ratio over the original block. |
+| `--tone 42 dtmf:1:2` | The 394 stored A-law codes were identical, followed by 118 padding codes. |
+| `--phrase 43 audio/estd0aa/bank_00/phrase_01.wav` | The 1,280 expanded factory cue codes were recovered exactly in a custom phrase. Both waveform copies and their order matched the factory menu's expansion. |
+| `--tone 44 dtmf:1` | 394 codes converted from μ-law to A-law, followed by 118 padding codes. The two carrier bins were preserved. |
+
+The encoder writes tone audio to ordinary announcement slots. Custom repeat-count authoring and standalone tone-bank writing remain open. [Encoder guide](../ENCODING.md#encode-tone-phrases) · [Bench status](../BENCH_STATUS.md)
+
 ## What remains on the card
 
-Northern Telecom's patent describes prerecorded tones alongside words and silence in NT1X80AA memory. The Nortel guide names `MWTTONE.AA01` as the data file for the milliwatt and receiver-off-hook feature, with separate PM firmware: `EDRMAE01` or later for NT1X80AA, or `ED16AA01` or later for NT1X80BA. The announcement/tone archive supplies the data files. For SIT specifically, Nortel documents that SITLOAD downloads voice-file data into announcement RAM and that OFCENG.PM_PCM_PROTOCOL_SELECTION selects the coding law. These sources establish what gets loaded and what the waveform bytes carry. They leave open whether firmware or dedicated logic applies the repeats, adjusts gain, or changes the phase, sample selection or cadence. [US6442246B1, description of Fig. 2](https://patents.google.com/patent/US6442246B1/en) · [Nortel DRAM and EDRAM Guide, Tone feature and chapter 14](https://www.gbppr.net/bsp/297-1001-527.pdf)
+An Ameritech patent describes prerecorded tones alongside words and silence in Northern Telecom's NT1X80AA memory. The Nortel guide names `MWTTONE.AA01` as the data file for the milliwatt and receiver-off-hook feature, with separate PM firmware: `EDRMAE01` or later for NT1X80AA, or `ED16AA01` or later for NT1X80BA. The announcement/tone archive supplies the data files. For SIT specifically, Nortel documents that SITLOAD downloads voice-file data into announcement RAM and that OFCENG.PM_PCM_PROTOCOL_SELECTION selects the coding law. These sources establish what gets loaded and what the waveform bytes carry. They leave open whether firmware or dedicated logic applies the repeats, adjusts gain, or changes the phase, sample selection or cadence. [US6442246B1, description of Fig. 2](https://patents.google.com/patent/US6442246B1/en) · [Nortel DRAM and EDRAM Guide, Tone feature and chapter 14](https://www.gbppr.net/bsp/297-1001-527.pdf)
 
 The [bench checklist](../BENCH_STATUS.md#tone-playback-test) gives a repeat-count test and the settings to record.
 
