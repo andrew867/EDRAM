@@ -70,6 +70,30 @@ python slm_tape.py append base.tap new.tap --from 0314-patches.tap.xz --file 'CB
 
 Use `append` when a native entry is available. It preserves its file code, logical-record attributes, and payload exactly, including on-tape byte order. Both compressed and uncompressed inputs are accepted. Edits produce an uncompressed `.tap` image.
 
+## Release manifests and the SLM restore path
+
+The archived EDRM0001 release contains two parallel ASCII inventories with CRLF line endings. The 62 lines of EDRM0001.loads are the filenames from EDRM0001.chksum in the same order, with the host-side extensions removed. A checksum row has four fields.
+
+| Field | Example | Meaning |
+| --- | --- | --- |
+| Filename | edrmtone.txt80 | Host-side file with its transport extension |
+| Checksum | 01878 | Decimal 16-bit BSD rotating checksum of the exact file bytes |
+| Blocks | 341 | Byte length rounded up in 512-byte units |
+| Status | NEW | The value observed on every archived row |
+
+The checksum rotates a 16-bit accumulator right by one bit before adding each byte, then keeps the low 16 bits. GNU sum -r returns the same checksum but reports 1024-byte blocks. The original manifests match all 61 binary and text loads, including both tone files. The remaining row, EDRM0001_INFO.txt, has the correct block count and a stored checksum of 03032. The 84 archived bytes produce 01732. The cause of that discrepancy is unknown. [Archived inventories](data/original) · [GNU sum](https://www.gnu.org/software/coreutils/manual/html_node/sum-invocation.html)
+
+Generate the pair for an existing encoded load and check it against the payload.
+
+~~~sh
+python release_manifest.py build LABANN labann-manifests LABANN.bin44
+python release_manifest.py verify labann-manifests/LABANN.loads --payload-dir .
+~~~
+
+The manifests are useful for packaging and checking files on a workstation. They carry no announcement data. Nortel's release document explicitly names tape EDRM0001 and tells the operator to list its SLM directory and restore each required voice file by name with RE FILE. It does not show either sidecar being read by DISKUT or LOADPM. For the documented SLM path, put the bin44 bytes into a named tape file such as LABANN with logical record length 44, restore LABANN to the disk volume that holds the EDRAM firmware, and select LABANN in EDRAMINV for the intended virtual announcement card. The DTM's LOADPM then downloads the firmware and the specified announcement file. PMLOADS and TMINV cover the peripheral firmware and its location. [EDRAM Voice File Release Document, 297-8991-597, pp. 2-7 and 2-8](http://www.dms-100.net/files/telephony/nortel/docs/pdf/297-8991-597.01.02.pdf#page=27) · [DRAM and EDRAM Guide, 297-1001-527, pp. 12-44 and 12-45](https://www.gbppr.net/bsp/297-1001-527.pdf)
+
+The package checksum, the bin44 per-record and aggregate checksums, and the SLM label checksum cover different bytes. The existing add-bin44 command builds the individual tape entry from the bin44 and its template. Native EDRM0001 media, switch restore, and card playback are still needed to confirm the generated label attributes and payload byte order.
+
 ## Prepare a bin44 bench tape
 
 The archived EDRAM distribution identifies itself as `EDRM0001`, version 010. Its binary voice loads contain 44-byte G-records with per-record checksums and a `G6` aggregate checksum. Nortel's EIU guide independently documents the `.binNN` extension as a way to carry the binary logical record length into a switch file. A `.bin44` retains its 44-byte records throughout encoding and tape packing. Tape framing operates on 512-byte blocks around the file stream. [Release identification](data/original/EDRM0001_INFO.txt) · [G-record format](FORMAT.md) · [EIU guide, Appendix C](https://www.gbppr.net/bsp/297-8991-910.pdf)
