@@ -8,6 +8,8 @@ Extract individual announcements and reusable audio segments from DMS-100 / SL-1
 
 The reference import workflow writes original files under [data/original](data/original), all extracted WAVs under [audio](audio), and a searchable player at [audio/listen.html](audio/listen.html). Download or clone the repository and open that HTML file locally; GitHub's source preview does not execute its audio player.
 
+Choose **Restored tones** in the player to browse the SIT, 750 Hz test and three-pulse prompt renders. Each matching row plays the restored tone first and has a **Direct A-law** comparison button. Supported SIT rows also offer the generated standard reference. Identical restorations share one WAV in [audio/tones](audio/tones).
+
 The transcription workflow uses multilingual Whisper small through faster-whisper, with voice activity detection, identical-PCM deduplication, six independent processing shards, per-segment timestamps and review flags. It processes announcements and reusable speech fragments. Known tone components and silence receive descriptive labels instead of invented dialogue. Transcripts are machine generated and not human verified. JSON and CSV transcripts accompany the HTML player.
 
 A listener identified eaabs0hc.bin44, bank 0, phrase 4 as the calling-card / operator bong with fade. Tone FFT measurements are recorded in [research](research).
@@ -82,4 +84,10 @@ The converter is a new Python implementation. Joe's C code, proprietary firmware
 
 ## SIT comparison signals
 
-The [waveform and FFT comparison](research/sit-waveform-fft.svg) shows the stored baseline beside an explicitly generated Bellcore reference. The player offers a separate Standard SIT reference button for supported menus. [Reference documentation](references/README.md) records the frequencies, durations and generation settings. Stored WAVs are preserved; the tone byte interpretation remains an open issue.
+The [waveform and FFT comparison](research/sit-waveform-fft.svg) shows the direct A-law baseline beside a generated Bellcore reference. [Reference documentation](references/README.md) records the frequencies, durations and generation settings. Re-export restored WAVs and rebuild the player using the existing transcripts with these commands.
+
+~~~sh
+python tone_playback.py data/original audio --archive
+python transcribe.py index audio
+python verify_corpus.py data/original audio
+~~~

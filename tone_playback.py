@@ -9,6 +9,7 @@ import json
 import math
 from pathlib import Path
 import struct
+from tempfile import TemporaryDirectory
 
 import edram
 import sit_reference
@@ -28,6 +29,8 @@ TONE_LAYOUT = {
 # The standard 750 Hz attack and loop are sometimes stored one byte earlier.
 # Match the full 512 bytes before substituting either address.
 TEST_TONE_SHA256 = "2b6876311c7f97ba8bd33bc8af224ae2f3484fa4146e0c2f3a11536133672f68"
+ARCHIVE_INDEX = "tone-restoration.json"
+RESTORATION_NOTE = "Experimental phase-aligned EDRAM loop restoration; original hardware playback is unverified"
 TEST_TONE = (edram.Segment(14, 1, 2), edram.Segment(15, 1, 3))
 PROMPT_TONE = (
     (edram.Segment(13, 1, 16),)
@@ -152,41 +155,94 @@ def restore(image, phrase, templates):
     return bytes(output), diagnostics
 
 
-def export(source, output):
-    image = edram.Image.read(source)
-    results = {"source": source.name, "sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
-               "interpretation": "experimental loop restoration from the stored waveform and menu timing",
-               "comparisons": [], "skipped": []}
+def restored_phrases(image, skipped):
     templates = {}
     for phrase in image.phrases(strict=False):
         try:
             restored, diagnostics = restore(image, phrase, templates)
         except edram.FormatError as exc:
-            results["skipped"].append({"bank": phrase.bank, "phrase": phrase.number, "reason": str(exc)})
+            skipped.append({"bank": phrase.bank, "phrase": phrase.number, "reason": str(exc)})
             continue
-        if not restored:
-            continue
+        if restored:
+            if len(restored) != 2 * sum(segment.samples for segment in phrase.segments):
+                raise ValueError(f"restoration changed menu timing for bank {phrase.bank}, phrase {phrase.number}")
+            yield phrase, restored, diagnostics
+
+
+def export(source, output):
+    image = edram.Image.read(source)
+    results = {"source": source.name, "sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
+               "interpretation": RESTORATION_NOTE, "comparisons": [], "skipped": []}
+    for phrase, restored, diagnostics in restored_phrases(image, results["skipped"]):
         filename = f"bank_{phrase.bank:02d}_{edram.phrase_name(phrase)}"
         direct, _ = edram.render(image, phrase)
-        if len(direct) != len(restored):
-            raise ValueError(f"restoration changed menu timing for {filename}")
         paths = {"direct_wav": filename + "_direct.wav", "restored_wav": filename + "_restored.wav"}
         edram.write_wav(output / paths["direct_wav"], direct, filename, "Direct EDRAM A-law expansion")
-        edram.write_wav(output / paths["restored_wav"], restored, filename,
-                        "Experimental phase-aligned EDRAM loop restoration; original hardware playback is unverified")
+        edram.write_wav(output / paths["restored_wav"], restored, filename, RESTORATION_NOTE)
         results["comparisons"].append({**paths, "samples": len(restored) // 2, "components": diagnostics})
     output.mkdir(parents=True, exist_ok=True)
-    (output / "tone-restoration.json").write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
+    (output / ARCHIVE_INDEX).write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
     return results
+
+
+def export_archive(sources, root):
+    """Add shared restored WAVs to a matching archive of direct A-law extracts."""
+    index = {"interpretation": RESTORATION_NOTE, "clips": {}, "files": {}, "skipped": []}
+    wavs = {}
+    for source in sources:
+        manifest_path = root / source.stem / "manifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        if (manifest["source_sha256"] != hashlib.sha256(source.read_bytes()).hexdigest()
+                or manifest["codec"] != "alaw-unmasked"):
+            raise ValueError(f"archive does not match an A-law extraction of {source.name}")
+        direct = {(p["bank"], p["number"]): p for p in manifest["phrases"] if p["wav"]}
+        skipped = []
+        for phrase, pcm, _ in restored_phrases(edram.Image.read(source), skipped):
+            entry = direct.get((phrase.bank, phrase.number))
+            if not entry:
+                raise ValueError(f"no direct export for {source.name} bank {phrase.bank} phrase {phrase.number}")
+            original = (Path(source.stem) / entry["wav"]).as_posix()
+            if not (root / original).is_file() or entry["samples"] != len(pcm) // 2:
+                raise ValueError(f"missing or mismatched direct export: {original}")
+            digest = hashlib.sha256(pcm).hexdigest()
+            if digest not in wavs:
+                if phrase.segments == TEST_TONE:
+                    name = "test-750"
+                elif phrase.segments == PROMPT_TONE:
+                    name = "prompt-750"
+                else:
+                    name = edram.phrase_name(phrase).split("_sit_")[1]
+                    name = f"sit-{name}"
+                wavs[digest] = (f"tones/{name}-{digest}.wav", pcm, name)
+            index["clips"][original] = wavs[digest][0]
+        index["skipped"].extend({"source": source.name, **item} for item in skipped)
+
+    with TemporaryDirectory(dir=root) as directory:
+        staging = Path(directory)
+        for digest, (path, pcm, name) in wavs.items():
+            edram.write_wav(staging / path, pcm, name, RESTORATION_NOTE)
+            index["files"][path] = {"samples": len(pcm) // 2, "pcm_sha256": digest}
+        for path in index["files"]:
+            (root / path).parent.mkdir(parents=True, exist_ok=True)
+            (staging / path).replace(root / path)
+        pending = staging / ARCHIVE_INDEX
+        pending.write_text(json.dumps(index, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        pending.replace(root / ARCHIVE_INDEX)
+    return index
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("source", type=Path)
     parser.add_argument("output", type=Path)
+    parser.add_argument("--archive", action="store_true", help="add restored tones to an existing A-law archive")
     args = parser.parse_args()
-    result = export(args.source, args.output)
-    print(f"{len(result['comparisons'])} tone comparisons, {len(result['skipped'])} skipped")
+    if args.archive:
+        result = export_archive(edram.input_paths([str(args.source)]), args.output)
+        print(f"{len(result['clips'])} restored clips, {len(result['files'])} WAVs, {len(result['skipped'])} skipped")
+    else:
+        result = export(args.source, args.output)
+        print(f"{len(result['comparisons'])} tone comparisons, {len(result['skipped'])} skipped")
 
 
 if __name__ == "__main__":

@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import wave
 import edram
+from tone_playback import ARCHIVE_INDEX
 
 
 def verify(source_dir: Path, output: Path):
@@ -13,6 +14,10 @@ def verify(source_dir: Path, output: Path):
               "phrase_wavs": 0, "segment_wavs": 0, "unavailable_phrases": 0,
               "invalid_menu_entries": 0, "phrase_duration_seconds": 0,
               "unit_tests": "run separately", "files": []}
+    index_path = output / ARCHIVE_INDEX
+    restoration = json.loads(index_path.read_text(encoding="utf-8")) if index_path.is_file() else None
+    restored_targets = restoration["clips"] if restoration is not None else {}
+    verified_targets = set()
     for path in edram.input_paths([str(source_dir)]):
         image = edram.Image.read(path)
         phrases = image.phrases(strict=False)
@@ -45,6 +50,10 @@ def verify(source_dir: Path, output: Path):
             assert pcm == expected
             assert hashlib.sha256(pcm).hexdigest() == entry["pcm_sha256"]
             assert implicit == entry["implicit_zero_samples"]
+            relative = (Path(path.stem) / entry["wav"]).as_posix()
+            if relative in restored_targets:
+                assert len(pcm) // 2 == restoration["files"][restored_targets[relative]]["samples"], relative
+                verified_targets.add(relative)
             result["phrase_wavs"] += 1
             result["phrase_duration_seconds"] += len(pcm) / 16000
             exported += 1
@@ -62,7 +71,22 @@ def verify(source_dir: Path, output: Path):
                                 "valid_menus": len(phrases), "exported_phrases": exported,
                                 "invalid_menus": image.invalid_phrases,
                                 "overwritten_bytes": sum(e["changed_bytes"] for e in image.overwrites)})
-    assert len(list(output.rglob("*.wav"))) == result["phrase_wavs"] + result["segment_wavs"], "unexpected stale WAV files"
+    restored_wavs = 0
+    if restoration is not None:
+        assert verified_targets == restored_targets.keys(), "restored tone has no direct extract"
+        files = restoration["files"]
+        assert set(restored_targets.values()) == files.keys(), "restored WAVs and clip links disagree"
+        actual = {path.relative_to(output).as_posix() for path in (output / "tones").glob("*.wav")}
+        assert actual == files.keys(), "restored WAVs and index disagree"
+        for path, entry in files.items():
+            with wave.open(str(output / path)) as wav:
+                assert (wav.getframerate(), wav.getnchannels(), wav.getsampwidth()) == (8000, 1, 2), path
+                assert wav.getnframes() == entry["samples"], path
+                pcm = wav.readframes(wav.getnframes())
+            assert hashlib.sha256(pcm).hexdigest() == entry["pcm_sha256"], path
+        restored_wavs = len(files)
+        result.update(restored_clips=len(verified_targets), restored_wavs=restored_wavs)
+    assert len(list(output.rglob("*.wav"))) == result["phrase_wavs"] + result["segment_wavs"] + restored_wavs, "unexpected stale WAV files"
     result["phrase_duration_seconds"] = round(result["phrase_duration_seconds"], 6)
     result["status"] = "passed"
     return result

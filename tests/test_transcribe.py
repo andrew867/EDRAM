@@ -64,6 +64,21 @@ class TranscriptTests(unittest.TestCase):
             self.assertIn("&lt;script&gt;alert(1)&lt;/script&gt;", page)
             self.assertNotIn("<script>alert(1)</script>", page)
 
+    def test_player_links_all_three_sit_versions(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "tone-restoration.json").write_text(json.dumps({"clips": {"pack/sit.wav": "tones/restored.wav"}}))
+            clip = {"path": "pack/sit.wav", "source": "pack", "kind": "announcement", "bank": 0,
+                    "label": "phrase_09_sit_02", "seconds": 0.96, "content": "tone",
+                    "reference_wav": "../references/sit/example.wav", "transcript": {"text": ""}}
+            transcribe.write_player(root, [clip])
+            page = (root / "listen.html").read_text()
+            self.assertIn('data-restored="true"', page)
+            self.assertIn('data-src="tones/restored.wav" data-playback="Restored tone"', page)
+            self.assertIn('href="tones/restored.wav" download', page)
+            self.assertIn('data-src="pack/sit.wav" data-playback="Direct A-law"', page)
+            self.assertIn('data-src="../references/sit/example.wav"', page)
+
 
 if __name__ == "__main__":
     unittest.main()

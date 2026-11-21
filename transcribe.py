@@ -13,6 +13,8 @@ from pathlib import Path
 import sys
 import wave
 
+from tone_playback import ARCHIVE_INDEX
+
 
 def read_pcm(path):
     with wave.open(str(path)) as wav:
@@ -149,6 +151,8 @@ def run_shard(root, plan_path, output, shard, shards, model_size, resume_parts=N
 
 
 def write_player(root, clips):
+    index = root / ARCHIVE_INDEX
+    restored_tones = json.loads(index.read_text(encoding="utf-8"))["clips"] if index.is_file() else {}
     rows = []
     for clip in clips:
         t = clip["transcript"]
@@ -156,12 +160,22 @@ def write_player(root, clips):
         review = "Review" if t.get("review_recommended") else ""
         title = f"{clip['source']} / bank {clip['bank']} / {clip['label']}"
         url = html.escape(clip["path"], quote=True)
+        restored = restored_tones.get(clip["path"])
+        if restored:
+            primary = html.escape(restored, quote=True)
+            play = f'<button data-src="{primary}" data-playback="Restored tone">Play restored tone</button> '
+            direct = f' <button data-src="{url}" data-playback="Direct A-law">Direct A-law</button>'
+        else:
+            primary = url
+            play = f'<button data-src="{url}">Play stored audio</button> '
+            direct = ""
         reference = clip.get("reference_wav")
-        compare = f'<button data-src="{html.escape(reference, quote=True)}" data-reference="true">Standard SIT reference</button>' if reference else ""
-        rows.append(f'<tr data-kind="{clip["kind"]}" data-review="{str(bool(review)).lower()}"><td>{html.escape(title)}'
+        compare = f' <button data-src="{html.escape(reference, quote=True)}" data-playback="Generated standard reference">Standard SIT reference</button>' if reference else ""
+        flag = ' data-restored="true"' if restored else ""
+        rows.append(f'<tr data-kind="{clip["kind"]}" data-review="{str(bool(review)).lower()}"{flag}><td>{html.escape(title)}'
                     f'<small>{clip["kind"]}, {clip["seconds"]:.3f}s, {html.escape(t.get("language") or clip["content"])}</small></td>'
                     f'<td class="transcript">{html.escape(text)}<small class="review">{review}</small></td>'
-                    f'<td><button data-src="{url}">Play stored audio</button> <a href="{url}" download>WAV</a> {compare}</td></tr>')
+                    f'<td>{play}<a href="{primary}" download>WAV</a>{direct}{compare}</td></tr>')
     page = '''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
 <title>EDRAM announcement player and transcripts</title><style>
 body{max-width:1400px;margin:1rem auto;padding:0 1rem;font:16px system-ui;background:#101820;color:#edf4f9}a{color:#7ad8ff}
@@ -170,17 +184,17 @@ input,select,button{font:inherit;padding:.4rem}input{width:min(650px,80%)}audio{
 table{width:100%;border-collapse:collapse}td{padding:.65rem;border-bottom:1px solid #334452}td:first-child{width:31%}small{display:block;color:#a5bac9}.review{color:#ffc46b}
 #now{margin:.5rem 0;color:#9ee5ff}#words{white-space:pre-wrap}.transcript{max-width:650px}button{cursor:pointer}
 @media(max-width:700px){td{display:block}td:first-child{width:auto}header p{font-size:13px}}
-</style><header><h1>EDRAM announcement archive</h1><p>Machine transcripts, not yet reviewed by a person. Tone and silence labels come from the audio/menu classification. Speaker identities are unassigned. Stored SIT decoding is under investigation; Standard SIT reference plays a separately generated comparison signal.</p>
+</style><header><h1>EDRAM announcement archive</h1><p>Machine transcripts await human review. Speaker identities are unassigned. Restored tones use the stored waveform and menu timing. Direct A-law and generated standard SIT are available for comparison where shown.</p>
 <input id="q" aria-label="Search transcripts" placeholder="Search words, source or phrase ID">
-<select id="kind" aria-label="Clip type"><option value="">All clips</option><option value="announcement" selected>Announcements</option><option value="segment">Speech and tone fragments</option></select>
+<select id="kind" aria-label="Clip type"><option value="">All clips</option><option value="announcement" selected>Announcements</option><option value="segment">Speech and tone fragments</option><option value="restored">Restored tones</option></select>
 <label><input type="checkbox" id="review" style="width:auto">Needs review</label><span id="count"></span>
 <audio controls id="player"></audio><div id="now">Select a recording</div><div id="words"></div></header>
 <table><tbody>ROWS</tbody></table><script>
 const player=document.querySelector('#player'), rows=[...document.querySelectorAll('tr')];
 function filter(){let n=0;const q=document.querySelector('#q').value.toLowerCase(),k=document.querySelector('#kind').value,r=document.querySelector('#review').checked;
-rows.forEach(row=>{row.hidden=!(row.textContent.toLowerCase().includes(q)&&(!k||row.dataset.kind===k)&&(!r||row.dataset.review==='true'));if(!row.hidden)n++;});document.querySelector('#count').textContent=' '+n+' clips';}
+rows.forEach(row=>{const type=k==='restored'?row.dataset.restored==='true':!k||row.dataset.kind===k;row.hidden=!(row.textContent.toLowerCase().includes(q)&&type&&(!r||row.dataset.review==='true'));if(!row.hidden)n++;});document.querySelector('#count').textContent=' '+n+' clips';}
 document.querySelectorAll('input,select').forEach(e=>e.addEventListener('input',filter));filter();
-document.addEventListener('click',e=>{if(e.target.dataset.src){const row=e.target.closest('tr');player.src=e.target.dataset.src;player.play();document.querySelector('#now').textContent=(e.target.dataset.reference?'GENERATED STANDARD REFERENCE: ':'STORED AUDIO: ')+row.cells[0].textContent;document.querySelector('#words').textContent=row.cells[1].textContent;}});
+document.addEventListener('click',e=>{if(e.target.dataset.src){const row=e.target.closest('tr');player.src=e.target.dataset.src;player.play();document.querySelector('#now').textContent=(e.target.dataset.playback||'Stored audio')+': '+row.cells[0].textContent;document.querySelector('#words').textContent=row.cells[1].textContent;}});
 </script></html>'''.replace("ROWS", "\n".join(rows))
     (root / "listen.html").write_text(page, encoding="utf-8")
 
@@ -231,7 +245,7 @@ def merge(root, plan_path, parts):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("plan", "run", "merge"))
+    parser.add_argument("command", choices=("plan", "run", "merge", "index"))
     parser.add_argument("root", type=Path)
     parser.add_argument("--plan", type=Path, default=Path("transcription-plan.json"))
     parser.add_argument("--output", type=Path, default=Path("transcripts-part-0.json"))
@@ -249,8 +263,11 @@ def main():
         print(json.dumps({"clips": len(plan["clips"]), "unique_speech": len(plan["tasks"]), "content": plan["counts"]}))
     elif args.command == "run":
         run_shard(args.root, args.plan, args.output, args.shard, args.shards, args.model, args.resume_parts)
-    else:
+    elif args.command == "merge":
         merge(args.root, args.plan, args.parts)
+    else:
+        transcripts = json.loads((args.root / "transcripts.json").read_text(encoding="utf-8"))
+        write_player(args.root, transcripts["clips"])
 
 
 if __name__ == "__main__":
