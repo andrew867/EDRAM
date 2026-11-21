@@ -1555,7 +1555,7 @@ eaoss0ag/segments/bank_01_page_0295_pages_020.wav,segment,speech,en,nine.,transc
 eaoss0ag/segments/bank_01_page_02a9_pages_018.wav,segment,speech,en,zero.,transcribed,True,False,,,,,
 eaoss0ag/segments/bank_01_page_02bb_pages_014.wav,segment,speech,en,one.,transcribed,False,False,,,,,
 eaoss0ag/segments/bank_01_page_02c9_pages_014.wav,segment,speech,en,2,transcribed,True,False,,,,,
-eaoss0ag/segments/bank_01_page_02d7_pages_016.wav,segment,speech,en,3,transcribed,False,False,,,,,
+eaoss0ag/segments/bank_01_page_02d7_pages_016.wav,segment,speech,en,3,transcribed,True,False,,,,,
 eaoss0ag/segments/bank_01_page_02e7_pages_015.wav,segment,speech,en,for,transcribed,True,False,,,,,
 eaoss0ag/segments/bank_01_page_02f6_pages_020.wav,segment,speech,en,5,transcribed,True,False,,,,,
 eaoss0ag/segments/bank_01_page_030a_pages_015.wav,segment,speech,en,6,transcribed,True,False,,,,,
@@ -1694,7 +1694,7 @@ eardt0ja/segments/bank_00_page_0295_pages_020.wav,segment,speech,en,nine.,transc
 eardt0ja/segments/bank_00_page_02a9_pages_018.wav,segment,speech,en,zero.,transcribed,True,False,,,,,
 eardt0ja/segments/bank_00_page_02bb_pages_014.wav,segment,speech,en,one.,transcribed,False,False,,,,,
 eardt0ja/segments/bank_00_page_02c9_pages_014.wav,segment,speech,en,2,transcribed,True,False,,,,,
-eardt0ja/segments/bank_00_page_02d7_pages_016.wav,segment,speech,en,3,transcribed,False,False,,,,,
+eardt0ja/segments/bank_00_page_02d7_pages_016.wav,segment,speech,en,3,transcribed,True,False,,,,,
 eardt0ja/segments/bank_00_page_02e7_pages_015.wav,segment,speech,en,for,transcribed,True,False,,,,,
 eardt0ja/segments/bank_00_page_02f6_pages_020.wav,segment,speech,en,5,transcribed,True,False,,,,,
 eardt0ja/segments/bank_00_page_030a_pages_015.wav,segment,speech,en,6,transcribed,True,False,,,,,
@@ -2067,7 +2067,7 @@ ecls10ak/bank_01/phrase_43.wav,announcement,speech,en,Nine,transcribed,True,Fals
 ecls10ak/bank_01/phrase_44.wav,announcement,speech,en,Zero,transcribed,True,False,catalog-checked-digit,flat,,17-82,zero.
 ecls10ak/bank_01/phrase_45.wav,announcement,speech,en,One,transcribed,False,False,catalog-checked-digit,flat,,17-82,one.
 ecls10ak/bank_01/phrase_46.wav,announcement,speech,en,Two,transcribed,True,False,catalog-checked-digit,flat,,17-82,To
-ecls10ak/bank_01/phrase_47.wav,announcement,speech,en,Three,transcribed,False,False,catalog-checked-digit,flat,,17-82,3
+ecls10ak/bank_01/phrase_47.wav,announcement,speech,en,Three,transcribed,True,False,catalog-checked-digit,flat,,17-82,3
 ecls10ak/bank_01/phrase_48.wav,announcement,speech,en,for,transcribed,True,False,,flat,,17-82,
 ecls10ak/bank_01/phrase_49.wav,announcement,speech,en,Five,transcribed,True,False,catalog-checked-digit,flat,,17-82,5
 ecls10ak/bank_01/phrase_50.wav,announcement,speech,en,Six,transcribed,True,False,catalog-checked-digit,flat,,17-82,6
@@ -2139,7 +2139,7 @@ ecls10ak/segments/bank_01_page_0295_pages_020.wav,segment,speech,en,nine.,transc
 ecls10ak/segments/bank_01_page_02a9_pages_018.wav,segment,speech,en,zero.,transcribed,True,False,,,,,
 ecls10ak/segments/bank_01_page_02bb_pages_014.wav,segment,speech,en,one.,transcribed,False,False,,,,,
 ecls10ak/segments/bank_01_page_02c9_pages_014.wav,segment,speech,en,2,transcribed,True,False,,,,,
-ecls10ak/segments/bank_01_page_02d7_pages_016.wav,segment,speech,en,3,transcribed,False,False,,,,,
+ecls10ak/segments/bank_01_page_02d7_pages_016.wav,segment,speech,en,3,transcribed,True,False,,,,,
 ecls10ak/segments/bank_01_page_02e7_pages_015.wav,segment,speech,en,for,transcribed,True,False,,,,,
 ecls10ak/segments/bank_01_page_02f6_pages_020.wav,segment,speech,en,5,transcribed,True,False,,,,,
 ecls10ak/segments/bank_01_page_030a_pages_015.wav,segment,speech,en,6,transcribed,True,False,,,,,
@@ -2376,7 +2376,7 @@ ecls20at/bank_01/phrase_43.wav,announcement,speech,en,Nine,transcribed,True,Fals
 ecls20at/bank_01/phrase_44.wav,announcement,speech,en,Zero,transcribed,True,False,catalog-checked-digit,flat,,17-98,zero.
 ecls20at/bank_01/phrase_45.wav,announcement,speech,en,One,transcribed,False,False,catalog-checked-digit,flat,,17-98,one.
 ecls20at/bank_01/phrase_46.wav,announcement,speech,en,Two,transcribed,True,False,catalog-checked-digit,flat,,17-98,To
-ecls20at/bank_01/phrase_47.wav,announcement,speech,en,Three,transcribed,False,False,catalog-checked-digit,flat,,17-98,3
+ecls20at/bank_01/phrase_47.wav,announcement,speech,en,Three,transcribed,True,False,catalog-checked-digit,flat,,17-98,3
 ecls20at/bank_01/phrase_48.wav,announcement,speech,en,for,transcribed,True,False,,flat,,17-98,
 ecls20at/bank_01/phrase_49.wav,announcement,speech,en,Five,transcribed,True,False,catalog-checked-digit,flat,,17-98,5
 ecls20at/bank_01/phrase_50.wav,announcement,speech,en,Six,transcribed,True,False,catalog-checked-digit,flat,,17-98,6
@@ -2459,7 +2459,7 @@ ecls20at/segments/bank_01_page_0295_pages_020.wav,segment,speech,en,nine.,transc
 ecls20at/segments/bank_01_page_02a9_pages_018.wav,segment,speech,en,zero.,transcribed,True,False,,,,,
 ecls20at/segments/bank_01_page_02bb_pages_014.wav,segment,speech,en,one.,transcribed,False,False,,,,,
 ecls20at/segments/bank_01_page_02c9_pages_014.wav,segment,speech,en,2,transcribed,True,False,,,,,
-ecls20at/segments/bank_01_page_02d7_pages_016.wav,segment,speech,en,3,transcribed,False,False,,,,,
+ecls20at/segments/bank_01_page_02d7_pages_016.wav,segment,speech,en,3,transcribed,True,False,,,,,
 ecls20at/segments/bank_01_page_02e7_pages_015.wav,segment,speech,en,for,transcribed,True,False,,,,,
 ecls20at/segments/bank_01_page_02f6_pages_020.wav,segment,speech,en,5,transcribed,True,False,,,,,
 ecls20at/segments/bank_01_page_030a_pages_015.wav,segment,speech,en,6,transcribed,True,False,,,,,
