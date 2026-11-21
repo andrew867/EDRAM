@@ -37,6 +37,8 @@ Existing output folders require explicit --overwrite. Prefer a new directory whe
 
 [The SLM tape tool](SLM_TAPE.md) lists and extracts archived tape files, appends existing entries, and builds experimental `.bin44` bench images. The documentation records the recovered labels, byte ordering, checksums, and the tape-to-disk path used before `LOADPM`.
 
+[The bench checklist](BENCH_STATUS.md) records the remaining DMS acceptance checks and tone research.
+
 ## Reference extraction
 
 | Result | Count |
