@@ -100,6 +100,38 @@ class TranscriptTests(unittest.TestCase):
             self.assertIn('data-src="pack/sit.wav" data-playback="Direct A-law"', page)
             self.assertIn('data-src="../references/sit/example.wav"', page)
 
+    def test_players_use_decoded_tones_instead_of_raw_bank_pages(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            folder = root / "edrmtone"
+            folder.mkdir()
+            raw = {"bank": 0, "wav": "bank_00/phrase_41.wav", "label": "phrase_41",
+                   "duration_seconds": 7.328, "segments": [{"page": 106, "pages": 86}]}
+            speech = dict(raw, bank=1, wav="bank_01/phrase_41.wav")
+            fragment = {"bank": 0, "page": 106, "pages": 86, "wav": "segments/bank_00_page_006a_pages_086.wav"}
+            tone = {"index": 22, "wav": "tone-bank/tone_22.wav", "tone_name": "DTMF D, set 1",
+                    "frequencies_hz": [934, 1624.4], "header_address": 0x6b26, "sample_address": 0x6b28,
+                    "samples": 394, "codec": "mulaw-unmasked"}
+            manifest = {"source": "edrmtone.txt80", "sample_rate": 8000, "phrases": [raw, speech],
+                        "segments": [fragment], "tone_bank": [tone]}
+            (folder / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+            clips = [
+                {"path": "edrmtone/" + entry["wav"], "source": "edrmtone", "kind": kind,
+                 "bank": entry["bank"], "label": "phrase_41", "seconds": 7.328,
+                 "content": "speech", "transcript": {"text": ""}}
+                for entry, kind in ((raw, "announcement"), (speech, "announcement"), (fragment, "segment"))
+            ]
+            for write_index in (lambda: transcribe.write_player(root, clips),
+                                lambda: edram.write_browser(root, [manifest])):
+                with self.subTest(write_index=write_index):
+                    write_index()
+                    page = (root / "listen.html").read_text(encoding="utf-8")
+                    self.assertNotIn(raw["wav"], page)
+                    self.assertNotIn(fragment["wav"], page)
+                    self.assertIn(speech["wav"], page)
+                    self.assertIn('data-src="edrmtone/tone-bank/tone_22.wav"', page)
+                    self.assertIn("DTMF D, set 1", page)
+
     def test_catalog_transcript_preserves_asr_and_checks_hash(self):
         entry = {"transcript_text": "Zero", "transcript_basis": "catalog-checked-digit",
                  "intonation": "falling", "printed_page": "17-49"}

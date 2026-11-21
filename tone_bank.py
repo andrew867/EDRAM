@@ -1,7 +1,7 @@
 """Recognize EDRAM tone cues and extract the archived NT1X80 tone banks."""
 
 import hashlib
-import json
+from itertools import chain
 from pathlib import Path
 
 
@@ -197,6 +197,22 @@ def bank_clips(manifest):
             }
 
 
-def manifest_clips(root):
-    for path in sorted(root.glob("*/manifest.json")):
-        yield from bank_clips(json.loads(path.read_text(encoding="utf-8")))
+def raw_bank_paths(manifest, bank_size, page_size):
+    """Find generic WAV exports that expand tone-bank records as phrase pages."""
+    regions = [(tone["header_address"], tone["sample_address"] + tone["samples"])
+               for tone in manifest.get("tone_bank", ())]
+    if not regions:
+        return set()
+    source = Path(manifest["source"]).stem
+    paths = set()
+    for entry in chain(manifest["phrases"], manifest.get("segments", ())):
+        if not entry["wav"]:
+            continue
+        base = entry["bank"] * bank_size
+        for segment in entry.get("segments", (entry,)):
+            start = base + segment["page"] * page_size
+            end = start + segment["pages"] * page_size
+            if any(start < region_end and region_start < end for region_start, region_end in regions):
+                paths.add((Path(source) / entry["wav"]).as_posix())
+                break
+    return paths

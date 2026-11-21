@@ -8,7 +8,7 @@ Speech extraction uses Joe Z's unmasked A-law mapping. Recognized SIT menus rend
 
 The reference import workflow writes original files under [data/original](data/original), all extracted WAVs under [audio](audio), and a searchable player at [audio/listen.html](audio/listen.html). Download or clone the repository and open that HTML file locally; GitHub's source preview does not execute its audio player.
 
-Choose **Tones and comparisons** to browse SIT, the corrected 750 Hz cues, the recorded alert and calling-card tones, and the standalone `MWTTONE` and `EDRMTONE` waveforms. Tone rows show their pitches or timing and link to the WAV for each load.
+Choose **Tone banks** for individual `MWTTONE` and `EDRMTONE` waveforms, including the receiver-off-hook howler, milliwatt carriers, and both `EDRMTONE` DTMF sets. **Tones and comparisons** also includes SIT, the corrected 750 Hz cues, and recorded alert and calling-card tones. Page dumps that overlap tone-bank records are kept in the source exports for inspection. One example is `EDRMTONE` bank 0 phrase 41, which reads across both DTMF sets.
 
 The transcription workflow uses multilingual Whisper small through faster-whisper, with voice activity detection, identical-PCM deduplication, six independent processing shards, per-segment timestamps and review flags. It processes announcements and reusable speech fragments. Known tone components and silence receive descriptive labels. JSON and CSV transcripts accompany the HTML player.
 

@@ -15,8 +15,9 @@ from pathlib import Path
 import sys
 import wave
 
+from edram import BANK_SIZE, PAGE_SIZE
+from tone_bank import bank_clips, raw_bank_paths
 from tone_playback import ARCHIVE_INDEX
-from tone_bank import manifest_clips
 
 NORTEL_CATALOG = Path(__file__).resolve().parent / "references" / "nortel-phrases.csv"
 NORTEL_GUIDE = "https://www.gbppr.net/bsp/297-1001-527.pdf"
@@ -264,8 +265,16 @@ def write_player(root, clips, *, catalog_path=NORTEL_CATALOG):
     index = root / ARCHIVE_INDEX
     restored_tones = json.loads(index.read_text(encoding="utf-8"))["clips"] if index.is_file() else {}
     catalog = load_nortel_catalog(catalog_path)
+    stored_tones = []
+    raw_paths = set()
+    for path in sorted(root.glob("*/manifest.json")):
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        stored_tones.extend(bank_clips(manifest))
+        raw_paths.update(raw_bank_paths(manifest, BANK_SIZE, PAGE_SIZE))
     rows = []
-    for clip in chain(clips, manifest_clips(root)):
+    for clip in chain(stored_tones, clips):
+        if clip["path"] in raw_paths:
+            continue
         t = clip["transcript"]
         text = t["text"] or clip.get("tone_name") or clip.get("description") or {
             "silence": "[Silence]", "tone": "[Tone sequence or component]",
@@ -314,8 +323,12 @@ def write_player(root, clips, *, catalog_path=NORTEL_CATALOG):
             direct = f' <button data-src="{url}" data-playback="Direct A-law">Direct A-law</button>'
         else:
             primary = url
-            play = (f'<button data-src="{url}" data-playback="Direct A-law">Direct A-law</button> ' if restored
-                    else f'<button data-src="{url}">Play stored audio</button> ')
+            if clip["kind"] == "tone-bank":
+                play = f'<button data-src="{url}" data-playback="Tone bank">Play tone</button> '
+            elif restored:
+                play = f'<button data-src="{url}" data-playback="Direct A-law">Direct A-law</button> '
+            else:
+                play = f'<button data-src="{url}">Play stored audio</button> '
             direct = ""
             if clip.get("frequencies_hz"):
                 spec = ", ".join(f"{freq:g} Hz" for freq in clip["frequencies_hz"])
@@ -339,9 +352,9 @@ table{width:100%;border-collapse:collapse}td{padding:.65rem;border-bottom:1px so
 .catalog{margin-bottom:.35rem;color:#a5bac9;font-size:.86rem}.catalog code{color:#edf4f9}.catalog a{margin-left:.2rem}
 .intonation{color:#a5bac9}
 @media(max-width:700px){td{display:block}td:first-child{width:auto}header p{font-size:13px}}
-</style><header><h1>EDRAM announcement archive</h1><p>Catalog-checked transcripts include Nortel phrase names and intonation. Browse SITs, cues and extracted tone banks under Tones and comparisons.</p>
-<input id="q" aria-label="Search the archive" placeholder="Search catalog names, transcripts, loads or phrase IDs">
-<select id="kind" aria-label="Clip type"><option value="">All clips</option><option value="announcement" selected>Announcements</option><option value="segment">Speech and tone fragments</option><option value="comparison">Tones and comparisons</option></select>
+</style><header><h1>EDRAM announcement archive</h1><p>Catalog-checked transcripts include Nortel phrase names and intonation. Use Tone banks for individual MWTTONE and EDRMTONE records.</p>
+<input id="q" aria-label="Search the archive" placeholder="Search transcripts, tone names, loads or phrase IDs">
+<select id="kind" aria-label="Clip type"><option value="">All clips</option><option value="announcement" selected>Announcements</option><option value="segment">Speech and tone fragments</option><option value="tone-bank">Tone banks</option><option value="comparison">Tones and comparisons</option></select>
 <label><input type="checkbox" id="review" style="width:auto">Needs review</label><span id="count"></span>
 <audio controls id="player"></audio><div id="now">Select a recording</div><div id="words"></div></header>
 <table><tbody>ROWS</tbody></table><script>

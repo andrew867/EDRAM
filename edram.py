@@ -386,13 +386,16 @@ def write_browser(output: Path, manifests):
     rows = []
     for manifest in manifests:
         source = manifest["source"]
+        raw_paths = tone_bank.raw_bank_paths(manifest, BANK_SIZE, PAGE_SIZE)
         for phrase in manifest["phrases"]:
             if not phrase["wav"]:
+                continue
+            url = (Path(Path(source).stem) / phrase["wav"]).as_posix()
+            if url in raw_paths:
                 continue
             name = f"{source} / bank {phrase['bank']} / {phrase['label']}"
             if phrase.get("tone_name"):
                 name += f' / {phrase["tone_name"]}'
-            url = (Path(Path(source).stem) / phrase["wav"]).as_posix()
             play = "Play Nortel SIT" if phrase.get("rendering") == "nortel-sit" else "Play"
             rows.append(f'<tr><td>{html.escape(name)}</td><td>{phrase["duration_seconds"]:.3f}s</td>'
                         f'<td><button data-src="{html.escape(url, quote=True)}">{play}</button> '
@@ -410,7 +413,7 @@ td{padding:.55rem;border-bottom:1px solid #334452} button{padding:.35rem 1rem;cu
 header{position:sticky;top:0;background:#101820;padding:1rem 0} audio{width:100%;margin:1rem 0}
 </style><header><h1>EDRAM announcement archive</h1>
 <p>8 kHz, 16-bit mono PCM. Recognized SITs use Nortel's EDRAM frequencies and timing. IDs are bank-local.</p>
-<input id="filter" aria-label="Filter announcements" placeholder="Filter by source, bank or phrase ID">
+<input id="filter" aria-label="Filter recordings" placeholder="Filter by source, tone name or phrase ID">
 <audio id="player" controls></audio><div id="playing">Select an announcement</div></header>
 <table><tbody>ROWS</tbody></table><script>
 const p=document.querySelector('#player');
