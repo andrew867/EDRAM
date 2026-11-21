@@ -1,11 +1,11 @@
 {
-  "converter_version": "0.1.0",
+  "converter_version": "0.2.0",
   "source": "acmsl0ga.bin44",
   "source_sha256": "27a05454b4d71cca4f22ca6fe9d2dcda4d2f2565d4f937f6ff2b600ab9e13b6c",
   "codec": "alaw-unmasked",
   "sample_rate": 8000,
   "sample_width_bits": 16,
-  "codec_status": "legacy-compatible A-law expansion; hardware equivalence unverified",
+  "playback_model": "stored codes and whole-block repetition; card equivalence unverified",
   "timing_status": "256 addressed samples per page at nominal 8000 Hz",
   "record_count": 14138,
   "addressed_bytes": 508448,
@@ -65,11 +65,8 @@
           "duration_ms": 160
         }
       ],
-      "rendering": "nortel-cue",
-      "menu_samples": 1280,
-      "source_pcm_sha256": "244e644657764fb6f45fd2865ab015ff87df6dfeb954b86ee370734ddaada3fe",
       "implicit_zero_samples": 192,
-      "pcm_sha256": "7d32f27374dec5a47dd733cdc293629ddb2f9e9a445669cf23756a424ded8f1c",
+      "pcm_sha256": "244e644657764fb6f45fd2865ab015ff87df6dfeb954b86ee370734ddaada3fe",
       "status": "exported"
     },
     {
@@ -167,11 +164,8 @@
           "duration_ms": 128
         }
       ],
-      "rendering": "nortel-cue",
-      "menu_samples": 7936,
-      "source_pcm_sha256": "170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14",
       "implicit_zero_samples": 5920,
-      "pcm_sha256": "60adedcc148792e4b68530cbf92308e2a178fa58fffd444c1eb0defb6c2aeb4d",
+      "pcm_sha256": "170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14",
       "status": "exported"
     },
     {
@@ -725,11 +719,8 @@
           "duration_ms": 160
         }
       ],
-      "rendering": "nortel-cue",
-      "menu_samples": 1280,
-      "source_pcm_sha256": "244e644657764fb6f45fd2865ab015ff87df6dfeb954b86ee370734ddaada3fe",
       "implicit_zero_samples": 192,
-      "pcm_sha256": "7d32f27374dec5a47dd733cdc293629ddb2f9e9a445669cf23756a424ded8f1c",
+      "pcm_sha256": "244e644657764fb6f45fd2865ab015ff87df6dfeb954b86ee370734ddaada3fe",
       "status": "exported"
     },
     {
@@ -827,11 +818,8 @@
           "duration_ms": 128
         }
       ],
-      "rendering": "nortel-cue",
-      "menu_samples": 7936,
-      "source_pcm_sha256": "170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14",
       "implicit_zero_samples": 5920,
-      "pcm_sha256": "60adedcc148792e4b68530cbf92308e2a178fa58fffd444c1eb0defb6c2aeb4d",
+      "pcm_sha256": "170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14",
       "status": "exported"
     },
     {
@@ -1618,6 +1606,5 @@
       "status": "exported",
       "implicit_zero_samples": 240
     }
-  ],
-  "cue_rendering": "nortel-cue"
+  ]
 }

@@ -2,17 +2,17 @@
   "sources": 61,
   "memory_banks": 118,
   "validated_phrase_menus": 2890,
-  "nortel_sit_wavs": 285,
-  "nortel_cue_wavs": 240,
+  "sit_wavs": 285,
+  "cue_wavs": 240,
   "tone_bank_wavs": 79,
-  "phrase_wavs": 2873,
-  "segment_wavs": 2432,
+  "phrase_wavs": 2872,
+  "segment_wavs": 2426,
   "unavailable_phrases": 17,
+  "tone_bank_overlaps": 7,
   "invalid_menu_entries": 3,
-  "phrase_duration_seconds": 5447.232,
+  "phrase_duration_seconds": 5447.36,
   "unit_tests": {
-    "status": "passed",
-    "count": 45
+    "status": "passed"
   },
   "files": [
     {
@@ -290,7 +290,7 @@
       "sha256": "ebad288fb78bfae82a141f4eaf7440f2797fdf45699a321fed6347b992d6296c",
       "banks": 1,
       "valid_menus": 55,
-      "exported_phrases": 47,
+      "exported_phrases": 46,
       "invalid_menus": [],
       "overwritten_bytes": 0
     },
@@ -584,8 +584,6 @@
       "overwritten_bytes": 0
     }
   ],
-  "restored_clips": 524,
-  "restored_wavs": 34,
   "status": "passed",
   "human_listening_review": false,
   "reference_archive_sha256": "88ab9decafafbb71642e5b58b9be91d1f9d6d801f00d838f1f16347506c27bf8"

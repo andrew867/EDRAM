@@ -1,18 +1,18 @@
 {
   "wav_files": 5305,
-  "unique_speech_pcm": 2646,
+  "unique_speech_pcm": 2640,
   "content_counts": {
     "silence": 618,
     "tone": 924,
-    "speech": 3763
+    "speech": 3756
   },
   "status_counts": {
     "silence": 618,
     "tone": 924,
     "transcribed": 3513,
-    "no_speech_detected": 250
+    "no_speech_detected": 243
   },
-  "review_recommended": 1574,
+  "review_recommended": 1567,
   "human_listening_review": false,
   "speaker_identities_assigned": false,
   "unused_results_reclassified_as_non_speech": 0,
