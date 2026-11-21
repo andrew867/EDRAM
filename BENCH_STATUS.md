@@ -33,6 +33,13 @@ If the disk bytes match and the short load fails, compare against an unmodified 
 
 [Recovered file format](FORMAT.md) · [Tone playback evidence](research/TONE_PLAYBACK.md)
 
+## Tone playback test
+
+1. Play one low-level asymmetric sample page and capture it over a digital PRI as a timing and gain control.
+2. Compare one page with repeat count three against three consecutive copies of the same page with repeat count one. Keep the path settings fixed and align both captures with the control. Compare frame count, level, phase and the point where the pattern restarts.
+3. Use a two-page pattern with different markers to distinguish whole-range repetition (`ABAB`) from page repetition (`AABB`). Repeat the comparison with the factory 750 Hz sustain and with silence.
+4. Capture the same SIT through normal call treatment and through manual announcement playback. Record the PCM law in `OFCENG.PM_PCM_PROTOCOL_SELECTION`, the firmware load and the card suffix.
+
 ## Record a bench result
 
 For each completed check, record the test date, switch release, card suffix, firmware load, transfer path, input SHA-256, disk record length and readback SHA-256, and the relevant MAP responses. For playback, also record the selected block, internal phrase number, assigned length, and captured audio duration. Retain the known-good control result alongside the generated-load result.

@@ -40,7 +40,6 @@ The output uses regular announcement phrase playback in either `.bin44` or `.txt
 | Path | What to verify |
 | --- | --- |
 | EIU FTP | The EIU guide's record-length extension convention maps `.bin44` to binary with a 44-byte logical record length. Confirm the target DMS filename and logical record length on the SLM volume. Compare bytes after a round trip. |
-| Serial MAP terminal | A `.txt80` file is ASCII S-records. Send a short file into the switch editor with paced lines and compare the saved records with the source before loading. |
 | SLM tape | Use the [SLM tape tool and bench procedure](SLM_TAPE.md) to inspect tape images, append native entries, and build a lab tape around a `.bin44` load. The file should restore through `DISKUT` with logical record length 44 before the EDRAM is loaded. |
 | Audio through an announcement recording trunk | `DRAMREC CONNECT` and `RECORD` can capture playback from a workstation fed into the provisioned headset or recording path. `PLAYBACK` verifies the result, and `UPLOAD` creates a native recovery file. |
 

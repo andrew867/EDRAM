@@ -52,7 +52,7 @@ Offsets are zero-based from the start of the 512-byte payload. Numeric fields be
 | 184 | 2 | Final block byte remainder in `EOF1`, zero when the last block is full. `HDR1` has zero here in these samples. |
 | 510 | 2 | Low 16 bits of the sum of the preceding 255 unsigned big-endian 16-bit words |
 
-The checksum formula matches all 338 labels. Across 168 files, `size = logical record length × logical record count`, `tape blocks = ceil(size / 512)` and `EOF1 remainder = size % 512`. The patch record length and value at 178 are 128 and 130. The office backup values are 1020 and 1030. In particular, the 1020-byte records require fewer tape blocks than rounding each record up to 1024 bytes would use. The label relationship at 172 and 178 is established. Its role in disk record allocation remains inferred, and the on-tape byte count uses the logical length at 168.
+The checksum formula matches all 338 labels. Across 168 files, `size = logical record length × logical record count`, `tape blocks = ceil(size / 512)` and `EOF1 remainder = size % 512`. The patch record length and value at 178 are 128 and 130. The office backup values are 1020 and 1030. In particular, the 1020-byte records require fewer tape blocks than rounding each record up to 1024 bytes would use. The on-tape byte count uses the logical length at 168.
 
 For `CBM12PGT$PATCH`, 353 logical records of 128 bytes produce 45,184 file bytes, stored in 89 tape blocks with 128 bytes used in the last block. Its pair-swapped payload begins with an intelligible `BADMBI PPC` marker. The 2019 `_XA` file has 227,831 logical records of 1020 bytes and a final remainder of 36. All examined padding bytes after the declared size were zero.
 

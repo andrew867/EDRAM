@@ -105,7 +105,7 @@ All 501 remaining bytes occur in four-byte, submenu-shaped words in two loads. T
 
 | Load | What remains open |
 | --- | --- |
-| `EACTS0AE`, banks 0 and 1 | 435 bytes in 145 unreferenced words below offset `0x0344`. A common word is `0D 00 01 02`, equivalent to playing page 13 twice if interpreted as a submenu entry. The active directory never points to these words. Their original purpose is unknown. |
-| `FSTD0BA`, bank 1 | 66 bytes in 22 words around its malformed SIT menus. Subtracting two from the three misaligned pointers gives recognizable SIT sequences. With only that adjustment, each entry plus its submenu sums to `FE` modulo 256 instead of zero. A repair would require more than moving the pointer. |
+| `EACTS0AE`, banks 0 and 1 | 435 bytes in 145 unreferenced words below offset `0x0344`. A common word is `0D 00 01 02`. No active directory entry references these words. |
+| `FSTD0BA`, bank 1 | 66 bytes in 22 words around its malformed SIT menus. The original entries fail submenu validation. The decoder leaves the source bytes untouched. |
 
 The 16-byte identifier area is structurally located, but its full meaning is open. For example, `EAOSS0AF` bank 1 contains `U1X76AF010`, and the tone loads carry `TONE00AA10` or `TONE00AB10`. The loader’s interpretation of all suffixes and fill values is unverified. Byte coverage also leaves open the hardware-specific use of the supplemental DTMF sets, the exact tone cadence and levels, and the format of native `DRAMREC UPLOAD` files. [Malformed menu entries](FORMAT.md#malformed-references) · [Bench status](BENCH_STATUS.md)

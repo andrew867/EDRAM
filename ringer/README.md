@@ -11,7 +11,6 @@ Four patterns measured from the [T7316 recording](https://www.youtube.com/watch?
 
 The low-fast, high-fast and three-pitch patterns are dominated by odd harmonics. In the narrow-pulse pattern, the second harmonic can be stronger than the fundamental, and the fourth is strongly suppressed. The shorter period visible in that recording is consistent with a roughly quarter-duty pulse. The synthesis uses those oscillator shapes with a harmonic roll-off. The handset speaker, amplifier and room response are unmodeled.
 
-`eacts0ae.bin44`, bank 0, phrase 01 has a 750 Hz fundamental. The low-fast ringer has a 750 Hz harmonic during its 250 Hz stage, which may explain the resemblance. The EDRAM cue matches the 160 ms test-tone menu described in [US6442246B1, Table 1](https://patents.google.com/patent/US6442246B1/en).
 
 ## Build and use
 

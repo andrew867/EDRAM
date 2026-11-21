@@ -44,11 +44,11 @@ All-`FF` and all-`00` directory entries are inactive. For an active slot, the fo
 | --- | ---: | --- |
 | `0` | 2 bytes | Little-endian starting sample page |
 | `2` | 1 byte | Number of consecutive pages in this range |
-| `3` | 1 byte | Number of times to play the whole range |
+| `3` | 1 byte | Repeat count. The converter copies the whole range this many times. |
 
 The converter reads `page_count × 256` sample codes starting at `bank_base + page × 0x100` and repeats that range `repeat_count` times before advancing to the next entry. At 8 kHz, 256 sample codes represent 32 ms.
 
-For example, `ESTD0AA` bank 0 phrase 8 has directory bytes `34 01 06 20` at `0x0020`. It points to six entries starting at `0x0134`. The first two entries, `11 00 01 01` and `12 00 02 04`, say to play page `0x11` once, then play the two-page range `0x12–0x13` four times. The default SIT export interprets the resulting menu using Nortel’s documented timing. Hardware handling of the raw tone samples remains a bench question. [Worked speech offsets](BYTE_MAP.md#follow-a-real-spoken-announcement) · [SIT playback notes](research/TONE_PLAYBACK.md)
+For example, `ESTD0AA` bank 0 phrase 8 has directory bytes `34 01 06 20` at `0x0020`. It points to six entries starting at `0x0134`. The first two entries, `11 00 01 01` and `12 00 02 04`, say to play page `0x11` once, then play the two-page range `0x12 through 0x13` four times. The offline converter expands those sample codes to 2,304 frames, or 288 ms at 8 kHz. It uses the stored waveform and menu timing for every SIT. [Worked speech offsets](BYTE_MAP.md#follow-a-real-spoken-announcement) · [SIT playback notes](research/TONE_PLAYBACK.md)
 
 Pages 13 and 16 in decimal commonly supply silence. Unaddressed parts of a referenced segment are supplied as zero codes and counted in the manifest. The converter flags a wholly absent non-silence segment as unavailable. [Page filenames and unwritten ranges](BYTE_MAP.md#why-a-page-can-be-missing-from-segments)
 

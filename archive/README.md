@@ -2,6 +2,8 @@
 
 The earlier converter offered generated Nortel/Bellcore SIT previews, repaired sample bytes and a fitted sustain-loop model. The current extractor and player decode the addressed samples. The historical artifacts here preserve the earlier comparisons.
 
+See [superseded interpretations](SUPERSEDED.md) for earlier codec, timing and transfer ideas.
+
 | Folder or file | Contents |
 | --- | --- |
 | [measurements](measurements) | FFT results, plots, historical playback notes and two loop examples |
