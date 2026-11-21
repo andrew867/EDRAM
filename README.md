@@ -1,5 +1,7 @@
 # Nortel EDRAM converter
 
+**First alpha** · [v0.2.0-alpha.1](https://github.com/andrew867/EDRAM/releases/tag/v0.2.0-alpha.1) · [Release notes](CHANGELOG.md)
+
 Extract speech and tones from DMS-100 and SL-100 announcement loads. The converter reads binary .bin44 and text S-record .txt80 files and writes 8 kHz, 16-bit mono WAVs. It runs on Python 3.10 or newer with the standard library.
 
 ## Listen to the archive
