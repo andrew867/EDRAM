@@ -55,8 +55,21 @@
       "duration_seconds": 0.16,
       "wav": "bank_00/phrase_01.wav",
       "label": "phrase_01",
+      "tone_name": "750 Hz test tone",
+      "frequencies_hz": [
+        750
+      ],
+      "tone_components": [
+        {
+          "frequency_hz": 750,
+          "duration_ms": 160
+        }
+      ],
+      "rendering": "nortel-cue",
+      "menu_samples": 1280,
+      "source_pcm_sha256": "244e644657764fb6f45fd2865ab015ff87df6dfeb954b86ee370734ddaada3fe",
       "implicit_zero_samples": 0,
-      "pcm_sha256": "244e644657764fb6f45fd2865ab015ff87df6dfeb954b86ee370734ddaada3fe",
+      "pcm_sha256": "7d32f27374dec5a47dd733cdc293629ddb2f9e9a445669cf23756a424ded8f1c",
       "status": "exported"
     },
     {
@@ -120,8 +133,45 @@
       "duration_seconds": 0.992,
       "wav": "bank_00/phrase_02.wav",
       "label": "phrase_02",
+      "tone_name": "Three-burst 750 Hz prompt",
+      "frequencies_hz": [
+        750
+      ],
+      "tone_components": [
+        {
+          "frequency_hz": 0,
+          "duration_ms": 512
+        },
+        {
+          "frequency_hz": 750,
+          "duration_ms": 96
+        },
+        {
+          "frequency_hz": 0,
+          "duration_ms": 32
+        },
+        {
+          "frequency_hz": 750,
+          "duration_ms": 96
+        },
+        {
+          "frequency_hz": 0,
+          "duration_ms": 32
+        },
+        {
+          "frequency_hz": 750,
+          "duration_ms": 96
+        },
+        {
+          "frequency_hz": 0,
+          "duration_ms": 128
+        }
+      ],
+      "rendering": "nortel-cue",
+      "menu_samples": 7936,
+      "source_pcm_sha256": "170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14",
       "implicit_zero_samples": 0,
-      "pcm_sha256": "170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14",
+      "pcm_sha256": "60adedcc148792e4b68530cbf92308e2a178fa58fffd444c1eb0defb6c2aeb4d",
       "status": "exported"
     },
     {
@@ -3363,5 +3413,256 @@
       "reason": "unavailable segment at 0x3d300, 11520 bytes"
     }
   ],
-  "sit_rendering": "nortel-sit"
+  "cue_rendering": "nortel-cue",
+  "sit_rendering": "nortel-sit",
+  "tone_bank": [
+    {
+      "index": 1,
+      "tone_name": "350 + 480 Hz",
+      "frequencies_hz": [
+        350,
+        480
+      ],
+      "header_address": 8502,
+      "sample_address": 8504,
+      "samples": 800,
+      "codec": "mulaw-unmasked",
+      "payload_sha256": "c66465b027d7d7db0e475322f7244aaac28f75dfcef44059dedfccd42766c174",
+      "wav": "tone-bank/tone_01.wav",
+      "sample_repair": {
+        "sample_index": 3,
+        "original_code": 148,
+        "replacement_code": 84
+      },
+      "pcm_sha256": "a671ed98011ab5fbe6e58fc2b51342a42c7ca150fcfbb8a150c85ff30df302ef"
+    },
+    {
+      "index": 2,
+      "tone_name": "440 + 620 Hz",
+      "frequencies_hz": [
+        440,
+        620
+      ],
+      "header_address": 9382,
+      "sample_address": 9384,
+      "samples": 800,
+      "codec": "mulaw-unmasked",
+      "payload_sha256": "dfc1ad82894df2998dfca9097a99596caadfac5ee1547da801ca5844138aacd1",
+      "wav": "tone-bank/tone_02.wav",
+      "pcm_sha256": "e74af64363b0ed93a2053afed81813aa839fffa6a17f60de5bb8c7a8217e0173"
+    },
+    {
+      "index": 3,
+      "tone_name": "850 Hz",
+      "frequencies_hz": [
+        850
+      ],
+      "header_address": 10238,
+      "sample_address": 10240,
+      "samples": 800,
+      "codec": "mulaw-unmasked",
+      "payload_sha256": "257321e28efe044e7398a6f38c1a93a10bc5acb53f07e32952d93ebdb4cd723f",
+      "wav": "tone-bank/tone_03.wav",
+      "pcm_sha256": "574f9c4a9e66fef03bbb0d7335d9c666dbaa6d4eb2c141960bd8495e2c0c67dc"
+    },
+    {
+      "index": 4,
+      "tone_name": "1340 Hz, first level",
+      "frequencies_hz": [
+        1340
+      ],
+      "header_address": 11094,
+      "sample_address": 11096,
+      "samples": 800,
+      "codec": "mulaw-unmasked",
+      "payload_sha256": "f73baa397aa58541b1c3b0a822f1d4c50d8417eae2a98c27d073b594a3823e04",
+      "wav": "tone-bank/tone_04.wav",
+      "pcm_sha256": "bf2db2bfe8c6f80c1a01c957deda267203cfaf0d16652feaa1c299a682fd9b65"
+    },
+    {
+      "index": 5,
+      "tone_name": "440 Hz, first level",
+      "frequencies_hz": [
+        440
+      ],
+      "header_address": 11926,
+      "sample_address": 11928,
+      "samples": 400,
+      "codec": "mulaw-unmasked",
+      "payload_sha256": "0f80a406615963ed620a32392cf478781e2285192e64ed84fb7b31d8c6cad28c",
+      "wav": "tone-bank/tone_05.wav",
+      "pcm_sha256": "8ebe04be1bf123c3af31a33988fa732aeef791bcadf7f6547f0dcb8f2c941bf9"
+    },
+    {
+      "index": 6,
+      "tone_name": "440 Hz, second level",
+      "frequencies_hz": [
+        440
+      ],
+      "header_address": 12406,
+      "sample_address": 12408,
+      "samples": 400,
+      "codec": "mulaw-unmasked",
+      "payload_sha256": "33d9e8330631d50de9fef56291f37e56cd646b2d5454f9fe3d7985894d3ff94a",
+      "wav": "tone-bank/tone_06.wav",
+      "pcm_sha256": "b831a1e241a3eb1da57200d2636c075ca7863f310d1b13a1640712fb207648df"
+    },
+    {
+      "index": 7,
+      "tone_name": "1340 Hz, second level",
+      "frequencies_hz": [
+        1340
+      ],
+      "header_address": 12894,
+      "sample_address": 12896,
+      "samples": 800,
+      "codec": "mulaw-unmasked",
+      "payload_sha256": "2ba84c2926b7757dbc42e9658802f2c7f544597dd6ab1630d53f189fc80b71c3",
+      "wav": "tone-bank/tone_07.wav",
+      "pcm_sha256": "54f5a7d578ca4e96a35492eb6a270d73d53c361fe8340c152e90da8ca708e072"
+    },
+    {
+      "index": 8,
+      "tone_name": "440 Hz, third level",
+      "frequencies_hz": [
+        440
+      ],
+      "header_address": 13766,
+      "sample_address": 13768,
+      "samples": 400,
+      "codec": "mulaw-unmasked",
+      "payload_sha256": "3409e906c2acd3c08e57c036cdd0ecec8c15963d3d39acdb1fd5a15d206cdb05",
+      "wav": "tone-bank/tone_08.wav",
+      "pcm_sha256": "d0cc27df9d6cb88a9ed51007d4e2ff459aa71bc479f6e80734efb912b8643d96"
+    },
+    {
+      "index": 9,
+      "tone_name": "1004 Hz milliwatt carrier",
+      "frequencies_hz": [
+        1004
+      ],
+      "header_address": 14238,
+      "sample_address": 14240,
+      "samples": 996,
+      "codec": "mulaw-unmasked",
+      "payload_sha256": "9fca0eb672a80ac11cb85e95bd7cfddae182bc9f2d01e6c2ea51567e6f60ae65",
+      "wav": "tone-bank/tone_09.wav",
+      "pcm_sha256": "14513b605e7a369e937d5e8535fe5307ad7dac454e995d8c5aa3d027dcbbb6e6"
+    },
+    {
+      "index": 10,
+      "tone_name": "Receiver off-hook howler",
+      "frequencies_hz": [
+        1404,
+        2060,
+        2452,
+        2604
+      ],
+      "header_address": 15306,
+      "sample_address": 15308,
+      "samples": 2000,
+      "codec": "mulaw-unmasked",
+      "payload_sha256": "4faabb3d7525bd02b19ff23f9aebd6cfd2943b4a0f9fedad416caca7836fccee",
+      "wav": "tone-bank/tone_10.wav",
+      "pcm_sha256": "9b2157e557b709c8cb426d099c6563c940122b2593c79f4dc30df97ec1feb3aa"
+    },
+    {
+      "index": 11,
+      "tone_name": "948 Hz test carrier",
+      "frequencies_hz": [
+        948
+      ],
+      "header_address": 17378,
+      "sample_address": 17380,
+      "samples": 996,
+      "codec": "mulaw-unmasked",
+      "payload_sha256": "d50749c4600b09c1f1c5a3b929c49779b8ae81003a30b6cbcf924d7aa83cd9f1",
+      "wav": "tone-bank/tone_11.wav",
+      "pcm_sha256": "fc87d95a7b3696f6df3173de0345cf941263d9714e6bd89aabfee8eb690d47de"
+    },
+    {
+      "index": 12,
+      "tone_name": "1020 Hz, short carrier",
+      "frequencies_hz": [
+        1020
+      ],
+      "header_address": 18446,
+      "sample_address": 18448,
+      "samples": 400,
+      "codec": "mulaw-unmasked",
+      "payload_sha256": "fdd71cc032817c3c1fa6e6d527b40a51c067f7f8c730f84c345cfbfd282496e2",
+      "wav": "tone-bank/tone_12.wav",
+      "pcm_sha256": "93bdd56998239299a99ed961892c6231e776fd78b459494d722abd0fcdd1ac33"
+    },
+    {
+      "index": 13,
+      "tone_name": "1004 Hz, level variant 1",
+      "frequencies_hz": [
+        1004
+      ],
+      "header_address": 18918,
+      "sample_address": 18920,
+      "samples": 996,
+      "codec": "mulaw-unmasked",
+      "payload_sha256": "55755f5d1b1947ddff111ced8622286f15662034bf9d3c3c167f2f38b0c64146",
+      "wav": "tone-bank/tone_13.wav",
+      "pcm_sha256": "77f71485456d07c1baa0dc687e56dac790f81eaa859e466d43f9d15cf7134dcf"
+    },
+    {
+      "index": 14,
+      "tone_name": "1004 Hz, level variant 2",
+      "frequencies_hz": [
+        1004
+      ],
+      "header_address": 19986,
+      "sample_address": 19988,
+      "samples": 996,
+      "codec": "mulaw-unmasked",
+      "payload_sha256": "b0782e6c5ea121ca91d84497b59f20d351e1c0de489310fabdf7f6a0144a3a40",
+      "wav": "tone-bank/tone_14.wav",
+      "pcm_sha256": "7510656f5600cde8ff7c57f872d0da3bf6c1956a56c28247ec423c9fdbcb9d34"
+    },
+    {
+      "index": 15,
+      "tone_name": "1004 Hz, level variant 3",
+      "frequencies_hz": [
+        1004
+      ],
+      "header_address": 21054,
+      "sample_address": 21056,
+      "samples": 996,
+      "codec": "mulaw-unmasked",
+      "payload_sha256": "3079aa8386b73a99151282d0d7cef70b8ece3eaafc117f196f87f46457bd9a59",
+      "wav": "tone-bank/tone_15.wav",
+      "pcm_sha256": "ccc8ff94e584dfa07546557d8610a98f601a846273206a9c87d4539b0e019b57"
+    },
+    {
+      "index": 16,
+      "tone_name": "1020 Hz, long carrier",
+      "frequencies_hz": [
+        1020
+      ],
+      "header_address": 22122,
+      "sample_address": 22124,
+      "samples": 1020,
+      "codec": "mulaw-unmasked",
+      "payload_sha256": "75d655568688c39def26232ef229df3ed789807e550877ff59fffd38e9ff67eb",
+      "wav": "tone-bank/tone_16.wav",
+      "pcm_sha256": "ae897ddbd30808a28b1fc44676f9f8fd87659b52326c4f94af97957e5cfcaf5b"
+    },
+    {
+      "index": 17,
+      "tone_name": "1004 Hz, level variant 4",
+      "frequencies_hz": [
+        1004
+      ],
+      "header_address": 23214,
+      "sample_address": 23216,
+      "samples": 996,
+      "codec": "mulaw-unmasked",
+      "payload_sha256": "0eb44923c1d716a72e9484fb2c8ee5a0fa179bc9da196f3ae0036efd187d0d7d",
+      "wav": "tone-bank/tone_17.wav",
+      "pcm_sha256": "1f33d33ed385be8b489ad9014e5c010d3b5c7beb89010dba4d3dbae3dc4d5676"
+    }
+  ]
 }

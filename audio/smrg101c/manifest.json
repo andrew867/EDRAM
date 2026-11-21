@@ -55,8 +55,21 @@
       "duration_seconds": 0.16,
       "wav": "bank_00/phrase_01.wav",
       "label": "phrase_01",
+      "tone_name": "750 Hz test tone",
+      "frequencies_hz": [
+        750
+      ],
+      "tone_components": [
+        {
+          "frequency_hz": 750,
+          "duration_ms": 160
+        }
+      ],
+      "rendering": "nortel-cue",
+      "menu_samples": 1280,
+      "source_pcm_sha256": "4a9814d7c150061fc2f11f92b93d5cd49382e4979267d026d7ca6db16da8e1c6",
       "implicit_zero_samples": 0,
-      "pcm_sha256": "4a9814d7c150061fc2f11f92b93d5cd49382e4979267d026d7ca6db16da8e1c6",
+      "pcm_sha256": "7d32f27374dec5a47dd733cdc293629ddb2f9e9a445669cf23756a424ded8f1c",
       "status": "exported"
     },
     {
@@ -120,8 +133,45 @@
       "duration_seconds": 0.992,
       "wav": "bank_00/phrase_02.wav",
       "label": "phrase_02",
+      "tone_name": "Three-burst 750 Hz prompt",
+      "frequencies_hz": [
+        750
+      ],
+      "tone_components": [
+        {
+          "frequency_hz": 0,
+          "duration_ms": 512
+        },
+        {
+          "frequency_hz": 750,
+          "duration_ms": 96
+        },
+        {
+          "frequency_hz": 0,
+          "duration_ms": 32
+        },
+        {
+          "frequency_hz": 750,
+          "duration_ms": 96
+        },
+        {
+          "frequency_hz": 0,
+          "duration_ms": 32
+        },
+        {
+          "frequency_hz": 750,
+          "duration_ms": 96
+        },
+        {
+          "frequency_hz": 0,
+          "duration_ms": 128
+        }
+      ],
+      "rendering": "nortel-cue",
+      "menu_samples": 7936,
+      "source_pcm_sha256": "996842b7121f3680563c40d18996d1a6438804927c2691dd45cbdd58bb88a2c5",
       "implicit_zero_samples": 0,
-      "pcm_sha256": "996842b7121f3680563c40d18996d1a6438804927c2691dd45cbdd58bb88a2c5",
+      "pcm_sha256": "60adedcc148792e4b68530cbf92308e2a178fa58fffd444c1eb0defb6c2aeb4d",
       "status": "exported"
     },
     {
@@ -482,5 +532,6 @@
       "status": "exported",
       "implicit_zero_samples": 0
     }
-  ]
+  ],
+  "cue_rendering": "nortel-cue"
 }

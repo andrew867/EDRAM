@@ -13,6 +13,7 @@ from tempfile import TemporaryDirectory
 
 import edram
 import sit_reference
+from tone_bank import CUE_SHA256, PROMPT_MENU, TEST_MENU
 
 
 # Attack page -> (loop page count, whole-cycle period in samples, measured Hz).
@@ -28,15 +29,10 @@ TONE_LAYOUT = {
 
 # The standard 750 Hz attack and loop are sometimes stored one byte earlier.
 # Match the full 512 bytes before substituting either address.
-TEST_TONE_SHA256 = "2b6876311c7f97ba8bd33bc8af224ae2f3484fa4146e0c2f3a11536133672f68"
 ARCHIVE_INDEX = "tone-restoration.json"
 RESTORATION_NOTE = "Experimental phase-aligned EDRAM loop restoration; original hardware playback is unverified"
-TEST_TONE = (edram.Segment(14, 1, 2), edram.Segment(15, 1, 3))
-PROMPT_TONE = (
-    (edram.Segment(13, 1, 16),)
-    + (edram.Segment(14, 1, 1), edram.Segment(15, 1, 2), edram.Segment(13, 1, 1)) * 2
-    + (edram.Segment(14, 1, 1), edram.Segment(15, 1, 2), edram.Segment(13, 1, 4))
-)
+TEST_TONE = tuple(edram.Segment(*entry) for entry in TEST_MENU)
+PROMPT_TONE = tuple(edram.Segment(*entry) for entry in PROMPT_MENU)
 
 
 def samples(raw):
@@ -79,9 +75,9 @@ def tone_templates(image, bank, attack_page):
         raise edram.FormatError(f"insufficient addressed audio for tone page {attack_page}")
     address = bank * edram.BANK_SIZE + attack_page * edram.PAGE_SIZE
     adjustment = 0
-    if attack_page == 14 and hashlib.sha256(attack_raw + loop_raw).hexdigest() != TEST_TONE_SHA256:
+    if attack_page == 14 and hashlib.sha256(attack_raw + loop_raw).hexdigest() != CUE_SHA256:
         candidate = image.read_bytes(address - 1, edram.PAGE_SIZE * 2)
-        if hashlib.sha256(candidate).hexdigest() == TEST_TONE_SHA256:
+        if hashlib.sha256(candidate).hexdigest() == CUE_SHA256:
             attack_raw, loop_raw = candidate[:edram.PAGE_SIZE], candidate[edram.PAGE_SIZE:]
             adjustment = -1
     attack = samples(attack_raw)

@@ -3,6 +3,8 @@
   "memory_banks": 118,
   "validated_phrase_menus": 2890,
   "nortel_sit_wavs": 285,
+  "nortel_cue_wavs": 240,
+  "tone_bank_wavs": 79,
   "phrase_wavs": 2873,
   "segment_wavs": 2432,
   "unavailable_phrases": 17,
@@ -10,7 +12,7 @@
   "phrase_duration_seconds": 5447.232,
   "unit_tests": {
     "status": "passed",
-    "count": 39
+    "count": 45
   },
   "files": [
     {

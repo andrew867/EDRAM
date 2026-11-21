@@ -8,7 +8,7 @@ Speech extraction uses Joe Z's unmasked A-law mapping. Recognized SIT menus rend
 
 The reference import workflow writes original files under [data/original](data/original), all extracted WAVs under [audio](audio), and a searchable player at [audio/listen.html](audio/listen.html). Download or clone the repository and open that HTML file locally; GitHub's source preview does not execute its audio player.
 
-Choose **Tones and comparisons** to browse SIT, the 750 Hz test, and the three-pulse prompt. **Play Nortel SIT** and **WAV** both use the corrected WAV in the source bank folder. Each SIT row shows its three frequencies and durations.
+Choose **Tones and comparisons** to browse SIT, the corrected 750 Hz cues, the recorded alert and calling-card tones, and the standalone `MWTTONE` and `EDRMTONE` waveforms. Tone rows show their pitches or timing and link to the WAV for each load.
 
 The transcription workflow uses multilingual Whisper small through faster-whisper, with voice activity detection, identical-PCM deduplication, six independent processing shards, per-segment timestamps and review flags. It processes announcements and reusable speech fragments. Known tone components and silence receive descriptive labels. JSON and CSV transcripts accompany the HTML player.
 
@@ -27,7 +27,7 @@ python verify_corpus.py samples decoded --json VALIDATION.json
 
 To use an existing archive, supply --archive /path/to/edram.tar.gz to fetch_samples.py. To inspect menus without writing audio, use python edram.py samples/estd0aa.bin44 --inspect.
 
-Output is 8 kHz, 16-bit mono PCM WAV with source and codec metadata. Every source has its own folder, every bank its own subfolder. Manifests retain source hashes, addresses, checksums, segment order and repetition counts, implicit zero-fill counts, ordered memory rewrites, invalid menus and unavailable references. `--segments` exports each referenced segment once without repeats. `--raw-sit` expands SIT sample bytes with the selected codec for diagnostic playback.
+Output is 8 kHz, 16-bit mono PCM WAV with source and codec metadata. Every source has its own folder, every bank its own subfolder. Manifests retain source hashes, addresses, checksums, segment order and repetition counts, implicit zero-fill counts, ordered memory rewrites, invalid menus and unavailable references. `--segments` exports each referenced segment once without repeats. `--raw-sit` bypasses SIT synthesis. `--raw-tones` expands all phrase tone bytes directly. Recognized standalone tone bank records export to a `tone-bank/` subfolder with their measured companding law.
 
 Existing output folders require explicit --overwrite. Prefer a new directory when changing settings; overwrite does not delete obsolete or unrelated files.
 
@@ -49,7 +49,7 @@ Existing output folders require explicit --overwrite. Prefer a new directory whe
 | Missing phrase payloads, skipped | 17 |
 | Structurally invalid menus, flagged | 3 |
 
-The 2,873 announcement WAVs include 285 SIT renders covering 32 sequences. Shared phrases and tone sequences occur repeatedly.
+The 2,873 announcement WAVs include 285 SIT renders covering 32 sequences and 240 corrected 750 Hz cues. The standalone banks add 79 waveform WAVs, with 17 records common to both files.
 
 The two txt80 tone files contain menus referencing speech absent from those files. Those announcements are unavailable instead of fabricated as silence. In fstd0ba.bin44, bank 1, phrases 8, 11 and 20 have misaligned pointers; their raw entries and reasons remain in invalid_phrases.
 

@@ -11,7 +11,7 @@ acmsc0ge,0,8,,,17-3,253,f9d4a0d15919a5b334af3bfbef47b020c1cdda165470d18f1f87202d
 acmsc0ge,0,9,,,17-3,253,f3091621e1cf84d15c1464e8aafcd943d84b198cc0cc20b3522aac65f22bc77e,4.000,3.392,speech,archive_match,,,Your preferred call forwarding service is now off.,catalog-checked
 acmsc0ge,0,10,,,17-4,254,7dcfdd6c386cb8848c6c69a197795d3492c39650718f94e60085eb017220396b,4.000,3.392,speech,archive_match,,,Your selective call acceptance service is now on.,catalog-checked
 acmsc0ge,0,11,,,17-4,254,21833f6114428e9c95319c120c8e99ee46bedcf6c34a68f5eb6578356ef98cb7,4.064,3.456,speech,archive_match,,,,
-acmsc0ge,0,12,,,17-4,254,983a74a73302d137465260b5668a39714c2df06e3fe6d2e3ab58a1fd580eaa3d,1.024,0.352,speech,archive_match,,,,
+acmsc0ge,0,12,,,17-4,254,983a74a73302d137465260b5668a39714c2df06e3fe6d2e3ab58a1fd580eaa3d,1.024,0.352,tone,archive_match,,,,
 acmsc0ge,0,13,,,17-4,254,dbb2d34ff8fb1210b5ef755cd6fa731d173c405e97119e1cf03026d9d84f2ede,0.032,,silence,archive_match,,,,
 acmsc0ge,1,0,,Silence.,17-4,254,0b9dbe8f4f16d28f53058cdd8875617c91226f4415da84bafa2e8324cc3e5735,1.024,,silence,archive_match,,,,
 acmsc0ge,1,1,,Test tone.,17-4,254,244e644657764fb6f45fd2865ab015ff87df6dfeb954b86ee370734ddaada3fe,0.160,,tone,archive_match,,,,
@@ -35,7 +35,7 @@ acmsc0gf,0,8,,,17-6,256,7ef93f64c03e624f4ea82336680741b750cd686ee8894977791ef97b
 acmsc0gf,0,9,,,17-6,256,db2bf1040222fe10cf92311803679f3fbaa282dffc25105c1b0e98e2d126dee1,3.552,2.994,speech,archive_match,,,,
 acmsc0gf,0,10,,,17-6,256,7dcfdd6c386cb8848c6c69a197795d3492c39650718f94e60085eb017220396b,4.000,3.392,speech,archive_match,,,Your selective call acceptance service is now on.,catalog-checked
 acmsc0gf,0,11,,,17-7,257,21833f6114428e9c95319c120c8e99ee46bedcf6c34a68f5eb6578356ef98cb7,4.064,3.456,speech,archive_match,,,,
-acmsc0gf,0,12,,,17-7,257,983a74a73302d137465260b5668a39714c2df06e3fe6d2e3ab58a1fd580eaa3d,1.024,0.352,speech,archive_match,,,,
+acmsc0gf,0,12,,,17-7,257,983a74a73302d137465260b5668a39714c2df06e3fe6d2e3ab58a1fd580eaa3d,1.024,0.352,tone,archive_match,,,,
 acmsc0gf,0,13,,,17-7,257,dbb2d34ff8fb1210b5ef755cd6fa731d173c405e97119e1cf03026d9d84f2ede,0.032,,silence,archive_match,,,,
 acmsc0gf,1,0,,Silence.,17-7,257,0b9dbe8f4f16d28f53058cdd8875617c91226f4415da84bafa2e8324cc3e5735,1.024,,silence,archive_match,,,,
 acmsc0gf,1,1,,Test tone.,17-7,257,244e644657764fb6f45fd2865ab015ff87df6dfeb954b86ee370734ddaada3fe,0.160,,tone,archive_match,,,,
@@ -59,7 +59,7 @@ acmsc0gg,0,8,,,17-9,259,4bd62f6a0f1fcdd202e3e8628420104d5802f4d250f221ffc1f66c2c
 acmsc0gg,0,9,,,17-9,259,d7b3d80e4e82c7a7ad2003c4280e200e1f3d6b0d0b89cd16e66f2cba3618728b,4.000,3.392,speech,archive_match,,,,
 acmsc0gg,0,10,,,17-9,259,7dcfdd6c386cb8848c6c69a197795d3492c39650718f94e60085eb017220396b,4.000,3.392,speech,archive_match,,,,
 acmsc0gg,0,11,,,17-9,259,21833f6114428e9c95319c120c8e99ee46bedcf6c34a68f5eb6578356ef98cb7,4.064,3.456,speech,archive_match,,,,
-acmsc0gg,0,12,,,17-9,259,983a74a73302d137465260b5668a39714c2df06e3fe6d2e3ab58a1fd580eaa3d,1.024,0.352,speech,archive_match,,,,
+acmsc0gg,0,12,,,17-9,259,983a74a73302d137465260b5668a39714c2df06e3fe6d2e3ab58a1fd580eaa3d,1.024,0.352,tone,archive_match,,,,
 acmsc0gg,0,13,,,17-9,259,dbb2d34ff8fb1210b5ef755cd6fa731d173c405e97119e1cf03026d9d84f2ede,0.032,,silence,archive_match,,,,
 acmsc0gg,1,0,,Silence.,17-10,260,0b9dbe8f4f16d28f53058cdd8875617c91226f4415da84bafa2e8324cc3e5735,1.024,,silence,archive_match,,,,
 acmsc0gg,1,1,,Test tone.,17-10,260,244e644657764fb6f45fd2865ab015ff87df6dfeb954b86ee370734ddaada3fe,0.160,,tone,archive_match,,,,
@@ -83,7 +83,7 @@ acmsc0gh,0,8,,,17-12,262,8c539471029741d06ffb3265c6a8d803109503788358a743e6f75fe
 acmsc0gh,0,9,,,17-12,262,1a2348809a786f406f6ffc6602e6286cef67542f164ce3d16be9bbf62d89dab5,4.128,3.520,speech,archive_match,,,,
 acmsc0gh,0,10,,,17-12,262,,3.936,3.328,speech,unconfirmed,,,,
 acmsc0gh,0,11,,,17-12,262,42379699574670ffab485ecc551f1ba1e81ed2daba705cba2fd0ce896b789d3d,3.648,3.040,speech,archive_match,,,,
-acmsc0gh,0,12,,,17-12,262,983a74a73302d137465260b5668a39714c2df06e3fe6d2e3ab58a1fd580eaa3d,1.024,0.352,speech,archive_match,,,,
+acmsc0gh,0,12,,,17-12,262,983a74a73302d137465260b5668a39714c2df06e3fe6d2e3ab58a1fd580eaa3d,1.024,0.352,tone,archive_match,,,,
 acmsc0gh,0,13,,,17-12,262,dbb2d34ff8fb1210b5ef755cd6fa731d173c405e97119e1cf03026d9d84f2ede,0.032,,silence,archive_match,,,,
 acmsc0gh,1,0,,Silence.,17-13,263,0b9dbe8f4f16d28f53058cdd8875617c91226f4415da84bafa2e8324cc3e5735,1.024,,silence,archive_match,,,,
 acmsc0gh,1,1,,Test tone.,17-13,263,244e644657764fb6f45fd2865ab015ff87df6dfeb954b86ee370734ddaada3fe,0.160,,tone,archive_match,,,,
@@ -107,7 +107,7 @@ acmsc0gj,0,8,,,17-15,265,4bd62f6a0f1fcdd202e3e8628420104d5802f4d250f221ffc1f66c2
 acmsc0gj,0,9,,,17-15,265,d7b3d80e4e82c7a7ad2003c4280e200e1f3d6b0d0b89cd16e66f2cba3618728b,4.000,3.392,speech,archive_match,,,,
 acmsc0gj,0,10,,,17-15,265,7dcfdd6c386cb8848c6c69a197795d3492c39650718f94e60085eb017220396b,4.000,3.392,speech,archive_match,,,,
 acmsc0gj,0,11,,,17-15,265,21833f6114428e9c95319c120c8e99ee46bedcf6c34a68f5eb6578356ef98cb7,4.064,3.456,speech,archive_match,,,,
-acmsc0gj,0,12,,,17-15,265,983a74a73302d137465260b5668a39714c2df06e3fe6d2e3ab58a1fd580eaa3d,1.024,0.352,speech,archive_match,,,,
+acmsc0gj,0,12,,,17-15,265,983a74a73302d137465260b5668a39714c2df06e3fe6d2e3ab58a1fd580eaa3d,1.024,0.352,tone,archive_match,,,,
 acmsc0gj,0,13,,,17-15,265,dbb2d34ff8fb1210b5ef755cd6fa731d173c405e97119e1cf03026d9d84f2ede,0.032,,silence,archive_match,,,,
 acmsc0gj,1,0,,Silence.,17-16,266,0b9dbe8f4f16d28f53058cdd8875617c91226f4415da84bafa2e8324cc3e5735,1.024,,silence,archive_match,,,,
 acmsc0gj,1,1,,Test tone.,17-16,266,244e644657764fb6f45fd2865ab015ff87df6dfeb954b86ee370734ddaada3fe,0.160,,tone,archive_match,,,,
@@ -131,7 +131,7 @@ acmsc0gk,0,8,,,17-18,268,f9d4a0d15919a5b334af3bfbef47b020c1cdda165470d18f1f87202
 acmsc0gk,0,9,,,17-18,268,f3091621e1cf84d15c1464e8aafcd943d84b198cc0cc20b3522aac65f22bc77e,4.000,3.392,speech,archive_match,,,,
 acmsc0gk,0,10,,,17-18,268,7dcfdd6c386cb8848c6c69a197795d3492c39650718f94e60085eb017220396b,4.000,3.392,speech,archive_match,,,,
 acmsc0gk,0,11,,,17-18,268,21833f6114428e9c95319c120c8e99ee46bedcf6c34a68f5eb6578356ef98cb7,4.064,3.456,speech,archive_match,,,,
-acmsc0gk,0,12,,,17-18,268,983a74a73302d137465260b5668a39714c2df06e3fe6d2e3ab58a1fd580eaa3d,1.024,0.352,speech,archive_match,,,,
+acmsc0gk,0,12,,,17-18,268,983a74a73302d137465260b5668a39714c2df06e3fe6d2e3ab58a1fd580eaa3d,1.024,0.352,tone,archive_match,,,,
 acmsc0gk,0,13,,,17-18,268,dbb2d34ff8fb1210b5ef755cd6fa731d173c405e97119e1cf03026d9d84f2ede,0.032,,silence,archive_match,,,,
 acmsc0gk,1,0,,Silence.,17-19,269,0b9dbe8f4f16d28f53058cdd8875617c91226f4415da84bafa2e8324cc3e5735,1.024,,silence,archive_match,,,,
 acmsc0gk,1,1,,Test tone.,17-19,269,244e644657764fb6f45fd2865ab015ff87df6dfeb954b86ee370734ddaada3fe,0.160,,tone,archive_match,,,,
@@ -155,7 +155,7 @@ acmsc0gl,0,8,,,17-21,271,4bd62f6a0f1fcdd202e3e8628420104d5802f4d250f221ffc1f66c2
 acmsc0gl,0,9,,,17-21,271,d7b3d80e4e82c7a7ad2003c4280e200e1f3d6b0d0b89cd16e66f2cba3618728b,4.000,3.392,speech,archive_match,,,,
 acmsc0gl,0,10,,,17-21,271,,4.000,3.392,speech,unconfirmed,,,,
 acmsc0gl,0,11,,,17-21,271,,4.064,3.456,speech,unconfirmed,,,,
-acmsc0gl,0,12,,,17-21,271,983a74a73302d137465260b5668a39714c2df06e3fe6d2e3ab58a1fd580eaa3d,1.024,0.352,speech,archive_match,,,,
+acmsc0gl,0,12,,,17-21,271,983a74a73302d137465260b5668a39714c2df06e3fe6d2e3ab58a1fd580eaa3d,1.024,0.352,tone,archive_match,,,,
 acmsc0gl,0,13,,,17-21,271,dbb2d34ff8fb1210b5ef755cd6fa731d173c405e97119e1cf03026d9d84f2ede,0.032,,silence,archive_match,,,,
 acmsc0gl,1,0,,Silence.,17-22,272,0b9dbe8f4f16d28f53058cdd8875617c91226f4415da84bafa2e8324cc3e5735,1.024,,silence,archive_match,,,,
 acmsc0gl,1,1,,Test tone.,17-22,272,244e644657764fb6f45fd2865ab015ff87df6dfeb954b86ee370734ddaada3fe,0.160,,tone,archive_match,,,,
@@ -465,7 +465,7 @@ eaccs0ah,0,0,,Silence.,17-47,297,0b9dbe8f4f16d28f53058cdd8875617c91226f4415da84b
 eaccs0ah,0,1,,Test tone.,17-47,297,244e644657764fb6f45fd2865ab015ff87df6dfeb954b86ee370734ddaada3fe,0.160,,tone,archive_match,,,,
 eaccs0ah,0,2,,Prompt tone.,17-47,297,170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14,0.992,,tone,archive_match,,,,
 eaccs0ah,0,3,,Silence.,17-47,297,3a1c5910f475ab9edd47d1b2180e612720ccffba9a49073a9895b969de83eee7,0.256,,silence,archive_match,,,,
-eaccs0ah,0,4,ACCSTONE,,17-47,297,11a7c0d13a601824a96b6f2b647efb793f464de9ffb02f7d2562159c73c7d917,1.216,,speech,archive_match,,,,
+eaccs0ah,0,4,ACCSTONE,,17-47,297,11a7c0d13a601824a96b6f2b647efb793f464de9ffb02f7d2562159c73c7d917,1.216,,tone,archive_match,,,,
 eaccs0ah,0,5,ACCSENG2,,17-47,297,c1bb5546e484085b9f9fa6d7783b0b48e9f55b8e9770e5d7f5f1816fa5736d76,5.568,,speech,archive_match,,,,
 eaccs0ah,0,6,ACCSENG1,,17-47,297,a5ada8a7e25d9c078356207f8e9a68472d80e01b93b934177bd8b12c8e8ff8b7,6.464,,speech,archive_match,,,,
 eaccs0ah,0,7,ACCSENG9,,17-47,297,49f7625c32c0aa21d085b143613cf0f7226ede673c5b23261fd1083af4c02b64,3.808,,speech,archive_match,,,,
@@ -479,7 +479,7 @@ eaccs0ah,1,0,,Silence.,17-48,298,0b9dbe8f4f16d28f53058cdd8875617c91226f4415da84b
 eaccs0ah,1,1,,Test tone.,17-48,298,244e644657764fb6f45fd2865ab015ff87df6dfeb954b86ee370734ddaada3fe,0.160,,tone,archive_match,,,,
 eaccs0ah,1,2,,Prompt tone.,17-48,298,170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14,0.992,,tone,archive_match,,,,
 eaccs0ah,1,3,ACCSPAUSE,Silence.,17-48,298,3a1c5910f475ab9edd47d1b2180e612720ccffba9a49073a9895b969de83eee7,0.256,,silence,archive_match,,,,
-eaccs0ah,1,4,ACCSTONE,,17-48,298,11a7c0d13a601824a96b6f2b647efb793f464de9ffb02f7d2562159c73c7d917,1.216,,speech,archive_match,,,,
+eaccs0ah,1,4,ACCSTONE,,17-48,298,11a7c0d13a601824a96b6f2b647efb793f464de9ffb02f7d2562159c73c7d917,1.216,,tone,archive_match,,,,
 eaccs0ah,1,5,ACCSENG3,,17-48,298,5da6537526366ab796dc130eaee99cfc6ca300ecfc421eaddaf78582d688147b,1.920,,speech,archive_match,,,Please enter your card number.,catalog-checked
 eaccs0ah,1,6,ACCSENG7,,17-48,298,c577a1aa8f110f85be8db053651d753e465dcadc38b2063a0e63bf9ce122dfd6,2.176,,speech,archive_match,,,Please dial the number you are calling.,catalog-checked
 eaccs0ah,1,7,ACCSENG5,,17-48,298,24536dcff3d06a47d5ee00085ac08d48a5d2b602f9d5ffaf3a6b1e0613c4cda2,1.952,,speech,archive_match,,,You may place another call now.,catalog-checked
@@ -993,7 +993,7 @@ ecls10aj,0,10,,All incoming callback requests canceled.,17-77,327,32ea370044cd19
 ecls10aj,0,11,,The system could not identify the last caller.,17-77,327,c72ff8a69761291c4f0bdc167ef6d37291d449850b89173a04af7b54ea9b5664,5.408,3.733|1.120,speech,archive_match,,,We're sorry! The last number that called your line is not known. Please hang up now.,catalog-checked
 ecls10aj,0,12,,This method cannot reach the number. The caller is asked to hang up.,17-77,327,85f8a4441ce5b63f7cab84f37e65d214edd07afd9db29c27c0668a26fa4641e8,4.832,3.168|1.120,speech,archive_match,,,We're sorry. The number cannot be reached by this method. Please hang up now.,catalog-checked
 ecls10aj,0,13,,The call was traced. Contact the police department to follow up.,17-78,328,fd6b6c4969b350c8a0ddf6137583f9e047d234963e07f98050c99575ad441c50,8.544,6.880|1.120,speech,archive_match,,,"The last call to your telephone has been traced. If you want to take action, contact your police department. Please hang up now.",catalog-checked
-ecls10aj,0,14,,Single busy signal.,17-78,328,27c6f6eb0fbb645463176253bd6d05d5fc97501dd5e5dd7c2562b2b22b26178f,1.024,0.512,speech,archive_match,,,,
+ecls10aj,0,14,,Single busy signal.,17-78,328,27c6f6eb0fbb645463176253bd6d05d5fc97501dd5e5dd7c2562b2b22b26178f,1.024,0.512,tone,archive_match,,,,
 ecls10aj,1,0,,Silence.,17-78,328,0b9dbe8f4f16d28f53058cdd8875617c91226f4415da84bafa2e8324cc3e5735,1.024,,silence,archive_match,,,,
 ecls10aj,1,1,,Test tone.,17-78,328,244e644657764fb6f45fd2865ab015ff87df6dfeb954b86ee370734ddaada3fe,0.160,,tone,archive_match,,,,
 ecls10aj,1,2,,Prompt tone.,17-79,329,170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14,0.992,0.512|0.096|0.032|0.096|0.032|0.096|0.128,tone,archive_match,,,,
@@ -1382,7 +1382,7 @@ emccs0ca,0,51,MCC12,Valid calling-card number with unrestricted PIN.,17-109,359,
 emccs0ca,0,52,MCC13,,17-109,359,3755fcf2a6861a864ba9c0b8c10fa2efdc6b2e2aff332c787f1c5d00776bc325,3.328,3.328,speech,archive_match,,,Invalid number. Please dial again now.,catalog-checked
 emccs0ca,0,53,MCC14,,17-109,359,38de1f68066eee1e943bf6aee8f329280aecb944732856039ca0c7639a6df9fb,2.432,2.432,speech,archive_match,,,Invalid number. Please hang up.,catalog-checked
 emccs0ca,0,54,MCC15,,17-109,359,f6304ce83c227de4f1f6e66eeaaaa0851145f5d6b3ad1d9dee7416dfc5aa1e63,5.888,5.888,speech,archive_match,,,Please hang up and dial direct. This number cannot be dialed as a sequence call.,catalog-checked
-emccs0ca,0,55,ABC tone,,17-109,359,4b8a9aa081525c5c290f185376f873529e2e8b06ac19baf7d369f0b4ae8bf091,1.216,1.216,speech,archive_match,,,,
+emccs0ca,0,55,ABC tone,,17-109,359,4b8a9aa081525c5c290f185376f873529e2e8b06ac19baf7d369f0b4ae8bf091,1.216,1.216,tone,archive_match,,,,
 emccs0ca,1,0,,Silence.,17-111,361,0b9dbe8f4f16d28f53058cdd8875617c91226f4415da84bafa2e8324cc3e5735,1.024,1.024,silence,archive_match,,,,
 emccs0ca,1,1,,Test tone.,17-111,361,244e644657764fb6f45fd2865ab015ff87df6dfeb954b86ee370734ddaada3fe,0.160,0.160,tone,archive_match,,,,
 emccs0ca,1,2,,Prompt tone.,17-111,361,170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14,0.992,0.992,tone,archive_match,,,,
@@ -1725,7 +1725,7 @@ fcls10bj,1,2,,Prompt tone.,17-134,384,170889db5165cf56d232e43d9ec4cbadc5ca32d5d0
 fcls10bj,1,3,,,17-134,384,3a1c5910f475ab9edd47d1b2180e612720ccffba9a49073a9895b969de83eee7,0.256,,silence,archive_match,,,,
 fcls10bj,1,4,,,17-134,384,a593fd042e70c90925c4d19fba1a4f1f38735ac464b2979666efd506ebf02e56,6.208,5.536,speech,archive_match,,,Une sonnerie spéciale vous avertira dès qu'elle sera libre. Veuillez raccrocher.,catalog-checked
 fcls10bj,1,5,,,17-134,384,f247ed18f1e8ad7918212364bd73dd7a44842e4edc76459dbeeb87d8b6b15627,5.152,4.544,speech,archive_match,,,Vous ne pouvez pas composer actuellement ce numéro au moyen de cette fonction.,catalog-checked
-fcls10bj,1,6,,,17-134,384,03cc143d225e751a1aa3d8bb4c8c7c3cb4b4e3be8216a616e8f19d0fb4ec3512,1.088,0.544,speech,archive_match,,,,
+fcls10bj,1,6,,,17-134,384,03cc143d225e751a1aa3d8bb4c8c7c3cb4b4e3be8216a616e8f19d0fb4ec3512,1.088,0.544,tone,archive_match,,,,
 fcls10bj,1,7,,,17-134,384,4455cfb5fdb035b263ace286f1110d5851bb6a3ed95846bea334aa018b72753e,3.360,2.688,speech,archive_match,,,,
 fcls10bj,1,8,,,17-134,384,d634af7dc4ec7b9904f7874037d1246533347e728d98db68a187a1c16bbb7377,1.984,1.312,speech,archive_match,,,La ligne est occupée.,catalog-checked
 fcls10bj,1,9,,,17-134,384,ae8281203719b189835151fe6b04cbe1657a90afd4c936bee01500fce8815a13,2.432,1.824,speech,archive_match,,,La ligne est de nouveau occupée.,catalog-checked
@@ -2020,7 +2020,7 @@ scls10cj,0,11,CLASSSPA08,,17-166,416,d692c179faf7b53302fbca347da61689d44bff64f8d
 scls10cj,1,4,CLASSSPA05,,17-166,416,62b2bd08a64a39d570173dbe7d75420c09b8bfddead412d2bc47686ca0924307,,,speech,archive_match,,,,
 scls10cj,1,5,CLASSSPA06,,17-166,416,41dc4d96618b681df36de7d0ad813ae59873dcd85ba15e1da41a37e5cd3ac1cd,,,speech,archive_match,,,,
 scls10cj,1,6,CLASSSPA07A,,17-167,417,3ddef86e3990595e825c5e221a2c529c412b8e6cbcc67a096cea8957fca68918,,,speech,archive_match,,,,
-scls10cj,1,7,CLASSSPA09,,17-167,417,0e21722e474cbc19fc795a8fc4e38506dbe49f5523ed69187e8d64f051473113,,,speech,archive_match,,,,
+scls10cj,1,7,CLASSSPA09,,17-167,417,0e21722e474cbc19fc795a8fc4e38506dbe49f5523ed69187e8d64f051473113,,,tone,archive_match,,,,
 scls10cj,1,8,CLASSSPA10,,17-167,417,9828314ef41ea6191bae1c521065eb5a6c854aa4273a539f64c69f8fd338a3d2,,,speech,archive_match,,,,
 scls10cj,1,9,CLASSSPA11A,,17-167,417,9a2b1258d96debbc5c1446d24ca32f08d329e2c1c6dcc50beefedcd2272a1968,,,speech,archive_match,,,,
 scls10cj,1,10,CLASSSPA11B,,17-167,417,dc9e9bed7fb5f267dd84578e253417f2a468d9bddcd0fe95fa90506e96e72955,,,speech,archive_match,,,,
@@ -2095,7 +2095,7 @@ scls20cp,0,4,SLESPA170-0 LISTDEL_SPA-01–01,,17-173,423,ed2e2135b948a285dc1d299
 scls20cp,0,5,SLESPA139-0 INITSERV_SPA-01–01,,17-173,423,2c7c917caccaab33a75a7ed649336e0ed234ec5028c15b242b8a2f0187029a5b,,,speech,archive_match,,,,
 scls20cp,1,4,SLESPA144-0 LISTEDIT_SPA-01–02,,17-174,424,f224e016cb5be03e35bef5c18c2dde3345c1417bc4754b17862387e8c9e947fa,,,speech,archive_match,,,,
 scls20cp,1,5,SLESPA168-0 LISTADD_SPA-01–01,,17-174,424,bff7a43dda88babba31ca0aee702559e9523d01c257620e824709d18f8185a75,,,speech,archive_match,,,,
-scls20cp,1,6,SLESPA004-0 CANCELLED_SPA_SPA-01–02,Prompt tone.,17-174,424,4fef9b2cac6e2209885e8e523c070dd395dd40fdc8f34506edfc199d6cf14a37,,,speech,archive_match,,,,
+scls20cp,1,6,SLESPA004-0 CANCELLED_SPA_SPA-01–02,Prompt tone.,17-174,424,4fef9b2cac6e2209885e8e523c070dd395dd40fdc8f34506edfc199d6cf14a37,,,tone,archive_match,,,,
 scls20cq,0,4,SLESPA143-0 LISTEDIT_SPA-01-04,,17-175,425,3e454d5dc03d2584cecef111ae41a27fdb19dc94c59a54eca6016bb8dbaa5c46,,,speech,archive_match,,,,
 scls20cq,0,5,SLESPA169-0 LISTADD_SPA-01–02,,17-175,425,6380d4ee8e211cd885941d035ab8bdef4a9a774341ce293a0d9d95349423915a,,,speech,archive_match,,,,
 scls20cq,0,6,SLESPA108-0 NOLASTDN_SPA,,17-175,425,863228501e55f691d254410749a67e39199f1abefca9c78a7c67aef670ed9a14,,,speech,archive_match,,,,
@@ -2261,7 +2261,7 @@ scls20cw,0,19,SLESPA009-1 SPA_INCLUDE-01,,17-191,441,bcd11534650c6b4c946c028064c
 scls20cw,0,20,SLESPA084-1 ENDOFLIST_SPA-01-02,,17-191,441,d129ef47435ae5c963e035cc0b7ae5be5e9cd0cff545a2047afc448e8ce7fe4c,,,speech,archive_match,,,Este es el fin de su lista.,catalog-checked
 scls20cw,0,21,SLESPA044-1 SPA_PUBLIC-00,,17-191,441,7e5fb176d78e3fa2eaa4fe952f8724affeafa686b311f0dc5f6da7e8311f8f8f,,,speech,archive_match,,,,
 scls20cw,0,22,SLESPA032-1 CURRDN_SPA-01-02,,17-192,442,af69ffe1f3ec47509b17259bb19e1eb3bc4458fe74db0aa6d50fa9c852403561,,,speech,archive_match,,,,
-scls20cw,0,23,SLESPA004-1 CANCELLED_SPA-01-01,Prompt tone.,17-192,442,4fef9b2cac6e2209885e8e523c070dd395dd40fdc8f34506edfc199d6cf14a37,,,speech,archive_match,,,,
+scls20cw,0,23,SLESPA004-1 CANCELLED_SPA-01-01,Prompt tone.,17-192,442,4fef9b2cac6e2209885e8e523c070dd395dd40fdc8f34506edfc199d6cf14a37,,,tone,archive_match,,,,
 scls20cw,1,4,SLESPA035-1 DIALED_SPA,,17-192,442,7a0ca7fd05c23b6c32e4ff4bc0f9444898f96733e9622ba9aae56d37705fe1ad,,,speech,archive_match,,,,
 scls20cw,1,5,SLESPA087-1 PRESENT_SPA-01-01,,17-192,442,353dc9f77a375c2d7810c6470a878565e881e914e5df9e13a0c3b1fe41c66a6d,,,speech,archive_match,,,,
 scls20cw,1,6,SLESPA083-1 FIRSTADN_SPA-01-01,,17-192,442,688cc385ff47a697dba27649d85b011349b1172d635c9ff2b89dbc93dc7b0187,,,speech,archive_match,,,,

@@ -44,6 +44,12 @@ Pages 13 and 16 commonly supply silence. Unaddressed parts of a referenced segme
 
 Standard SIT menus 8 through 39 combine attack pages 17, 20, 23, 26 and 29 with repeated two-page components beginning at 18, 21, 24, 27 and 30. IDs are bank-local; phrase 8 in another pack may contain speech. SIT labels require the corresponding menu structure rather than just the phrase number.
 
+## Standalone tone banks
+
+The archived S-record images with identifiers `TONE00AA10` and `TONE00AB10` at `0x0670` contain waveform records outside the phrase tables. Each starts with a two-byte big-endian word count, followed by twice that many bytes of companded sample data. The common records sit in a zero-padded region from `0x2100` through `0x5e93`. `TONE00AB10` also has a contiguous chain from `0x5e9e` through `0x11443`.
+
+The exporter recognizes these regions by byte fingerprint and checks that every length word and sample byte is present in the load. The manifests record the exact header address, sample address, byte count, source hash, and selected codec for each record. See [tone playback measurements](research/TONE_PLAYBACK.md) for the law assignment and measured frequencies.
+
 ## Malformed references
 
 fstd0ba.bin44, bank 1, has these entries:
@@ -58,4 +64,4 @@ They point two bytes into four-byte entries and produce invalid segment fields. 
 
 ## Decoding status
 
-The default expands one stored code per sample using standard G.711 A-law after XOR 0x55. There is no four-bit nibble unpacker in this release. Tone spectra and envelopes are being measured because baseline SIT playback was reported incorrect. No generated sine wave is substituted for an unexplained record.
+The speech decoder expands one stored code per sample using standard G.711 A-law after XOR 0x55. Validated SIT and 750 Hz cue menus drive sine synthesis. Standalone tone bank records use the companding law identified for their region and retain the stored sample count.

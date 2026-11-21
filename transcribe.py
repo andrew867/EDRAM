@@ -7,6 +7,7 @@ from collections import Counter
 import csv
 import hashlib
 import html
+from itertools import chain
 import json
 import re
 import signal
@@ -15,6 +16,7 @@ import sys
 import wave
 
 from tone_playback import ARCHIVE_INDEX
+from tone_bank import manifest_clips
 
 NORTEL_CATALOG = Path(__file__).resolve().parent / "references" / "nortel-phrases.csv"
 NORTEL_GUIDE = "https://www.gbppr.net/bsp/297-1001-527.pdf"
@@ -35,8 +37,11 @@ def is_silence(pcm):
     return not samples or max(abs(s) for s in samples) <= 8
 
 
-def sit_clip_fields(entry):
-    return {key: entry[key] for key in ("rendering", "sit_components", "source_pcm_sha256") if key in entry}
+TONE_FIELDS = ("rendering", "sit_components", "source_pcm_sha256", "tone_name", "tone_components", "frequencies_hz")
+
+
+def tone_clip_fields(entry):
+    return {key: entry[key] for key in TONE_FIELDS if key in entry}
 
 
 def sit_references(root):
@@ -44,28 +49,34 @@ def sit_references(root):
     return json.loads(path.read_text(encoding="utf-8"))["clips"] if path.exists() else {}
 
 
-def refresh_sit_clips(root, clips):
+def refresh_tone_clips(root, clips):
     references = sit_references(root)
     entries = {}
     for path in root.glob("*/manifest.json"):
         manifest = json.loads(path.read_text(encoding="utf-8"))
         entries.update({(Path(path.parent.name) / p["wav"]).as_posix(): p for p in manifest["phrases"]
-                        if p["wav"] and "_sit_" in p["label"]})
+                        if p["wav"] and ("_sit_" in p["label"] or p.get("tone_name"))})
     changed = False
     for clip in clips:
         entry = entries.get(clip["path"])
         if entry is None:
             continue
-        fields = sit_clip_fields(entry)
+        fields = tone_clip_fields(entry)
         fields.update(seconds=entry["duration_seconds"], pcm_sha256=entry["pcm_sha256"])
-        if fields.get("rendering") == "nortel-sit":
+        if fields.get("rendering") in ("nortel-sit", "nortel-cue"):
             fields["reference_wav"] = None
         else:
             fields["reference_wav"] = references.get(clip["path"], {}).get("path")
-            for key in ("rendering", "sit_components", "source_pcm_sha256"):
-                if key in clip:
-                    del clip[key]
-                    changed = True
+        for key in TONE_FIELDS:
+            if key in clip and key not in fields:
+                del clip[key]
+                changed = True
+        if entry.get("tone_name") and clip["content"] != "tone":
+            clip["asr_before_tone_identification"] = clip["transcript"]
+            clip["transcript"] = {"text": "", "status": "tone", "review_recommended": False,
+                                  "human_verified": False, "speaker": None}
+            clip["content"] = "tone"
+            changed = True
         changed |= any(clip.get(key) != value for key, value in fields.items())
         clip.update(fields)
     return changed
@@ -96,7 +107,7 @@ def make_plan(root):
                 digest = hashlib.sha256(pcm).hexdigest()
                 silent = is_silence(pcm)
                 annotation = annotations.get(relative, {})
-                tone = (annotation.get("content") == "tone" or "_sit_" in p.get("label", "") or
+                tone = (p.get("tone_name") or annotation.get("content") == "tone" or "_sit_" in p.get("label", "") or
                         (kind == "segment" and (p["bank"], p["page"], p["pages"]) in tone_segments) or
                         (kind == "announcement" and all(s["page"] in (13, 14, 15, 16) and s["pages"] == 1 for s in p["segments"])))
                 if tone and not silent:
@@ -105,9 +116,9 @@ def make_plan(root):
                               "label": p.get("label", Path(p["wav"]).stem), "pcm_sha256": digest,
                               "seconds": len(pcm) / 16000, "content": "silence" if silent else "speech",
                               "description": annotation.get("label", ""), "annotation_provenance": annotation.get("provenance"),
-                              **sit_clip_fields(p)})
+                              **tone_clip_fields(p)})
     for clip in clips:
-        clip["reference_wav"] = (None if clip.get("rendering") == "nortel-sit"
+        clip["reference_wav"] = (None if clip.get("rendering") in ("nortel-sit", "nortel-cue")
                                  else references.get(clip["path"], {}).get("path"))
         if clip["pcm_sha256"] in tone_hashes:
             clip["content"] = "tone"
@@ -254,11 +265,14 @@ def write_player(root, clips, *, catalog_path=NORTEL_CATALOG):
     restored_tones = json.loads(index.read_text(encoding="utf-8"))["clips"] if index.is_file() else {}
     catalog = load_nortel_catalog(catalog_path)
     rows = []
-    for clip in clips:
+    for clip in chain(clips, manifest_clips(root)):
         t = clip["transcript"]
-        text = t["text"] or (clip.get("description") or ("[Silence]" if clip["content"] == "silence" else "[Tone sequence or component]" if clip["content"] == "tone" else "[No speech detected, review]"))
+        text = t["text"] or clip.get("tone_name") or clip.get("description") or {
+            "silence": "[Silence]", "tone": "[Tone sequence or component]",
+        }.get(clip["content"], "[No speech detected, review]")
         review = "Review" if t.get("review_recommended") else ""
-        title = f"{clip['source']} / bank {clip['bank']} / {clip['label']}"
+        bank_label = "tone bank" if clip["kind"] == "tone-bank" else f"bank {clip['bank']}"
+        title = f"{clip['source']} / {bank_label} / {clip['label']}"
         words = html.escape(text)
         entry = catalog_entry(clip, catalog)
         if entry:
@@ -282,14 +296,17 @@ def write_player(root, clips, *, catalog_path=NORTEL_CATALOG):
         url = html.escape(clip["path"], quote=True)
         restored = restored_tones.get(clip["path"])
         reference = clip.get("reference_wav")
-        nortel_sit = clip.get("rendering") == "nortel-sit"
-        if nortel_sit:
+        rendering = clip.get("rendering")
+        if rendering in ("nortel-sit", "nortel-cue"):
             primary = url
-            play = f'<button data-src="{url}" data-playback="Nortel EDRAM SIT">Play Nortel SIT</button> '
+            label = "Nortel SIT" if rendering == "nortel-sit" else "tone"
+            play = f'<button data-src="{url}" data-playback="{label}">Play {label}</button> '
             direct = ""
             restored = None
-            parts = clip["sit_components"]
-            spec = " / ".join(f'{part["frequency_hz"]:g} Hz × {part["duration_ms"]} ms' for part in parts)
+            parts = clip["sit_components"] if rendering == "nortel-sit" else clip["tone_components"]
+            spec = " / ".join(
+                f'{part["frequency_hz"]:g} Hz × {part["duration_ms"]} ms' if part["frequency_hz"]
+                else f'{part["duration_ms"]} ms silence' for part in parts)
             words = f'{words}<small>{spec}</small>'
         elif reference:
             primary = html.escape(reference, quote=True)
@@ -300,9 +317,14 @@ def write_player(root, clips, *, catalog_path=NORTEL_CATALOG):
             play = (f'<button data-src="{url}" data-playback="Direct A-law">Direct A-law</button> ' if restored
                     else f'<button data-src="{url}">Play stored audio</button> ')
             direct = ""
+            if clip.get("frequencies_hz"):
+                spec = ", ".join(f"{freq:g} Hz" for freq in clip["frequencies_hz"])
+                if clip["kind"] == "tone-bank":
+                    spec += f' / sample address 0x{clip["sample_address"]:x} / {clip["codec"]}'
+                words = f'{words}<small>{spec}</small>'
         compare = (f' <button data-src="{html.escape(restored, quote=True)}" data-playback="Loop experiment">Loop experiment</button>'
                    if restored else "")
-        flag = ' data-comparison="true"' if nortel_sit or restored or reference else ""
+        flag = ' data-comparison="true"' if rendering or restored or reference or clip.get("tone_name") else ""
         rows.append(f'<tr data-kind="{clip["kind"]}" data-review="{str(bool(review)).lower()}"{flag}><td>{html.escape(title)}'
                     f'<small>{clip["kind"]}, {clip["seconds"]:.3f}s, {html.escape(t.get("language") or clip["content"])}</small></td>'
                     f'<td class="transcript">{words}<small class="review">{review}</small></td>'
@@ -317,7 +339,7 @@ table{width:100%;border-collapse:collapse}td{padding:.65rem;border-bottom:1px so
 .catalog{margin-bottom:.35rem;color:#a5bac9;font-size:.86rem}.catalog code{color:#edf4f9}.catalog a{margin-left:.2rem}
 .intonation{color:#a5bac9}
 @media(max-width:700px){td{display:block}td:first-child{width:auto}header p{font-size:13px}}
-</style><header><h1>EDRAM announcement archive</h1><p>Catalog-checked transcripts include Nortel phrase names and intonation when available. SIT WAVs play the documented EDRAM pitches and timing.</p>
+</style><header><h1>EDRAM announcement archive</h1><p>Catalog-checked transcripts include Nortel phrase names and intonation. Browse SITs, cues and extracted tone banks under Tones and comparisons.</p>
 <input id="q" aria-label="Search the archive" placeholder="Search catalog names, transcripts, loads or phrase IDs">
 <select id="kind" aria-label="Clip type"><option value="">All clips</option><option value="announcement" selected>Announcements</option><option value="segment">Speech and tone fragments</option><option value="comparison">Tones and comparisons</option></select>
 <label><input type="checkbox" id="review" style="width:auto">Needs review</label><span id="count"></span>
@@ -333,6 +355,9 @@ document.addEventListener('click',e=>{if(e.target.dataset.src){const row=e.targe
 
 
 def write_transcripts(root, summary, clips):
+    summary["content_counts"] = dict(Counter(c["content"] for c in clips))
+    summary["unique_speech_pcm"] = len({c["pcm_sha256"] for c in clips if c["content"] == "speech"})
+    summary["review_recommended"] = sum(bool(c["transcript"].get("review_recommended")) for c in clips)
     summary["status_counts"] = dict(Counter(c["transcript"]["status"] for c in clips))
     summary["catalog_checked_transcripts"] = sum(bool(c["transcript"].get("text_source")) for c in clips)
     payload = json.dumps({"summary": summary, "clips": clips}, ensure_ascii=False, indent=2)
@@ -413,7 +438,7 @@ def main():
     else:
         path = args.root / "transcripts.json"
         transcripts = json.loads(path.read_text(encoding="utf-8"))
-        changed = refresh_sit_clips(args.root, transcripts["clips"])
+        changed = refresh_tone_clips(args.root, transcripts["clips"])
         changed |= apply_nortel_transcripts(transcripts["clips"], load_nortel_catalog(NORTEL_CATALOG))
         if changed:
             write_transcripts(args.root, transcripts["summary"], transcripts["clips"])

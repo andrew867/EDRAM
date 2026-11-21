@@ -3,5 +3,6 @@
   "phrases": 2890,
   "exported": 2873,
   "unavailable": 17,
-  "invalid_menu_entries": 3
+  "invalid_menu_entries": 3,
+  "tone_bank_wavs": 79
 }

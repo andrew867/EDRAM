@@ -6,11 +6,13 @@ import json
 from pathlib import Path
 import wave
 import edram
+import tone_bank
 from tone_playback import ARCHIVE_INDEX
 
 
 def verify(source_dir: Path, output: Path):
     result = {"sources": 0, "memory_banks": 0, "validated_phrase_menus": 0, "nortel_sit_wavs": 0,
+              "nortel_cue_wavs": 0, "tone_bank_wavs": 0,
               "phrase_wavs": 0, "segment_wavs": 0, "unavailable_phrases": 0,
               "invalid_menu_entries": 0, "phrase_duration_seconds": 0,
               "unit_tests": "run separately", "files": []}
@@ -43,7 +45,9 @@ def verify(source_dir: Path, output: Path):
                     continue
                 raise AssertionError(f"unexpectedly unavailable: {path} {phrase.number}")
             expected, implicit, tone = edram.render_export(
-                image, phrase, manifest["codec"], digest, raw_sit=manifest.get("sit_rendering") != "nortel-sit")
+                image, phrase, manifest["codec"], digest,
+                raw_sit=manifest.get("sit_rendering") != "nortel-sit",
+                raw_cues=manifest.get("cue_rendering") != "nortel-cue")
             with wave.open(str(folder / entry["wav"])) as wav:
                 assert (wav.getframerate(), wav.getnchannels(), wav.getsampwidth()) == (8000, 1, 2)
                 assert wav.getnframes() == entry["samples"] == len(expected) // 2
@@ -52,8 +56,10 @@ def verify(source_dir: Path, output: Path):
             assert hashlib.sha256(pcm).hexdigest() == entry["pcm_sha256"]
             assert implicit == entry["implicit_zero_samples"]
             assert entry.get("rendering") == tone.get("rendering")
-            assert all(entry.get(field) == value for field, value in tone.items())
-            result["nortel_sit_wavs"] += bool(tone)
+            assert all(entry.get(field) == value for field, value in tone.items()
+                       if field in entry or tone.get("rendering"))
+            result["nortel_sit_wavs"] += tone.get("rendering") == "nortel-sit"
+            result["nortel_cue_wavs"] += tone.get("rendering") == "nortel-cue"
             relative = (Path(path.stem) / entry["wav"]).as_posix()
             if relative in restored_targets:
                 assert entry.get("menu_samples", entry["samples"]) == restoration["files"][restored_targets[relative]]["samples"], relative
@@ -71,6 +77,21 @@ def verify(source_dir: Path, output: Path):
             data, _ = image.segment_bytes(entry["bank"], edram.Segment(entry["page"], entry["pages"], 1))
             assert pcm == edram.decode(data, manifest["codec"])
             result["segment_wavs"] += 1
+        if "tone_bank" in manifest:
+            for entry, (expected, raw) in zip(manifest["tone_bank"], tone_bank.records(image), strict=True):
+                assert all(entry[key] == value for key, value in expected.items())
+                if not entry["wav"]:
+                    continue
+                if "sample_repair" in entry:
+                    raw = tone_bank.repair_samples(expected, raw)
+                    assert entry["sample_repair"] == expected["sample_repair"]
+                pcm = edram.decode(raw, entry["codec"])
+                with wave.open(str(folder / entry["wav"])) as wav:
+                    assert (wav.getframerate(), wav.getnchannels(), wav.getsampwidth()) == (8000, 1, 2)
+                    assert wav.getnframes() == entry["samples"]
+                    assert wav.readframes(wav.getnframes()) == pcm
+                assert hashlib.sha256(pcm).hexdigest() == entry["pcm_sha256"]
+                result["tone_bank_wavs"] += 1
         result["files"].append({"source": path.name, "sha256": digest, "banks": banks,
                                 "valid_menus": len(phrases), "exported_phrases": exported,
                                 "invalid_menus": image.invalid_phrases,
@@ -90,7 +111,7 @@ def verify(source_dir: Path, output: Path):
             assert hashlib.sha256(pcm).hexdigest() == entry["pcm_sha256"], path
         restored_wavs = len(files)
         result.update(restored_clips=len(verified_targets), restored_wavs=restored_wavs)
-    assert len(list(output.rglob("*.wav"))) == result["phrase_wavs"] + result["segment_wavs"] + restored_wavs, "unexpected stale WAV files"
+    assert len(list(output.rglob("*.wav"))) == result["phrase_wavs"] + result["segment_wavs"] + result["tone_bank_wavs"] + restored_wavs, "unexpected stale WAV files"
     result["phrase_duration_seconds"] = round(result["phrase_duration_seconds"], 6)
     result["status"] = "passed"
     return result

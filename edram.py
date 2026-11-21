@@ -11,6 +11,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 import struct
 from sit_reference import archived_profile, synthesize
+import tone_bank
 
 VERSION = "0.1.0"
 RATE = 8000
@@ -244,18 +245,36 @@ def render(image: Image, phrase: Phrase, codec="alaw-unmasked"):
     return b"".join(chunks), implicit
 
 
-def render_export(image, phrase, codec, source_hash, *, raw_sit=False):
+def render_export(image, phrase, codec, source_hash, *, raw_sit=False, raw_cues=False):
     pcm, implicit = render(image, phrase, codec)
-    if raw_sit or "_sit_" not in phrase_name(phrase):
-        return pcm, implicit, {}
-    try:
-        parts, profile_source = archived_profile((asdict(s) for s in phrase.segments),
-                                                 source_hash=source_hash, bank=phrase.bank, phrase=phrase.number)
-    except ValueError:
-        return pcm, implicit, {}
-    info = {"rendering": "nortel-sit", "sit_components": parts, "sit_profile_source": profile_source,
-            "menu_samples": len(pcm) // 2, "source_pcm_sha256": hashlib.sha256(pcm).hexdigest()}
-    return synthesize(parts, rate=RATE), implicit, info
+    if not raw_sit and "_sit_" in phrase_name(phrase):
+        try:
+            parts, profile_source = archived_profile((asdict(s) for s in phrase.segments),
+                                                     source_hash=source_hash, bank=phrase.bank, phrase=phrase.number)
+        except ValueError:
+            pass
+        else:
+            info = {"rendering": "nortel-sit", "sit_components": parts, "sit_profile_source": profile_source,
+                    "menu_samples": len(pcm) // 2, "source_pcm_sha256": hashlib.sha256(pcm).hexdigest()}
+            return synthesize(parts, rate=RATE), implicit, info
+    if cue := tone_bank.cue_profile(image, phrase, BANK_SIZE, PAGE_SIZE):
+        name, parts = cue
+        info = {"tone_name": name, "frequencies_hz": [750], "tone_components": parts}
+        if not raw_cues:
+            info.update(rendering="nortel-cue", menu_samples=len(pcm) // 2,
+                        source_pcm_sha256=hashlib.sha256(pcm).hexdigest())
+            return synthesize(parts, rate=RATE), implicit, info
+        return pcm, implicit, info
+    if codec == "alaw-unmasked" and len(pcm) <= 2 * RATE * 2:
+        digest = hashlib.sha256(pcm).hexdigest()
+        if recorded := tone_bank.RECORDED_TONES.get(digest):
+            name, frequencies = recorded
+            info = {"tone_name": name, "frequencies_hz": list(frequencies)}
+            if not raw_cues and (lead := tone_bank.RECORDED_LEAD_REPAIRS.get(digest)):
+                info.update(rendering="repaired-tone", source_pcm_sha256=digest, silenced_lead_samples=lead)
+                pcm = bytes(2 * lead) + pcm[2 * lead:]
+            return pcm, implicit, info
+    return pcm, implicit, {}
 
 
 def chunk(tag: bytes, data: bytes) -> bytes:
@@ -280,7 +299,7 @@ def phrase_name(phrase: Phrase):
     return f"phrase_{phrase.number:02d}"
 
 
-def export(path: Path, output: Path, codec: str, segments=False, overwrite=False, *, raw_sit=False):
+def export(path: Path, output: Path, codec: str, segments=False, overwrite=False, *, raw_sit=False, raw_tones=False):
     image = Image.read(path)
     phrases = image.phrases(strict=False)
     folder = output / path.stem
@@ -306,16 +325,26 @@ def export(path: Path, output: Path, codec: str, segments=False, overwrite=False
         entry["wav"] = None
         entry["label"] = phrase_name(phrase)
         try:
-            pcm, implicit, tone = render_export(image, phrase, codec, manifest["source_sha256"], raw_sit=raw_sit)
+            pcm, implicit, tone = render_export(image, phrase, codec, manifest["source_sha256"],
+                                                raw_sit=raw_sit or raw_tones, raw_cues=raw_tones)
             relative = Path(f"bank_{phrase.bank:02d}") / (phrase_name(phrase) + ".wav")
-            if tone:
+            rendering = tone.get("rendering")
+            if rendering == "nortel-sit":
                 manifest["sit_rendering"] = "nortel-sit"
                 write_wav(folder / relative, pcm, f"Nortel EDRAM SIT {phrase.number - 7}",
                           "Sine synthesis from Nortel 297-1001-527 Table 4-2; 274/380 ms; peak PCM 5000.")
-                entry.update(tone, samples=len(pcm) // 2, duration_seconds=len(pcm) / (2 * RATE))
+            elif rendering == "nortel-cue":
+                manifest["cue_rendering"] = "nortel-cue"
+                write_wav(folder / relative, pcm, tone["tone_name"],
+                          "Measured 750 Hz; cadence from source phrase menu; peak PCM 5000.")
+            elif rendering == "repaired-tone":
+                manifest["cue_rendering"] = "nortel-cue"
+                write_wav(folder / relative, pcm, tone["tone_name"],
+                          f"Stored tone with {tone['silenced_lead_samples']} lead-in samples silenced.")
             else:
                 write_wav(folder / relative, pcm, f"{path.stem} bank {phrase.bank} phrase {phrase.number}",
                           f"source_sha256={manifest['source_sha256']}; codec={codec}; menu=0x{phrase.menu_address:x}")
+            entry.update(tone, samples=len(pcm) // 2, duration_seconds=len(pcm) / (2 * RATE))
             entry.update(wav=relative.as_posix(), implicit_zero_samples=implicit,
                          pcm_sha256=hashlib.sha256(pcm).hexdigest(), status="exported")
         except FormatError as exc:
@@ -335,6 +364,15 @@ def export(path: Path, output: Path, codec: str, segments=False, overwrite=False
             except FormatError as exc:
                 entry.update(status="unavailable", reason=str(exc))
             manifest["segments"].append(entry)
+    for entry, payload in tone_bank.records(image):
+        if entry["wav"]:
+            if not raw_tones:
+                payload = tone_bank.repair_samples(entry, payload)
+            pcm = decode(payload, entry["codec"])
+            write_wav(folder / entry["wav"], pcm, entry["tone_name"],
+                      f"Stored EDRAM tone bank waveform; codec={entry['codec']}.")
+            entry["pcm_sha256"] = hashlib.sha256(pcm).hexdigest()
+        manifest.setdefault("tone_bank", []).append(entry)
     (folder / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     with (folder / "phrases.csv").open("w", newline="", encoding="utf-8") as file:
         fields = ("bank", "number", "status", "duration_seconds", "samples", "wav", "implicit_zero_samples", "reason")
@@ -352,11 +390,18 @@ def write_browser(output: Path, manifests):
             if not phrase["wav"]:
                 continue
             name = f"{source} / bank {phrase['bank']} / {phrase['label']}"
+            if phrase.get("tone_name"):
+                name += f' / {phrase["tone_name"]}'
             url = (Path(Path(source).stem) / phrase["wav"]).as_posix()
             play = "Play Nortel SIT" if phrase.get("rendering") == "nortel-sit" else "Play"
             rows.append(f'<tr><td>{html.escape(name)}</td><td>{phrase["duration_seconds"]:.3f}s</td>'
                         f'<td><button data-src="{html.escape(url, quote=True)}">{play}</button> '
                         f'<a href="{html.escape(url, quote=True)}" download>WAV</a></td></tr>')
+        for clip in tone_bank.bank_clips(manifest):
+            name = f"{source} / tone bank / {clip['label']} / {clip['tone_name']}"
+            url = html.escape(clip["path"], quote=True)
+            rows.append(f'<tr><td>{html.escape(name)}</td><td>{clip["seconds"]:.4f}s</td>'
+                        f'<td><button data-src="{url}">Play</button> <a href="{url}" download>WAV</a></td></tr>')
     document = '''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
 <title>EDRAM announcement archive</title><style>
 body{max-width:1100px;margin:2rem auto;padding:0 1rem;font:16px system-ui;background:#101820;color:#edf4f9}
@@ -399,6 +444,7 @@ def main(argv=None):
     parser.add_argument("--inspect", action="store_true", help="validate and list tables without writing files")
     parser.add_argument("--codec", choices=tuple(PCM_TABLES), default="alaw-unmasked")
     parser.add_argument("--raw-sit", action="store_true", help="expand SIT sample bytes with the selected codec")
+    parser.add_argument("--raw-tones", action="store_true", help="expand phrase tone bytes without sine synthesis")
     parser.add_argument("--segments", action="store_true", help="also export each referenced segment without repeats")
     parser.add_argument("--overwrite", action="store_true", help="allow replacing outputs in existing source folders")
     parser.add_argument("--version", action="version", version=VERSION)
@@ -410,9 +456,12 @@ def main(argv=None):
             if args.inspect:
                 image = Image.read(path)
                 phrases = image.phrases(strict=False)
-                print(json.dumps({"source": path.name, "records": len(image.records), "phrases": [asdict(p) for p in phrases], "invalid_phrases": image.invalid_phrases}))
+                print(json.dumps({"source": path.name, "records": len(image.records), "phrases": [asdict(p) for p in phrases],
+                                  "invalid_phrases": image.invalid_phrases,
+                                  "tone_bank": [entry for entry, _ in tone_bank.records(image)]}))
             else:
-                manifest = export(path, args.output, args.codec, args.segments, args.overwrite, raw_sit=args.raw_sit)
+                manifest = export(path, args.output, args.codec, args.segments, args.overwrite,
+                                  raw_sit=args.raw_sit, raw_tones=args.raw_tones)
                 manifests.append(manifest)
                 count = sum(p["status"] == "exported" for p in manifest["phrases"])
                 print(f"{path.name}: {count}/{len(manifest['phrases'])} phrases exported")
@@ -421,7 +470,8 @@ def main(argv=None):
             summary = {"sources": len(manifests), "phrases": sum(len(m["phrases"]) for m in manifests),
                        "exported": sum(p["status"] == "exported" for m in manifests for p in m["phrases"]),
                        "unavailable": sum(p["status"] == "unavailable" for m in manifests for p in m["phrases"]),
-                       "invalid_menu_entries": sum(len(m["invalid_phrases"]) for m in manifests)}
+                       "invalid_menu_entries": sum(len(m["invalid_phrases"]) for m in manifests),
+                       "tone_bank_wavs": sum(bool(t["wav"]) for m in manifests for t in m.get("tone_bank", []))}
             (args.output / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
             print(json.dumps(summary))
     except (FormatError, OSError) as exc:

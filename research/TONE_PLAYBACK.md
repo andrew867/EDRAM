@@ -12,7 +12,33 @@ Each EDRAM component is 274 ms or 2,192 frames when short, and 380 ms or 3,040 f
 
 In `fstd0ba.bin44` bank 1 phrase 16, the valid-checksum pointer starts one four-byte slot early and omits the final sustain. The renderer recognizes the archived file hash and the exact anomalous menu. It uses bank 0's SIT 9 sequence, corroborated by Nortel, with 913.8 Hz for 380 ms followed by 1370.6 Hz and 1776.7 Hz for 274 ms each.
 
-The re-export contains 285 SIT WAVs and all 32 pitch and duration profiles. An FFT audit of the 855 components measured each peak within 0.01 Hz of its specified pitch. Every component contained exactly 2,192 or 3,040 frames, including its edge tapers.
+The SIT export contains 285 WAVs and all 32 pitch and duration profiles. An FFT audit of the 855 components measured each peak within 0.01 Hz of its specified pitch. Every component contained exactly 2,192 or 3,040 frames, including its edge tapers.
+
+## Cues in the phrase tables
+
+The test cue is a single 160 ms sine at 750 Hz. The prompt has 512 ms of silence, three 96 ms bursts with two 32 ms gaps, and 128 ms of trailing silence. This reproduces the 992 ms sequence described in [US6442246B1, Table 1](https://patents.google.com/patent/US6442246B1/en). Some Nortel catalog rows say 760 Hz. The shared sample bytes have a 750 Hz carrier, including the variant stored one byte before the nominal address. The archive contains 120 test cues and 120 prompt cues rendered at the measured pitch and the menu cadence.
+
+Recorded cues retain the original waveform wherever the encoded samples already carry the signal. These include the ACTS alert (350 + 440 Hz followed by 480 + 620 Hz, four repeats), variants of the calling-card bong (941 + 1477 Hz onset and 350 + 440 Hz decay), and approximately 400 Hz CLASS prompts. The Spanish CLASS busy cue in `scls10cj` bank 1 phrase 7 has a full-scale glitch before the 480 + 620 Hz waveform. The repair zeros the first 513 samples and keeps the stored busy burst and total duration.
+
+## MWTTONE and EDRMTONE
+
+Nortel documents the use of `MWTTONE` for both 102 milliwatt test trunks and receiver-off-hook service. In these archived S-records, the tone bank follows the announcement data at `0x2100`. Record lengths are big-endian counts of 16-bit words. Two companded 8-bit samples follow per word. Zero padding separates the first 17 records. The supplemental bank in `EDRMTONE` starts at `0x5e9e` and its 47 records are contiguous.
+
+| Record | Waveform address | Samples | Measured carrier or mixture |
+| --- | --- | ---: | --- |
+| 9 | `0x37a0` | 996 | 1004 Hz milliwatt |
+| 10 | `0x3bcc` | 2,000 | 1404 + 2060 + 2452 + 2604 Hz receiver off hook |
+| 11 | `0x43e4` | 996 | 948 Hz test carrier |
+| 22 to 37 | `0x6b28` through `0x825c` | 394 each | All 16 DTMF combinations, first set |
+| 46 to 61 | `0xc8b8` through `0xdfec` | 394 each | All 16 DTMF combinations, second set |
+
+Tone records before the header at `0xb5ea` fit unmasked G.711 mu-law best as a group. Those from `0xb5ea` onward fit unmasked A-law. For example, the 850 Hz carrier in the common bank has 1.33% RMS residual after a sine fit with mu-law and 4.70% with A-law. Its quieter supplemental counterpart has 1.24% with A-law and 5.36% with mu-law. The DTMF sets use a 394-sample period. Their measured pitches correspond to integer cycle counts in that period. The two constant-fill records are indexed without audio.
+
+In both files, record 1 differs from the copy in `EDRMTONE` record 18 by one sign bit at sample index 3. The WAV uses the matching copy's code `0x54` in place of `0x94`. The manifest records the edit and the hash of the original encoded record. `--raw-tones` retains the original code.
+
+The 124.5 ms milliwatt and 250 ms howler WAVs preserve the stored samples. The switch supplies trunk cadence and output level.
+
+[Nortel DRAM and EDRAM Guide, chapter 14](https://www.gbppr.net/bsp/297-1001-527.pdf#page=179) · [Stored MWTTONE WAVs](../audio/mwttone/tone-bank) · [EDRMTONE record index](../audio/edrmtone/manifest.json)
 
 ## Earlier loop experiment
 
