@@ -30,7 +30,7 @@ If the disk bytes match and the short load fails, compare against an unmodified 
 | Custom repeat menus and standalone tone-bank encoding | Build the same test pattern as repeated pages and as explicit copies. The current encoder gives custom submenu entries a repeat count of one. For a standalone bank writer, first obtain a known-good control and verify an unchanged restore, then try a same-length sample replacement on the lab card with regenerated checksums. The current reader recognizes archived bank regions by exact fingerprint. |
 | `MWTTONE` aggregate footer | Obtain an intact comparison or the loader's checksum rules. The archived `.txt80` S6 value is `0x2473DF66`, while the included records sum to `0x130C4166` under the rules verified against `EDRMTONE`. The individual record checksums and release-inventory checksum verify. |
 | `EDRM0001_INFO.txt` release checksum | Find the version of the metadata file that produced the listed value `03032`, or document the archived mismatch as final. The original tar bytes give `28684`. |
-| Incomplete or malformed archive entries | Find originals containing the 17 unavailable phrase payloads and the three malformed `FSTD0BA` bank 1 menus. Keep the gaps visible in export validation. |
+| Incomplete archive entries | Find originals containing the 17 unavailable phrase payloads. The four `FSTD0BA` directory entries have an [offline repair](FORMAT.md#malformed-references) that keeps the archive intact. |
 
 [Recovered file format](FORMAT.md) · [Tone playback evidence](research/TONE_PLAYBACK.md)
 

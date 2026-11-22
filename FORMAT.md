@@ -48,7 +48,7 @@ All-`FF` and all-`00` directory entries are inactive. For an active slot, the fo
 
 The converter reads `page_count × 256` sample codes starting at `bank_base + page × 0x100` and repeats that range `repeat_count` times before advancing to the next entry. At 8 kHz, 256 sample codes represent 32 ms.
 
-For example, `ESTD0AA` bank 0 phrase 8 has directory bytes `34 01 06 20` at `0x0020`. It points to six entries starting at `0x0134`. The first two entries, `11 00 01 01` and `12 00 02 04`, say to play page `0x11` once, then play the two-page range `0x12 through 0x13` four times. The offline converter expands those sample codes to 2,304 frames, or 288 ms at 8 kHz. It uses the stored waveform and menu timing for every SIT. [Worked speech offsets](BYTE_MAP.md#follow-a-real-spoken-announcement) · [SIT playback notes](research/TONE_PLAYBACK.md)
+For example, `ESTD0AA` bank 0 phrase 8 has directory bytes `34 01 06 20` at `0x0020`. It points to six entries starting at `0x0134`. The first two entries, `11 00 01 01` and `12 00 02 04`, say to play page `0x11` once, then play the two-page range `0x12 through 0x13` four times. The offline converter expands those sample codes to 2,304 frames, or 288 ms at 8 kHz. It uses the stored waveform and menu timing for every SIT. [Worked tone offsets](BYTE_MAP.md#follow-real-tone-data) · [SIT component layout](research/TONE_PLAYBACK.md#sit-component-layout)
 
 Pages 13 and 16 in decimal commonly supply silence. Unaddressed parts of a referenced segment are supplied as zero codes and counted in the manifest. The converter flags a wholly absent non-silence segment as unavailable. [Page filenames and unwritten ranges](BYTE_MAP.md#why-a-page-can-be-missing-from-segments)
 
@@ -62,15 +62,25 @@ The exporter recognizes these regions by byte fingerprint and checks that every 
 
 ## Malformed references
 
-fstd0ba.bin44, bank 1, has these entries:
+The archived `FSTD0BA` bank 1 SIT directory differs from bank 0 in four slots. The 960 bytes containing all 32 SIT submenus (bank-relative `0x0134` through `0x04F3`) and the 3,840 bytes containing their waveforms are identical across both banks.
 
-| Phrase | Raw entry | Submenu pointer |
-| ---: | --- | --- |
-| 8 | 36 01 06 1e | 0x0136 |
-| 11 | 86 01 08 90 | 0x0186 |
-| 20 | 96 02 07 a1 | 0x0296 |
+| Phrase (decimal) | Bank 1 directory address | Archived entry | Verified replacement |
+| ---: | --- | --- | --- |
+| 8 | `0x40020` | `36 01 06 1E` | `34 01 06 20` |
+| 11 | `0x4002C` | `86 01 08 90` | `84 01 08 92` |
+| 16 | `0x40040` | `10 02 07 31` | `14 02 07 29` |
+| 20 | `0x40050` | `96 02 07 A1` | `94 02 07 A3` |
 
-They point two bytes into four-byte entries and produce invalid segment fields. Valid corresponding SIT sequences exist in bank 0, but the converter does not silently patch the source or substitute that bank.
+For slots 8, 11, and 20, the raw pointer starts two bytes into the intended submenu word. The raw checksum sums to zero because the shifted window drops `11 00` at the start of the first word and picks up the same two bytes from the next SIT. Subtracting two from the pointer changes the sum to `FE`. The replacement therefore changes the pointer **and** the checksum. Slot 16 starts one full word early. The original checksum still passes, but its menu begins with the previous SIT's last page and omits the final two-page sustain. The literal export is 736 ms. The corrected menu gives 960 ms, matching bank 0 and the other factory copies.
+
+The [repair tool](repair_fstd0ba.py) accepts the hash of the archived `FSTD0BA` and writes a new `.bin44` using the four bank 0 directory entries. It checks the repaired entries against their own bank 1 submenus and rebuilds the transport checksums. Eight addressed bytes change, all in the directory. The archive and default decode retain the original data.
+
+~~~sh
+python repair_fstd0ba.py data/original/fstd0ba.bin44 FSTD0BA-fixed.bin44
+python edram.py FSTD0BA-fixed.bin44 -o decoded --segments
+~~~
+
+All four recovered bank 1 WAVs match the corresponding bank 0 PCM. The repair has been checked offline. [Regression test](tests/test_repair_fstd0ba.py) · [SIT component layout](research/TONE_PLAYBACK.md#sit-component-layout)
 
 ## Decoding status
 

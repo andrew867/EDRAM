@@ -21,11 +21,30 @@ The last 128 bytes of page 15 are four exact copies of this 32-byte pattern.
 
 Unmasked A-law expands the block to 32 signed samples with three rising zero crossings in a circular traversal. That is three cycles in 4 ms, or **750 Hz**. A 32-byte period is evidence of a waveform table. The submenu supplies addresses, range lengths and repeat counts. The WAVE export repeats the 256-byte attack twice and the 256-byte sustain three times, for 1,280 frames (160 ms). It uses each page from its addressed location, including in banks where the recognizable cue bytes begin one byte earlier.
 
-SIT phrase 8 uses attack/sustain pairs with byte addresses `0x1100 / 0x1200`, `0x1700 / 0x1800`, and `0x1D00 / 0x1E00`. Each pair plays one attack page and four copies of a two-page sustain, giving 288 ms per component in the offline model. The last page of the low middle sustain (page 25, address `0x1900`) repeats a 64-byte block with 11 cycles, or 1,375 Hz at 8 kHz. The high middle sustain ends in page 28 (address `0x1C00`), with 23 cycles in a 128-byte block, or 1,437.5 Hz. Table 4-2 gives nominal middle carriers of 1,370.6 and 1,428.5 Hz. It gives 288/384 ms for DRAM and 274/380 ms for EDRAM, while the menus expand to 288/384 ms. A single sample-rate adjustment cannot reconcile both duration pairs. Measuring the card's treatment of the waveforms and timing requires a capture. [ESTD0AA export manifest](../audio/estd0aa/manifest.json) · [Nortel DRAM and EDRAM Guide, Table 4-2](https://www.gbppr.net/bsp/297-1001-527.pdf#page=59)
-
 At 8 kHz with unmasked A-law, the last 96 samples of the 750 Hz attack measure about 3,648 PCM RMS after removing the DC mean. The last 32 samples of the sustain measure 89 PCM RMS, about 32 dB quieter. Several SIT sustains are also roughly 33 dB below their attacks, while others have a quiet onset and a sustain near the attack level. Full-block replay preserves these differences. [Archived measurements](../archive/measurements/tone-fft-summary.json)
 
 Across all 2,890 validated phrase menus in the archive, 4,018 submenu references have a repeat count above one. Referenced silence accounts for 2,560, the 750 Hz cue pages account for 600, and SIT sustains account for 854. The remaining four are the same ACTS alert entry `10 00 04 04`, referenced by phrases 5 and 63 in both banks of EACTS0AE. It selects four pages from `0x10` and repeats the range four times, yielding 512 ms at 8 kHz. This ties the repeat field to both tones and silence in these files. [ACTS alert WAV](../audio/eacts0ae/bank_00/phrase_05.wav) · [Corpus counts](../VALIDATION.json)
+
+### SIT component layout
+
+The menu describes three pitches in sequence. For each pitch, the bytes describe one attack page followed by a two-page sustain. A long component adds another pass through the sustain and then plays its first page once more. In `ESTD0AA` bank 0, the third component uses these exact submenu words.
+
+| Component | Submenu bytes in play order | Frames at 8 kHz |
+| --- | --- | --- |
+| Short, phrase 8 | `1D 00 01 01`, then `1E 00 02 04` | `(1 + 2 × 4) × 256 = 2,304` (288 ms) |
+| Long, phrase 9 | `1D 00 01 01`, then `1E 00 02 05`, then `1E 00 01 01` | `(1 + 2 × 5 + 1) × 256 = 3,072` (384 ms) |
+
+The third word in the long component uses ordinary page, page-count and repeat fields. It points back to the first sustain page. There is no separate release field in these entries or separately addressed release sample. The last 32 frames of each of the five attack/sustain variants still contain carrier energy in both length forms. All 32 SIT menus follow this short/long structure. [ESTD0AA manifest](../audio/estd0aa/manifest.json) · [Worked byte offsets](../BYTE_MAP.md#follow-real-tone-data)
+
+### Shared tone data and measured timing
+
+Image addresses `0x1100` through `0x1FFF` contain the same 3,840 bytes in all nine copies across `ESTD0AA`, `ASTD0AB`, `FSTD0BA`, `EMCCS0CA`, `MWTTONE`, and `EDRMTONE`. The SHA-256 of that address range after zero fill is `d7595046b61df181a089349bfd793a445383fe2dc7bd1a5bbb255d777b78c995`. This proves reuse across the archived **EDRAM** loads. Nortel lists corresponding NT1X76 DRAM packs and identifies the four announcement voice files as SITLOAD sources. A corresponding DRAM ROM image would let us compare the waveforms with the shared load bytes. [Nortel DRAM and EDRAM Guide, Tables 3-4 and 4-2](https://www.gbppr.net/bsp/297-1001-527.pdf)
+
+The final page of the low middle sustain (`0x1900`) repeats a 64-byte block with 11 cycles (1,375 Hz at 8 kHz). The high middle sustain ends with 23 cycles in a 128-byte block (`0x1C00`, 1,437.5 Hz). Nortel gives nominal middle carriers of 1,370.6 and 1,428.5 Hz, and specifies 274/380 ms for EDRAM. The archived menus expand to 288/384 ms. Each of the five attack pages begins with 32 zero codes (4 ms). Measuring from after that lead-in accounts for the long value of 380 ms and leaves the short at 284 ms. A fixed sample-rate change also fails to reconcile both lengths. The on-wire timing and gain need a capture from the SITLOAD path. [Nortel DRAM and EDRAM Guide, Table 4-2](https://www.gbppr.net/bsp/297-1001-527.pdf#page=59)
+
+### French standard bank recovery
+
+In `FSTD0BA`, bank 1 has a byte-identical copy of bank 0's SIT submenus and sample pages. The three misaligned directory entries and the fourth entry that lands on the previous SIT's last word have verified replacements. Use the [explicit repair](../FORMAT.md#malformed-references) to export the four corrected SITs from bank 1.
 
 ## Standalone records
 
