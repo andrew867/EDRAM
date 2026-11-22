@@ -10,6 +10,7 @@ import wave
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import edram
 import encode_edram
+import firmware_sit
 
 
 XA_CORE = encode_edram.DATA / "xacore"
@@ -38,6 +39,9 @@ class FirmwareSITTests(unittest.TestCase):
                         self.assertEqual(hashlib.sha256(staged).hexdigest(), case["staged_sha256"])
                         delta = [p.record_address - p.stored_address for p in tone.components]
                         self.assertEqual(delta, [0, 0, 0] if selector == 0x4040 else [0x80000, 0, 0])
+                        first_codec = firmware_sit.ALAW if selector == 0x5050 else firmware_sit.MULAW
+                        self.assertEqual([p.codec for p in tone.components],
+                                         [first_codec, firmware_sit.MULAW, firmware_sit.MULAW])
 
     def test_firmware_cli_exports_active_wavs_and_padded_raw_codes(self):
         path = XA_CORE / "srecords" / "ED16AA07.srec"
@@ -55,8 +59,31 @@ class FirmwareSITTests(unittest.TestCase):
             self.assertEqual(staged[6576:], bytes(80))
             with wave.open(str(folder / first["wav"])) as wav:
                 self.assertEqual(wav.getnframes(), 6576)
-                self.assertEqual(wav.readframes(6576), edram.decode(staged[:6576], manifest["preview_codec"]))
+                self.assertEqual(manifest["preview_codec"], "per-component")
+                expected = edram.decode(staged[:2192], "alaw-unmasked")
+                expected += edram.decode(staged[2192:6576], "mulaw-unmasked")
+                self.assertEqual(wav.readframes(6576), expected)
             self.assertIn(f'{path.stem}/sit_01.wav', (root / "listen.html").read_text(encoding="utf-8"))
+
+    def test_builtin_cues_replay_original_pages(self):
+        vectors = json.loads((FIRMWARE / "playback-vectors.json").read_text(encoding="utf-8"))
+        for name in vectors["firmware_sha256"]:
+            image = (XA_CORE / "srecords" / f"{name}.srec").read_bytes()
+            for selector in firmware_sit.SELECTORS:
+                firmware = edram.parse_firmware_sit(image, selector)
+                for case in vectors["builtin_cues"]:
+                    cue = firmware.cue(case["slot"])
+                    self.assertEqual(len(cue.codes), case["samples"])
+                    self.assertEqual(hashlib.sha256(cue.codes).hexdigest(), case["staged_sha256"])
+                    self.assertEqual([a for part in cue.components
+                                      for a in [part.page_address] * part.repeats], case["page_addresses"])
+                    pcm = edram.render_firmware_tone(cue)
+                    self.assertEqual(pcm, edram.decode(cue.codes, firmware_sit.MULAW))
+                    if cue.slot == 1:
+                        self.assertEqual(cue.codes, cue.codes[:256] * 5)
+                        self.assertEqual(cue.codes[:256], cue.codes[:32] * 8)
+                    else:
+                        self.assertEqual(pcm[:16 * 256 * 2], bytes(16 * 256 * 2))
 
     def test_unsupported_firmware_and_sit_numbers_are_rejected(self):
         with self.assertRaisesRegex(edram.FormatError, "unsupported built-in SIT"):
@@ -71,8 +98,15 @@ class FirmwareSITTests(unittest.TestCase):
         image = edram.Image.read(encode_edram.TEMPLATE)
         reserved = {p.number: p for p in image.phrases() if p.number < 40}
         self.assertEqual(page_codes, edram.render_codes(image, reserved[8])[0])
-        self.assertEqual(encode_edram.read_tone("cue:test"), edram.render_codes(image, reserved[1])[0])
-        self.assertEqual(encode_edram.read_tone("cue:prompt"), edram.render_codes(image, reserved[2])[0])
+        self.assertEqual(encode_edram.read_tone("cue:page:test"), edram.render_codes(image, reserved[1])[0])
+        self.assertEqual(encode_edram.read_tone("cue:page:prompt"), edram.render_codes(image, reserved[2])[0])
+        cue = encode_edram.read_tone("cue:test")
+        self.assertEqual(cue, cue[:256] * 5)
+        self.assertNotEqual(cue, edram.render_codes(image, reserved[1])[0])
+        alternate = encode_edram.read_tone("sit:firmware:1:5050")
+        firmware = edram.parse_firmware_sit(encode_edram.SIT_FIRMWARE.read_bytes(), 0x5050)
+        self.assertEqual(alternate[:2192], firmware.sit(1).codes[:2192])
+        self.assertEqual(alternate[2192:], firmware_codes[2192:])
         self.assertEqual(len(page_codes), 6912)
         self.assertEqual(len(firmware_codes), 6576)
         cycle = b"\x82" * 256 + b"\x96" * 256

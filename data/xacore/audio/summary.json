@@ -5,11 +5,6 @@
   "exact_factory_matches": 18,
   "factory_reference_loads": 61,
   "reference_waveforms": 2951,
-  "unique_reference_waveforms": 1635,
-  "factory_overlay_exact_matches": {
-    "1": 0,
-    "2": 97
-  },
-  "reference_tone_renders": 18,
+  "unique_reference_waveforms": 1634,
   "orphan_renders": 4
 }

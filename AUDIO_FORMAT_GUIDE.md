@@ -32,7 +32,7 @@ Speech uses unmasked G.711 A-law in these files. XOR each stored byte with `0x55
 
 In ESTD0AA bank 0 phrase 8, the first SIT component plays page 17 once, then the two-page range starting at page 18 four times. Two more attack/sustain pairs supply the other pitches. That is 288 ms per component at 8 kHz. The converter expands those bytes, including their level differences. In the 750 Hz cue, the last 128 bytes of page 15 contain four identical 32-byte blocks. Each decodes to three cycles at 8 kHz. [Byte walk-through and playback measurements](research/TONE_PLAYBACK.md)
 
-The recovered firmware also has built-in SIT waveforms. Its descriptors specify 274 or 380 ms per component, while the archived ESTD0AA page menus give 288 or 384 ms. The firmware decoder exports that built-in path separately and keeps the exact staged sample codes alongside each WAV preview. [Firmware decoder](README.md#decode-built-in-firmware-sits)
+The recovered firmware has its own built-in SITs and 750 Hz cues. The SIT descriptors specify 274 or 380 ms per component. The decoder selects mu-law or A-law for each waveform record and exports exact staged codes alongside the WAV. Both firmware cues use a steady 750 Hz sample page. [Firmware decoder](README.md#decode-built-in-firmware-sits)
 
 ## Standalone tone banks have their own record boundaries
 

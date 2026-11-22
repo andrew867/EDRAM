@@ -30,13 +30,14 @@ python encode_edram.py LABTONE.bin44 --phrase 40 greeting-8k.wav \
 | `howler` or `milliwatt` | The shared bank's receiver off-hook howler or 1004 Hz carrier, at the stored length. |
 | `dtmf:5` or `dtmf:5:2` | Key 5 from either archived DTMF set. Keys 0 through 9, A through D, star, and pound are available. Set 1 is the default. |
 | `mwttone:11` or `edrmtone:62` | Any playable record by its one-based number in the Tone banks view. |
-| `cue:test` or `cue:prompt` | The stored 750 Hz test cue or the three-burst prompt from ESTD0AA. |
+| `cue:test` or `cue:prompt` | The 750 Hz test cue or three-burst prompt from the OEM firmware. Both use the same steady waveform bytes. |
+| `cue:page:test` or `cue:page:prompt` | The page-based test or prompt from ESTD0AA, including its stored attack and sustain. |
 | `sit:page:1` | The archived ESTD0AA SIT 1 in bank slot 8. It contains three 288 ms components. Use SIT numbers 1 through 32. |
-| `sit:firmware:1` | Built-in SIT 1 from the recovered ED16AA07 firmware using selector `0x4040`. It contains three 274 ms components. Use SIT numbers 1 through 32. |
+| `sit:firmware:1` | Built-in SIT 1 from the recovered ED16AA07 firmware using selector `0x4040`. It contains three 274 ms components. Use SIT numbers 1 through 32. Append `:5050` to select the alternate first record. |
 
 A frequency and duration specify new audio for a custom load. The encoder generates those samples as part of authoring that load. They use a short edge taper and a combined PCM peak limit of 5,000 before quantization. Archived A-law records retain their codes. Archived mu-law records are decoded and requantized to the announcement load's A-law format. Each stored record contributes its recorded samples, so the switch's tone-service cadence and output level are outside this encoding path.
 
-The output uses regular announcement phrase playback in `.bin44` or `.txt80`. The encoder retains the factory tone and SIT slots below 40. `sit:firmware:N` takes the active firmware samples, expands them with the mu-law preview interpretation, and requantizes them to the announcement load's A-law. SIT 1 uses 6,576 active samples. When stored as a single phrase it occupies 6,656 samples after page padding. To inspect the exact firmware staging codes and compare playback paths, use the [decoder's firmware mode](README.md#decode-built-in-firmware-sits).
+The output uses regular announcement phrase playback in `.bin44` or `.txt80`. The encoder retains the factory tone and SIT slots below 40. Firmware sources contribute their active sample codes. An A-law component keeps its codes. A mu-law component is expanded and requantized to the announcement load's A-law. SIT 1 uses 6,576 active samples. When stored as a single phrase it occupies 6,656 samples after page padding. To inspect the exact firmware staging codes and compare playback paths, use the [decoder's firmware mode](README.md#decode-built-in-firmware-sits).
 
 ### Repeat an authored page range
 

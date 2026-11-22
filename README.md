@@ -4,13 +4,20 @@
 
 Decode speech and tones directly from the sample bytes in Nortel DMS-100 and SL-100 loads. The converter reconstructs the addressed image from `.bin44` or `.txt80` records, expands the stored G.711 codes to 8 kHz, 16-bit mono PCM, and follows the phrase menu's page and repeat counts. Standalone tones use the sample range given by each record header. Python 3.10 or newer is sufficient.
 
-## Listen to the archive
+## Listen to the firmware tones
+
+The firmware players contain 32 SITs and both 750 Hz cues decoded from the Nortel waveform bytes. Download the repository and open the player locally. Both players include raw sample-code downloads and WAVs decoded with the law identified for each waveform.
+
+- [Firmware player with selector 0x4040](data/xacore/firmware/audio/4040/listen.html)
+- [Firmware player with selector 0x5050](data/xacore/firmware/audio/5050/listen.html)
+
+## Listen to the announcement-load archive
 
 Clone or download the repository and open [audio/listen.html](audio/listen.html) locally. Search by load, phrase number, transcript, or Nortel mnemonic such as AVRE08. Use **Tones** for SITs, cues and alerts. Use **Tone banks** for individual DTMF keys, milliwatt carriers and the receiver off-hook howler.
 
-Every Play button and WAV download points to a file decoded from the archived loads. That includes speech, SITs, the 750 Hz cues, DTMF, milliwatt tones, and the receiver off-hook howler. Tone names, frequencies, and transcripts annotate those recordings. The WAVs keep the stored levels and the lengths implied by the menus. [Worked byte map](BYTE_MAP.md#follow-real-tone-data) · [Nortel phrase catalog](references/NORTEL_PHRASES.md)
+This player presents the bytes and menus of the archived announcement and tone loads. That includes speech, SITs, the 750 Hz cues, DTMF, milliwatt tones, and the receiver off-hook howler. Tone names, frequencies, and transcripts annotate those recordings. The WAVs keep the stored levels and the lengths implied by the menus. [Worked byte map](BYTE_MAP.md#follow-real-tone-data) · [Nortel phrase catalog](references/NORTEL_PHRASES.md)
 
-The [XA-Core player](data/xacore/audio/listen.html) covers the recovered PTSI Cellular announcements, the DTM test recordings, and the reconstructed cue tones. The [phrase catalog](data/xacore/audio/catalog.csv) identifies the load, slot, and source of each clip.
+The [XA-Core player](data/xacore/audio/listen.html) covers the recovered PTSI Cellular announcements and DTM test recordings, and links to both firmware players. The [phrase catalog](data/xacore/audio/catalog.csv) identifies the load, slot, and source of each clip.
 
 ## Decode a load
 
@@ -37,11 +44,11 @@ Pass a directory to decode all supported loads inside it. The `--segments` optio
 ## Decode built-in firmware SITs
 
 ~~~sh
-python edram.py --firmware-sit data/xacore/srecords/ED16AA07.srec -o decoded-firmware
-python edram.py --firmware-sit --sit-selector 0x5050 data/xacore/srecords/EDRMAE11.srec -o decoded-selector-5050
+python edram.py --firmware-tones data/xacore/srecords/ED16AA07.srec -o decoded-firmware
+python edram.py --firmware-tones --sit-selector 0x5050 data/xacore/srecords/EDRMAE11.srec -o decoded-selector-5050
 ~~~
 
-Each export includes 32 WAV previews, the raw bytes staged by the firmware model, a manifest with sample counts and SHA-256 hashes, and a player. The two recovered firmware builds are supported as S-records or mapped flat binaries. Use `--inspect` for a JSON-only preview. Announcement loads still play their stored page-based SITs. [Firmware SIT format](FORMAT.md#built-in-firmware-sits)
+Each export includes 34 WAVs, the raw staged codes, a manifest with sample counts, per-component laws and SHA-256 hashes, and a player. Both recovered firmware builds are supported as S-records or mapped flat binaries. Use `--inspect` for JSON output. The announcement-load decoder follows the stored page menus. [Firmware SIT format](FORMAT.md#built-in-firmware-sits)
 
 ## Verify an extraction
 

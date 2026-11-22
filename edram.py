@@ -14,7 +14,7 @@ import struct
 import firmware_sit
 import tone_bank
 
-VERSION = "0.3.0"
+VERSION = "0.3.1"
 RATE = 8000
 BANK_SIZE = 0x40000
 PAGE_SIZE = 256
@@ -228,7 +228,7 @@ def alaw_sample(value: int) -> int:
 
 
 def mulaw_sample(value: int) -> int:
-    """Diagnostic alternative, equivalent to mu-law(value ^ 0x7f)."""
+    """G.711 expansion of stored unmasked code, equivalent to mu-law(value ^ 0x7f)."""
     sample = ((((value & 15) << 3) + 132) << ((value >> 4) & 7)) - 132
     return sample if value & 128 else -sample
 
@@ -385,32 +385,49 @@ def parse_firmware_sit(raw: bytes, selector=0x4040):
         raise FormatError(str(exc)) from exc
 
 
-def export_firmware_sit(path, output, codec, selector=0x4040, *, inspect=False, overwrite=False):
+def render_firmware_tone(tone, codec=None):
+    return b"".join(decode(codes, codec or law) for codes, law in firmware_sit.coded_chunks(tone))
+
+
+def firmware_tone_entry(tone, firmware, label, title, folder, codec):
+    codes = tone.codes
+    staged = codes.ljust(len(codes) + (-len(codes) % PAGE_SIZE), b"\0")
+    pcm = render_firmware_tone(tone, codec)
+    entry = {"slot": tone.slot, "label": title, "samples": len(codes),
+             "duration_seconds": len(codes) / RATE, "staged_samples": len(staged),
+             "active_sha256": hashlib.sha256(codes).hexdigest(),
+             "staged_sha256": hashlib.sha256(staged).hexdigest(),
+             "pcm_sha256": hashlib.sha256(pcm).hexdigest(),
+             "components": [asdict(part) for part in tone.components]}
+    if folder is not None:
+        entry.update(wav=f"{label}.wav", raw=f"{label}.staged.bin")
+        write_wav(folder / entry["wav"], pcm, f"{firmware.name} {title}",
+                  f"selector=0x{firmware.selector:04x}; WAV law={codec or 'per component'}")
+        (folder / entry["raw"]).write_bytes(staged)
+    return entry
+
+
+def export_firmware_sit(path, output, codec=None, selector=0x4040, *, inspect=False, overwrite=False):
     source = path.read_bytes()
     firmware = parse_firmware_sit(source, selector)
     folder = None if inspect else output_folder(path, output, overwrite)
-    entries = []
+    sits = []
     for number in range(1, 33):
-        sit = firmware.sit(number)
-        codes = sit.codes
-        staged = codes.ljust(len(codes) + (-len(codes) % PAGE_SIZE), b"\0")
-        entry = {"number": number, "slot": sit.slot, "samples": len(codes),
-                 "duration_seconds": len(codes) / RATE, "staged_samples": len(staged),
-                 "active_sha256": hashlib.sha256(codes).hexdigest(),
-                 "staged_sha256": hashlib.sha256(staged).hexdigest(),
-                 "components": [asdict(part) for part in sit.components]}
-        if folder is not None:
-            label = f"sit_{number:02d}"
-            entry.update(wav=f"{label}.wav", raw=f"{label}.staged.bin")
-            write_wav(folder / entry["wav"], decode(codes, codec), f"{firmware.name} built-in SIT {number}",
-                      f"selector=0x{selector:04x}; preview_codec={codec}; stages={len(staged)} codes")
-            (folder / entry["raw"]).write_bytes(staged)
-        entries.append(entry)
+        entry = firmware_tone_entry(firmware.sit(number), firmware, f"sit_{number:02d}",
+                                    f"Built-in SIT {number:02d}", folder, codec)
+        entry["number"] = number
+        sits.append(entry)
+    cues = [
+        firmware_tone_entry(firmware.cue(slot), firmware, f"cue_{slot:02d}",
+                            title, folder, codec)
+        for slot, title in firmware_sit.CUES.items()
+    ]
     manifest = {
         "converter_version": VERSION, "source": path.name, "firmware": firmware.name,
         "source_sha256": hashlib.sha256(source).hexdigest(), "flat_sha256": firmware.sha256,
         "selector": selector, "low_memory_byte": firmware_sit.LOW_MEMORY_BYTE,
-        "preview_codec": codec, "sample_rate": RATE, "firmware_sits": entries,
+        "preview_codec": codec or "per-component", "sample_rate": RATE,
+        "firmware_sits": sits, "firmware_cues": cues,
     }
     if folder is not None:
         (folder / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
@@ -421,11 +438,14 @@ def write_browser(output: Path, manifests):
     rows = []
     for manifest in manifests:
         source = manifest["source"]
-        for sit in manifest.get("firmware_sits", ()):
-            name = f"{source} / built-in SIT {sit['number']:02d} / slot {sit['slot']}"
-            url = html.escape((Path(Path(source).stem) / sit["wav"]).as_posix(), quote=True)
-            rows.append(f'<tr><td>{html.escape(name)}</td><td>{sit["duration_seconds"]:.3f}s</td>'
-                        f'<td><button data-src="{url}">Play</button> <a href="{url}" download>WAV</a></td></tr>')
+        for tone in (*manifest.get("firmware_cues", ()), *manifest.get("firmware_sits", ())):
+            name = f'{manifest["firmware"]} / 0x{manifest["selector"]:04x} / {tone["label"]}'
+            folder = Path(Path(source).stem)
+            url = html.escape((folder / tone["wav"]).as_posix(), quote=True)
+            raw_url = html.escape((folder / tone["raw"]).as_posix(), quote=True)
+            rows.append(f'<tr><td>{html.escape(name)}</td><td>{tone["duration_seconds"]:.3f}s</td>'
+                        f'<td><button data-src="{url}">Play</button> <a href="{url}" download>WAV</a> '
+                        f'<a href="{raw_url}" download>Raw codes</a></td></tr>')
         if "firmware_sits" in manifest:
             continue
         raw_paths = tone_bank.raw_bank_paths(manifest, BANK_SIZE, PAGE_SIZE)
@@ -446,21 +466,28 @@ def write_browser(output: Path, manifests):
             url = html.escape(clip["path"], quote=True)
             rows.append(f'<tr><td>{html.escape(name)}</td><td>{clip["seconds"]:.4f}s</td>'
                         f'<td><button data-src="{url}">Play</button> <a href="{url}" download>WAV</a></td></tr>')
+    firmware_only = bool(manifests) and all("firmware_sits" in m for m in manifests)
+    title = "Nortel EDRAM firmware tones" if firmware_only else "EDRAM announcement archive"
+    description = ("8 kHz PCM decoded from firmware waveforms. Raw downloads contain the staged sample codes."
+                   if firmware_only else
+                   "8 kHz, 16-bit mono PCM. WAVs expand the stored sample bytes at the addressed locations. IDs are bank-local.")
     document = '''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
-<title>EDRAM announcement archive</title><style>
+<title>PAGE_TITLE</title><style>
 body{max-width:1100px;margin:2rem auto;padding:0 1rem;font:16px system-ui;background:#101820;color:#edf4f9}
 a{color:#7ad8ff} input{font:inherit;padding:.6rem;width:95%} table{width:100%;border-collapse:collapse}
 td{padding:.55rem;border-bottom:1px solid #334452} button{padding:.35rem 1rem;cursor:pointer}
 header{position:sticky;top:0;background:#101820;padding:1rem 0} audio{width:100%;margin:1rem 0}
-</style><header><h1>EDRAM announcement archive</h1>
-<p>8 kHz, 16-bit mono PCM. WAVs expand the stored sample bytes at the addressed locations. IDs are bank-local.</p>
+</style><header><h1>PAGE_TITLE</h1>
+<p>PAGE_DESCRIPTION</p>
 <input id="filter" aria-label="Filter recordings" placeholder="Filter by source, tone name or phrase ID">
-<audio id="player" controls></audio><div id="playing">Select an announcement</div></header>
+<audio id="player" controls></audio><div id="playing">Select a recording</div></header>
 <table><tbody>ROWS</tbody></table><script>
 const p=document.querySelector('#player');
 document.addEventListener('click',e=>{if(e.target.dataset.src){p.src=e.target.dataset.src;p.play();document.querySelector('#playing').textContent=e.target.closest('tr').cells[0].textContent;}});
 document.querySelector('#filter').addEventListener('input',e=>{const q=e.target.value.toLowerCase();document.querySelectorAll('tr').forEach(r=>r.hidden=!r.textContent.toLowerCase().includes(q));});
-</script></html>'''.replace("ROWS", "\n".join(rows))
+</script></html>'''
+    document = (document.replace("PAGE_TITLE", title).replace("PAGE_DESCRIPTION", description)
+                .replace("ROWS", "\n".join(rows)))
     (output / "listen.html").write_text(document, encoding="utf-8")
 
 
@@ -488,8 +515,9 @@ def main(argv=None):
     parser.add_argument("-o", "--output", type=Path, default=Path("edram-wav"))
     parser.add_argument("--inspect", action="store_true", help="validate and list tables without writing files")
     parser.add_argument("--codec", choices=tuple(PCM_TABLES),
-                        help="WAV law (default: A-law for announcements, mu-law for firmware SIT preview)")
-    parser.add_argument("--firmware-sit", action="store_true", help="decode built-in SITs from firmware S-records or mapped flat binaries")
+                        help="override the WAV law (A-law for announcements, per waveform for firmware by default)")
+    parser.add_argument("--firmware-sit", "--firmware-tones", action="store_true",
+                        help="decode built-in SITs and 750 Hz cues from firmware images")
     parser.add_argument("--sit-selector", type=lambda value: int(value, 0), choices=firmware_sit.SELECTORS,
                         metavar="{0x4040,0x5050}", help="firmware SIT selector (default: 0x4040)")
     parser.add_argument("--raw-sit", "--raw-tones", action="store_true", help=argparse.SUPPRESS)
@@ -504,8 +532,7 @@ def main(argv=None):
     try:
         paths = input_paths(args.inputs, firmware=args.firmware_sit)
         if args.firmware_sit:
-            codec = args.codec or "mulaw-unmasked"
-            manifests = [export_firmware_sit(path, args.output, codec, args.sit_selector or 0x4040,
+            manifests = [export_firmware_sit(path, args.output, args.codec, args.sit_selector or 0x4040,
                                              inspect=args.inspect, overwrite=args.overwrite) for path in paths]
             if args.inspect:
                 for manifest in manifests:
@@ -513,7 +540,8 @@ def main(argv=None):
             else:
                 write_browser(args.output, manifests)
                 for manifest in manifests:
-                    print(f"{manifest['source']}: {len(manifest['firmware_sits'])} built-in SITs exported")
+                    print(f"{manifest['source']}: {len(manifest['firmware_sits'])} SITs "
+                          f"and {len(manifest['firmware_cues'])} built-in cues exported")
             return
         codec = args.codec or "alaw-unmasked"
         manifests = []

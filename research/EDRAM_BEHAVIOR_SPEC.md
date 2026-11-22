@@ -85,6 +85,8 @@ The built-in directory can be chosen instead of the installed bank's menu. Its s
 | 2 | 3 | Big-endian sample record address |
 | 5 | 3 | Big-endian duration in units of four 16-bit words, equivalent to eight sample codes |
 
+Slot 1 emits five copies of the 256-byte sample page at `0x400800`. Slot 2 emits 16 silent pages, three tone pages, one silent page, three tone pages, one silent page, three tone pages, and four silent pages. It gets the silent pages from `0x400700`, which startup clears. Read the counts from the ordinary built-in descriptors and replay the addressed pages. Both tested firmware builds and selectors produced identical cue codes.
+
 A waveform record starts with a big-endian 16-bit **word count**, followed by that many two-byte sample words. In the tested finite-cycle profile, repeat the waveform record from its first sample until the duration is satisfied. Start the next descriptor immediately, including inside a staging block. Fill the unused tail of the last block with zero codes.
 
 ```c
@@ -155,6 +157,7 @@ The [measured vectors](../data/xacore/firmware/playback-vectors.json) contain ex
 - **Archived speech or page-based tone.** Play `ESTD0AA` slot 8 using its bank-local menu. Compare the 6,912 raw staged bytes and the resulting offline A-law PCM with the archive.
 - **Checksum rejection.** Change one bit of the menu checksum. Expect the native error `0x41` before staging output.
 - **Protected writes.** Send packets crossing either edge of the protected window and a packet entirely inside it. Compare writable bytes, protected bytes, the sum of unfiltered payloads, and the completion reply.
-- **Built-in tones.** Run slots 8-39 with each tested selector and the finite-cycle profile. Compare the active length and the full sequence of zero-padded staging blocks.
+- **Built-in cues.** Run slots 1 and 2 with each tested selector. Compare the ordered absolute page addresses, the output hashes, and 1,280 and 7,936 staged codes, respectively.
+- **Built-in SITs.** Run slots 8-39 with each tested selector and the finite-cycle profile. Compare the active length and the full sequence of zero-padded staging blocks.
 
 The remaining hardware acceptance cases are the live serial framing, interrupt timing, law and gain on the wire, recording completion, continuous tones, and additional bank types and alternate selectors. Those cases need a card trace or the resident runtime.

@@ -50,7 +50,13 @@ In `FSTD0BA`, bank 1 has a byte-identical copy of bank 0's SIT submenus and samp
 
 The two recovered 68k loads contain a separate three-component SIT directory. Under the tested `0x4040` profile, each descriptor addresses a waveform record whose samples loop for 2,192 or 3,040 frames. Under `0x5050`, the first record comes from the second embedded waveform table. The second and third records use the stored addresses. Both profiles were run through the native stage routine for all 32 SITs on both firmware builds with runtime byte `[0x000001] = 1`. [Firmware evidence](EDRAM_FIRMWARE_EVIDENCE.md) and [raw byte vectors](../data/xacore/firmware/playback-vectors.json)
 
-For example, ESTD0AA SIT 1 has 6,912 samples in its three ordinary page ranges. Firmware SIT 1 stages 6,576 active codes plus 80 zero codes at the end of its last page. For the three SIT 1 waveform records used under `0x4040`, the dominant frequency bin accounts for about 99.87% to 99.98% of waveform energy when expanded as unmasked mu-law, compared with about 99.69% to 99.78% under unmasked A-law. This supports the offline mu-law preview. The raw hashes are independent of companding. [Decoder usage](../README.md#decode-built-in-firmware-sits)
+For example, ESTD0AA SIT 1 has 6,912 samples in its three ordinary page ranges. Firmware SIT 1 stages 6,576 active codes plus 80 zero codes at the end of its last page. For the three SIT 1 waveform records used under `0x4040`, the dominant frequency bin accounts for about 99.87% to 99.98% of waveform energy when expanded as unmasked mu-law, compared with about 99.69% to 99.78% under unmasked A-law. All five records used at the stored addresses have lower out-of-carrier energy under unmasked mu-law. The two relocated first-pitch records have lower out-of-carrier energy under unmasked A-law. The WAV exporter selects the law per record. The raw hashes are independent of companding. [Decoder usage](../README.md#decode-built-in-firmware-sits)
+
+The 68 checked-in firmware WAVs were compared sample for sample with FFmpeg's G.711 decoders after applying the standard masks to each component's stored codes. With 100 ms windows at the start and end of each SIT 1 component, the RMS differences are below 0.004 dB under both selectors.
+
+### Built-in 750 Hz cues
+
+Firmware slot 1 repeats the 256 sample bytes at `0x400800` five times. The page consists of eight identical 32-sample blocks. Each block expands to three 750 Hz cycles. The 160 ms output measures about -19.0 dBFS RMS throughout. Slot 2 uses that page for each of three 96 ms bursts, with pauses from the startup-cleared page. Both binaries and selectors gave identical raw cue hashes. The 32 dB attack-to-sustain drop belongs to the archived announcement load's corresponding cue. [OEM firmware player](../data/xacore/firmware/audio/4040/listen.html)
 
 ## Standalone records
 

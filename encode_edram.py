@@ -10,13 +10,14 @@ import struct
 import wave
 
 import edram
+import firmware_sit
 import tone_bank
 
 
 DATA = Path(__file__).resolve().parent / "data"
 TEMPLATE = DATA / "original" / "estd0aa.bin44"
 SIT_FIRMWARE = DATA / "xacore" / "srecords" / "ED16AA07.srec"
-CUE_SLOTS = {"cue:test": 1, "cue:prompt": 2}
+CUE_SLOTS = {"test": 1, "prompt": 2}
 FIRST_VOICE_PHRASE = 40
 FIRST_VOICE_ADDRESS = 0x2100
 NAME_ADDRESS = 0x670
@@ -54,23 +55,18 @@ def to_voice_law(raw, codec):
 
 
 def stored_tone(component, banks):
-    if component in CUE_SLOTS or re.fullmatch(r"sit:page:[0-9]+", component):
-        if component in CUE_SLOTS:
-            slot = CUE_SLOTS[component]
-        else:
-            number = int(component.rsplit(":", 1)[1])
-            if not 1 <= number <= 32:
-                raise ValueError("SIT number must be from 1 to 32")
-            slot = number + 7
-        if "template" not in banks:
-            image = edram.Image.read(TEMPLATE)
-            banks["template"] = image, {p.number: p for p in image.phrases() if p.bank == 0}
-        image, phrases = banks["template"]
-        return edram.render_codes(image, phrases[slot])[0]
-    if match := re.fullmatch(r"sit:firmware:([0-9]+)", component):
-        if "firmware" not in banks:
-            banks["firmware"] = edram.parse_firmware_sit(SIT_FIRMWARE.read_bytes())
-        return to_voice_law(banks["firmware"].sit(int(match[1])).codes, "mulaw-unmasked")
+    if cue := re.fullmatch(r"cue:(page:)?(test|prompt)", component):
+        slot = CUE_SLOTS[cue[2]]
+        if not cue[1]:
+            return firmware_tone(banks, 0x4040, slot=slot)
+        return template_phrase(banks, slot)
+    if match := re.fullmatch(r"sit:page:([0-9]+)", component):
+        number = int(match[1])
+        if not 1 <= number <= 32:
+            raise ValueError("SIT number must be from 1 to 32")
+        return template_phrase(banks, number + 7)
+    if match := re.fullmatch(r"sit:firmware:([0-9]+)(?::(4040|5050))?", component):
+        return firmware_tone(banks, int(match[2] or "4040", 16), number=int(match[1]))
     if component in STORED_TONE_ALIASES:
         source, selector = STORED_TONE_ALIASES[component]
     elif match := re.fullmatch(r"(mwttone|edrmtone):([0-9]+)", component):
@@ -87,6 +83,22 @@ def stored_tone(component, banks):
         if selector in (entry["index"], entry["tone_name"]) and entry["wav"]:
             return to_voice_law(raw, entry["codec"])
     raise ValueError(f"no playable stored tone: {component!r}")
+
+
+def template_phrase(cache, slot):
+    if "template" not in cache:
+        image = edram.Image.read(TEMPLATE)
+        cache["template"] = image, {p.number: p for p in image.phrases() if p.bank == 0}
+    image, phrases = cache["template"]
+    return edram.render_codes(image, phrases[slot])[0]
+
+
+def firmware_tone(cache, selector, *, slot=None, number=None):
+    if selector not in cache:
+        cache[selector] = edram.parse_firmware_sit(SIT_FIRMWARE.read_bytes(), selector)
+    firmware = cache[selector]
+    tone = firmware.cue(slot) if slot is not None else firmware.sit(number)
+    return b"".join(to_voice_law(codes, law) for codes, law in firmware_sit.coded_chunks(tone))
 
 
 def synthesize_tone(frequencies, frames):

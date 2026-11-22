@@ -140,7 +140,7 @@ def trace_voice(name, bank, slot):
     return bytes(stream), pages, machine.events
 
 
-def trace_tone(name, slot, selector, low_memory_byte):
+def builtin_machine(name, selector, low_memory_byte):
     machine = Machine(name)
     for i in range(4):
         address = machine.addr["copy_table"] + 10 * i
@@ -152,7 +152,26 @@ def trace_tone(name, slot, selector, low_memory_byte):
     machine.put(CONTEXT + 0x3A, 0)
     machine.put(machine.addr["builtin"], directory)
     machine.put(machine.addr["selector"], selector, 2)
-    machine.start_phrase(directory, slot)
+    return machine
+
+
+def trace_cue(name, slot, selector):
+    machine = builtin_machine(name, selector, 1)
+    machine.start_phrase(machine.addr["directory"], slot)
+    stream = bytearray()
+    addresses = []
+    while not machine.events:
+        if len(addresses) >= 64:
+            raise RuntimeError("Built-in cue never completed")
+        addresses.append(machine.get(CONTEXT + 0x44) + machine.get(CONTEXT + 0x48, 2) * PAGE_SIZE)
+        stream.extend(machine.page())
+    return {"slot": slot, "samples": len(stream), "staged_sha256": sha256(stream),
+            "page_addresses": addresses, "events": machine.events}
+
+
+def trace_tone(name, slot, selector, low_memory_byte):
+    machine = builtin_machine(name, selector, low_memory_byte)
+    machine.start_phrase(machine.addr["directory"], slot)
     base = machine.get(CONTEXT + 0x3E)
     descriptors = [machine.read(base + 8 * i, 8) for i in range(3)]
     active = bytearray()
@@ -302,7 +321,10 @@ def verify(vectors):
             actual = trace_tone(name, case["slot"], alternate["value"], tone["low_memory_byte"])
             assert actual["model_match"] and actual["events"] == PLAYBACK_DONE, (name, case["slot"])
             assert all(actual[key] == value for key, value in case.items()), (name, case["slot"])
-        print(f"{name}: phrase staging, loader, request and both built-in tone selectors matched")
+        for selector in (tone["selector"], alternate["value"]):
+            for case in vectors["builtin_cues"]:
+                assert trace_cue(name, case["slot"], selector) == case, (name, selector, case["slot"])
+        print(f"{name}: phrase staging, loader, request and built-in cues and SITs matched")
 
 
 if __name__ == "__main__":

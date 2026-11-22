@@ -54,6 +54,8 @@ The harness maps the flat image at `0x400`, allocates a stack and uses caller-se
 - The application request fixture sends bank select `80` and phrase `09` to channel 1 through the firmware's decoded queue buffer. It checks the exact generated playlists, stored mode, and next channel state.
 - The tone fixture applies the native copy routine at `0x00EA2A` to the four startup entries before playing built-in slots 8 through 39. It sets low-memory byte `[0x000001]` to 1 and compares native staging with a direct repeat of the waveforms for selectors `0x4040` and `0x5050`, including the trailing zero codes. A further test uses selector `0x4040`, sets the byte to 0, and records the changed hash for slot 8.
 
+The cue fixture uses the same startup copies and starts slots 1 and 2. It records every page address consumed by the native staging routine. Slot 1 emits five copies of `0x400800`. Slot 2 adds the silence ranges at `0x400700`. Both selectors and firmware builds produce the same 1,280 and 7,936 staged sample codes, respectively.
+
 The instruction at `0x01A582` in ED16AA07 compares a register byte with absolute memory location `0x000001`. Setting that RAM byte is part of the test profile. The first-descriptor initializer at `0x01332A` or `0x01336E` relocates the first waveform record by `0x80000` in the `0x5050` profile. The in-buffer advance at `0x01A758` or `0x01A72A` uses the next record address directly. Both images reproduced the resulting mixed-address sequence. An independent implementation can consume them as sample records and finite durations and compare its output with the hashes.
 
 ## Hardware evidence still needed

@@ -65,7 +65,11 @@ The firmware directories in `ED16AA07` and `EDRMAE11` have built-in SIT slots 8 
 
 In the tested profile, the firmware loops the waveform to fill each duration, joins the components within the same output buffer, and zero-pads the last 256-byte staging block. Selector `0x4040` uses the descriptor addresses as stored. With `0x5050`, the first component's record address is increased by `0x80000`. The next two use their stored addresses. Both tests used runtime byte `[0x000001] = 1` with no bank-specific waveform override. [Behavior specification](research/EDRAM_BEHAVIOR_SPEC.md#built-in-tone-playback) and [firmware evidence](research/EDRAM_FIRMWARE_EVIDENCE.md)
 
-Use `edram.py --firmware-sit` to export these sequences. The raw `.staged.bin` has the exact padded codes. The WAV uses active samples only. `--codec` controls WAV expansion independently of selector, with unmasked mu-law as the preview default. On-wire companding and gain need a card capture, especially for the alternate selector's first component. [Usage](README.md#decode-built-in-firmware-sits)
+The waveform records at their stored addresses expand as unmasked G.711 mu-law. The first record relocated by selector `0x5050` expands as unmasked G.711 A-law. The decoder picks the law per component from the resolved record. The loaded announcement tables have their own sample encoding.
+
+The firmware's two 750 Hz cues use ordinary absolute page descriptors. Slot 1 plays page `0x400800` five times for 160 ms. Slot 2 uses the same waveform for all three bursts, with silence from startup-cleared page `0x400700`. The waveform expands as unmasked mu-law. Both recovered builds stage identical cue bytes under the tested selectors.
+
+Use `edram.py --firmware-tones` to export the cues and SITs. Each raw `.staged.bin` contains the exact padded codes. The WAV contains active samples with the recorded levels. A forced `--codec` applies just to WAV expansion for diagnostic comparisons. The on-wire law and gain need a card capture. [Usage](README.md#decode-built-in-firmware-sits)
 
 ## Standalone tone banks
 

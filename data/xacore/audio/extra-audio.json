@@ -1,114 +1,18 @@
 [
   {
     "load": "ANN1",
-    "reference_tones": [
-      {
-        "phrase": 1,
-        "wav": "reference-tones/phrase_01_factory_overlay.wav",
-        "pages_from_factory": [
-          14,
-          15
-        ],
-        "duration_seconds": 0.16,
-        "implicit_zero_samples": 0,
-        "pcm_sha256": "e91c99bf87485d02f5af2abe37e717484c98cfd5dae8e7b4c3dc3eca534327d1"
-      },
-      {
-        "phrase": 2,
-        "wav": "reference-tones/phrase_02_factory_overlay.wav",
-        "pages_from_factory": [
-          14,
-          15
-        ],
-        "duration_seconds": 0.992,
-        "implicit_zero_samples": 5632,
-        "pcm_sha256": "170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14"
-      }
-    ],
     "orphan_audio": []
   },
   {
     "load": "ANN2",
-    "reference_tones": [
-      {
-        "phrase": 1,
-        "wav": "reference-tones/phrase_01_factory_overlay.wav",
-        "pages_from_factory": [
-          14,
-          15
-        ],
-        "duration_seconds": 0.16,
-        "implicit_zero_samples": 0,
-        "pcm_sha256": "e91c99bf87485d02f5af2abe37e717484c98cfd5dae8e7b4c3dc3eca534327d1"
-      },
-      {
-        "phrase": 2,
-        "wav": "reference-tones/phrase_02_factory_overlay.wav",
-        "pages_from_factory": [
-          14,
-          15
-        ],
-        "duration_seconds": 0.992,
-        "implicit_zero_samples": 5632,
-        "pcm_sha256": "170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14"
-      }
-    ],
     "orphan_audio": []
   },
   {
     "load": "ANN3",
-    "reference_tones": [
-      {
-        "phrase": 1,
-        "wav": "reference-tones/phrase_01_factory_overlay.wav",
-        "pages_from_factory": [
-          14,
-          15
-        ],
-        "duration_seconds": 0.16,
-        "implicit_zero_samples": 0,
-        "pcm_sha256": "e91c99bf87485d02f5af2abe37e717484c98cfd5dae8e7b4c3dc3eca534327d1"
-      },
-      {
-        "phrase": 2,
-        "wav": "reference-tones/phrase_02_factory_overlay.wav",
-        "pages_from_factory": [
-          14,
-          15
-        ],
-        "duration_seconds": 0.992,
-        "implicit_zero_samples": 5632,
-        "pcm_sha256": "170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14"
-      }
-    ],
     "orphan_audio": []
   },
   {
     "load": "ANN4",
-    "reference_tones": [
-      {
-        "phrase": 1,
-        "wav": "reference-tones/phrase_01_factory_overlay.wav",
-        "pages_from_factory": [
-          14,
-          15
-        ],
-        "duration_seconds": 0.16,
-        "implicit_zero_samples": 0,
-        "pcm_sha256": "e91c99bf87485d02f5af2abe37e717484c98cfd5dae8e7b4c3dc3eca534327d1"
-      },
-      {
-        "phrase": 2,
-        "wav": "reference-tones/phrase_02_factory_overlay.wav",
-        "pages_from_factory": [
-          14,
-          15
-        ],
-        "duration_seconds": 0.992,
-        "implicit_zero_samples": 5632,
-        "pcm_sha256": "170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14"
-      }
-    ],
     "orphan_audio": [
       {
         "wav": "orphan-pages.wav",
@@ -215,30 +119,6 @@
   },
   {
     "load": "ANN5",
-    "reference_tones": [
-      {
-        "phrase": 1,
-        "wav": "reference-tones/phrase_01_factory_overlay.wav",
-        "pages_from_factory": [
-          14,
-          15
-        ],
-        "duration_seconds": 0.16,
-        "implicit_zero_samples": 0,
-        "pcm_sha256": "e91c99bf87485d02f5af2abe37e717484c98cfd5dae8e7b4c3dc3eca534327d1"
-      },
-      {
-        "phrase": 2,
-        "wav": "reference-tones/phrase_02_factory_overlay.wav",
-        "pages_from_factory": [
-          14,
-          15
-        ],
-        "duration_seconds": 0.992,
-        "implicit_zero_samples": 5632,
-        "pcm_sha256": "170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14"
-      }
-    ],
     "orphan_audio": [
       {
         "wav": "orphan-pages.wav",
@@ -314,30 +194,6 @@
   },
   {
     "load": "ANN6",
-    "reference_tones": [
-      {
-        "phrase": 1,
-        "wav": "reference-tones/phrase_01_factory_overlay.wav",
-        "pages_from_factory": [
-          14,
-          15
-        ],
-        "duration_seconds": 0.16,
-        "implicit_zero_samples": 0,
-        "pcm_sha256": "e91c99bf87485d02f5af2abe37e717484c98cfd5dae8e7b4c3dc3eca534327d1"
-      },
-      {
-        "phrase": 2,
-        "wav": "reference-tones/phrase_02_factory_overlay.wav",
-        "pages_from_factory": [
-          14,
-          15
-        ],
-        "duration_seconds": 0.992,
-        "implicit_zero_samples": 5632,
-        "pcm_sha256": "170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14"
-      }
-    ],
     "orphan_audio": [
       {
         "wav": "orphan-pages.wav",
@@ -382,86 +238,14 @@
   },
   {
     "load": "ANN7",
-    "reference_tones": [
-      {
-        "phrase": 1,
-        "wav": "reference-tones/phrase_01_factory_overlay.wav",
-        "pages_from_factory": [
-          14,
-          15
-        ],
-        "duration_seconds": 0.16,
-        "implicit_zero_samples": 0,
-        "pcm_sha256": "e91c99bf87485d02f5af2abe37e717484c98cfd5dae8e7b4c3dc3eca534327d1"
-      },
-      {
-        "phrase": 2,
-        "wav": "reference-tones/phrase_02_factory_overlay.wav",
-        "pages_from_factory": [
-          14,
-          15
-        ],
-        "duration_seconds": 0.992,
-        "implicit_zero_samples": 5632,
-        "pcm_sha256": "170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14"
-      }
-    ],
     "orphan_audio": []
   },
   {
     "load": "ANN8",
-    "reference_tones": [
-      {
-        "phrase": 1,
-        "wav": "reference-tones/phrase_01_factory_overlay.wav",
-        "pages_from_factory": [
-          14,
-          15
-        ],
-        "duration_seconds": 0.16,
-        "implicit_zero_samples": 0,
-        "pcm_sha256": "e91c99bf87485d02f5af2abe37e717484c98cfd5dae8e7b4c3dc3eca534327d1"
-      },
-      {
-        "phrase": 2,
-        "wav": "reference-tones/phrase_02_factory_overlay.wav",
-        "pages_from_factory": [
-          14,
-          15
-        ],
-        "duration_seconds": 0.992,
-        "implicit_zero_samples": 5632,
-        "pcm_sha256": "170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14"
-      }
-    ],
     "orphan_audio": []
   },
   {
     "load": "DTM_BK3",
-    "reference_tones": [
-      {
-        "phrase": 1,
-        "wav": "reference-tones/phrase_01_factory_overlay.wav",
-        "pages_from_factory": [
-          14,
-          15
-        ],
-        "duration_seconds": 0.16,
-        "implicit_zero_samples": 0,
-        "pcm_sha256": "e91c99bf87485d02f5af2abe37e717484c98cfd5dae8e7b4c3dc3eca534327d1"
-      },
-      {
-        "phrase": 2,
-        "wav": "reference-tones/phrase_02_factory_overlay.wav",
-        "pages_from_factory": [
-          14,
-          15
-        ],
-        "duration_seconds": 0.992,
-        "implicit_zero_samples": 5632,
-        "pcm_sha256": "170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14"
-      }
-    ],
     "orphan_audio": [
       {
         "wav": "orphan-pages.wav",

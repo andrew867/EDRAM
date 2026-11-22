@@ -33,7 +33,6 @@ Clone or download the repository and open [audio/listen.html](audio/listen.html)
 | --- | ---: |
 | Checksum-valid menu slots | 71 across 9 loads |
 | Direct phrase WAVs | 53, comprising 35 speech slots and 18 silence slots |
-| Factory-reference tone renders | 18, two per load |
 | Unreferenced recorded fragments | 4, one each in ANN4, ANN5, ANN6 and DTM_BK3 |
 | Individual referenced segment WAVs | 249 |
 
@@ -41,7 +40,7 @@ All 35 speech slots differ from the decoded reference waveforms in the repositor
 
 ANN1 through ANN8 contain a set of PTSI Cellular recordings for the Oklahoma Panhandle. The prompts cover the mobile service area, 611, toll billing, emergency dialing, follow-me roaming and automatic call delivery. ANN7 slot 09 explicitly names PTSI Cellular and the Oklahoma Panhandle. A [contemporary Panhandle newspaper](https://newspapers.swco.ttu.edu/server/api/core/bitstreams/899cb423-d31d-4b93-a334-6ff15049a416/content) connects that service name with the Guymon cellular switch. The recordings' dates are unknown. DTM_BK3 slot 09 begins with a spoken test announcement. Slot 16 contains another short spoken test fragment. The unreferenced pages include more recorded audio.
 
-Slots 01 and 02 reference pages 14 and 15, which all nine backups omit. Four factory references agree on those bytes. The separately labeled overlays use the backup's original menu and the two factory pages. Slot 01 is a 750 Hz sustain variant. Slot 02 is the stock three-burst pattern and matches factory PCM exactly. No standalone DTMF or howler tone bank was detected in these nine loads.
+The menus for slots 01 and 02 reference pages 14 and 15, which all nine backups omit. The [firmware player](firmware/audio/4040/listen.html) contains the 750 Hz test tone and three-burst prompt decoded from the built-in sample page at `0x400800`. Both recovered firmware builds produce the same cue bytes.
 
 Each phrase WAV expands the stored unmasked A-law codes at 8,000 samples/s and applies the menu repeats. The unreferenced fragments concatenate the surviving pages in address order. The exact original offsets are in [audio/extra-audio.json](audio/extra-audio.json).
 
@@ -49,7 +48,7 @@ The [firmware review](../../research/XA_CORE_FIRMWARE.md) covers the two 68k loa
 
 ## Reproduce the audio export
 
-Run this from the repository root. The output includes the unwrapped records, decoded audio, factory overlays, unreferenced fragments, and exact waveform comparisons. The archived listening catalog includes transcript and phrase labels added after the extract.
+Run this from the repository root. The output includes the unwrapped records, decoded audio, unreferenced fragments, and exact waveform comparisons. The archived listening catalog includes transcript and phrase labels added after the extract.
 
 ```sh
 python xacore_audio.py data/xacore/original data/original decoded/xacore
