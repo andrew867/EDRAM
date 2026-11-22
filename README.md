@@ -2,13 +2,13 @@
 
 **First alpha** · [v0.2.0-alpha.1](https://github.com/andrew867/EDRAM/releases/tag/v0.2.0-alpha.1) · [Release notes](CHANGELOG.md)
 
-Extract speech and tones from DMS-100 and SL-100 announcement loads. The converter reads binary .bin44 and text S-record .txt80 files and writes 8 kHz, 16-bit mono WAVs. It runs on Python 3.10 or newer with the standard library.
+Decode speech and tones directly from the sample bytes in Nortel DMS-100 and SL-100 loads. The converter reconstructs the addressed image from `.bin44` or `.txt80` records, expands the stored G.711 codes to 8 kHz, 16-bit mono PCM, and follows the phrase menu's page and repeat counts. Standalone tones use the sample range given by each record header. Python 3.10 or newer is sufficient.
 
 ## Listen to the archive
 
 Clone or download the repository and open [audio/listen.html](audio/listen.html) locally. Search by load, phrase number, transcript, or Nortel mnemonic such as AVRE08. Use **Tones** for SITs, cues and alerts. Use **Tone banks** for individual DTMF keys, milliwatt carriers and the receiver off-hook howler.
 
-The player uses the decoded waveform for every clip. It shows Nortel catalog wording where the recording matches it, and machine transcripts with review flags elsewhere. [Nortel phrase catalog](references/NORTEL_PHRASES.md)
+Every Play button and WAV download points to a file decoded from the archived loads. That includes speech, SITs, the 750 Hz cues, DTMF, milliwatt tones, and the receiver off-hook howler. Tone names, frequencies, and transcripts annotate those recordings. The WAVs keep the stored levels and the lengths implied by the menus. [Worked byte map](BYTE_MAP.md#follow-real-tone-data) · [Nortel phrase catalog](references/NORTEL_PHRASES.md)
 
 ## Decode a load
 
@@ -32,12 +32,13 @@ Pass a directory to decode all supported loads inside it. The `--segments` optio
 ## Verify an extraction
 
 ~~~sh
+python verify_corpus.py data/original audio --check-player
 python edram.py data/original -o decoded --segments
-python verify_corpus.py data/original decoded
+python verify_corpus.py data/original decoded --check-player
 python -m unittest discover -s tests -v
 ~~~
 
-The reference run covers 61 loads and verifies 5,377 WAVs against the decoded source PCM. It reports missing payloads, invalid menus and page ranges that cross standalone tone records. Card playback, including SIT timing and level, needs a hardware comparison. [Verification report](VALIDATION.json)
+The reference run verifies 5,377 WAVs against the PCM decoded from 61 loads and checks all 59 binary G6 payload sums. The searchable archive indexes all 5,377 WAVs. A fresh decoder run builds a smaller player for full phrases and standalone tone records. The verifier also reports missing payloads, invalid menus, and ranges that cross standalone tone records. Actual card timing and level still need a hardware capture. [Verification report](VALIDATION.json) · [Independent FFmpeg check](research/TONE_PLAYBACK.md#independent-waveform-check)
 
 ## Transcribe and rebuild the player
 
@@ -55,5 +56,3 @@ Transcription deduplicates identical PCM and saves checkpoints. Review flags ide
 ## Source and license
 
 The reference loads in `data/original/` come from EDRM0001 version 010. Joe Z documented the G-record and unmasked A-law interpretations. Nortel 297-1001-527 describes DRAM and EDRAM services and catalogs the factory phrases. The MIT license covers this repository's implementation, tests and documentation. The original recordings and load files retain their respective ownership. [Source archive and hash](data/README.md) · [Joe Z's notes](http://www.dms-100.net/telephony/nortel/dms-100/edram/) · [Nortel DRAM and EDRAM Guide](https://www.gbppr.net/bsp/297-1001-527.pdf)
-
-The separate [T7316 ringer model](ringer/README.md) reproduces four patterns measured from a BCM set recording.

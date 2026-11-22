@@ -18,7 +18,7 @@ Every binary record is 44 bytes.
 | remaining through 42 | variable | Padding |
 | 43 | 1 | 0x16 terminator |
 
-The sum from byte 2 through the checksum is 0xff modulo 256. Short-record checksums are not at fixed byte 42. G0 is the first data record, G2 continues loading, and G6 is a non-data footer. G6 has count 1 and holds a four-byte big-endian sum starting at offset 3. Add every G0/G2 payload as unsigned big-endian 16-bit words, including records that rewrite an earlier address, and keep the low 32 bits. This verifies all 59 bin44 loads in the reference archive.
+The sum from byte 2 through the checksum is 0xff modulo 256. Short-record checksums are not at fixed byte 42. G0 is the first data record, G2 continues loading, and G6 is a non-data footer. G6 has count 1 and holds a four-byte big-endian sum starting at offset 3. Add every G0/G2 payload as unsigned big-endian 16-bit words, including records that rewrite an earlier address, and keep the low 32 bits. The corpus verifier checks the aggregate sum for all 59 `.bin44` loads in the reference archive. The ordinary decoder validates the framing and each record's one-byte checksum.
 
 Reconstruct addressed memory rather than concatenating payloads. Omitted regions are zero-filled under the factory-file policy. Apply records in order; later writes replace earlier bytes. Changed-byte rewrites occur in astd0ab, estd0aa and fstd0ba.
 

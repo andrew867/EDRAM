@@ -87,7 +87,7 @@ The standalone tone bank has its own boundaries. An `S2` line describes a write 
 | Step | Image address | Location in both `.txt80` files | Bytes and meaning |
 | --- | --- | --- | --- |
 | Read the tone length | `0x3BCA` to `0x3BCB` | Line 558, file byte `0x082E7`. The line writes from `0x3BB4`. | `03 E8` gives 1,000 words, or 2,000 sample bytes. |
-| Read the first samples | `0x3BCC` | Line 559, file byte `0x08306`. The line writes from `0x3BCC`. | Starts `D2 C1 49 E8 DC 76 65 F3`. |
+| Read the first samples | `0x3BCC` | Line 559, file byte `0x082F8`. The line writes from `0x3BCC`. | Starts `D2 C1 49 E8 DC 76 65 F3`. |
 | Stop at the calculated boundary | `0x439A` to `0x439B` | Line 642, file byte `0x096CB`. The line writes from `0x4394`. | Last two sample codes are `69 61`. The next address, `0x439C`, is outside the waveform. |
 
 The first four codes expand with unmasked μ-law to `4604, 2108, -3132, 12412`. The four peaks in the 2,000-sample PCM block are 1404, 2060, 2452 and 2604 Hz. All four are already mixed into that one waveform, which lasts 250 ms at 8 kHz. The exporter derives the display label from the identified record. The WAV comes from expanding its sample codes. [MWTTONE source](data/original/mwttone.txt80) · [Howler WAV](audio/mwttone/tone-bank/tone_10.wav)

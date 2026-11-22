@@ -11,7 +11,7 @@ An EDRAM audio load is a set of writes to specific addresses in the card’s dat
 | `.loads` and `.chksum` | Release inventory and package checksum files. A `.loads` entry names a file. A `.chksum` entry checks the bytes of that file as distributed. |
 | `.wav` | The converter’s output. It contains 8 kHz, 16-bit mono PCM ready to listen to. |
 
-The record address determines where its bytes go, and a later write can replace an earlier one. The converter reconstructs the image before looking up any phrase. The transport extension identifies the record framing. The structures inside the image determine how audio is found. [Record fields and checksums](FORMAT.md) · [Release inventories](SLM_TAPE.md#release-manifests-and-the-slm-restore-path)
+The record address determines where its bytes go, and a later write can replace an earlier one. The converter reconstructs the image before looking up any phrase. The transport extension identifies the record framing. The structures inside the image determine which stored sample codes become audio. The player opens those WAVs directly. Frequency labels and transcript text describe the clips. [Record fields and checksums](FORMAT.md) · [Release inventories](SLM_TAPE.md#release-manifests-and-the-slm-restore-path)
 
 ## A spoken phrase is a list of sample ranges
 
@@ -40,6 +40,6 @@ The receiver off-hook howler is record 10. At `0x3BCA`, the header is `03 E8`, o
 
 This also explains the jumble in `EDRMTONE` bank 0, phrase 41. Its two large page ranges, `0x6A00` to `0xBFFF` and `0xC000` to `0x114FF`, run across tone headers, other tones, and both DTMF sets. Reading them as one phrase decodes all those bytes together. The player’s **Tone banks** view uses the individual record boundaries and displays one playable WAV per record. [Phrase and tone record manifest](audio/edrmtone/manifest.json)
 
-## What the encoder writes
+## Build a custom load
 
-`--phrase` takes a speech WAV and `--tone` takes a generated sequence or an archived tone record. Both write ordinary announcement phrases into slots 40 through 63 of the `ESTD0AA` template. The encoder stores A-law sample codes, pads to 256-sample boundaries, and builds the address records and checksums. An archived μ-law howler becomes A-law audio in a phrase slot. Playback of custom loads on a physical switch remains a bench question. [Encoder examples](ENCODING.md#encode-tone-phrases) · [Bench status](BENCH_STATUS.md)
+Use the [encoder guide](ENCODING.md) to build new announcement phrases and see how to reuse archived tone samples. The encoder writes a separate load for bench testing.
