@@ -157,8 +157,10 @@ def trace_tone(name, slot, selector, low_memory_byte):
     descriptors = [machine.read(base + 8 * i, 8) for i in range(3)]
     active = bytearray()
     words_per_record = []
-    for descriptor in descriptors:
+    for i, descriptor in enumerate(descriptors):
         address = int.from_bytes(descriptor[2:5], "big")
+        if i == 0 and selector == 0x5050:
+            address += 0x80000
         words = machine.get(address, 2)
         duration = int.from_bytes(descriptor[5:], "big") * 8
         sample = machine.read(address + 2, words * 2)
@@ -295,7 +297,12 @@ def verify(vectors):
         case = tone["alternate_low_memory"]["slot_result"]
         assert trace_tone(name, case["slot"], tone["selector"],
                           tone["alternate_low_memory"]["value"]) == case, name
-        print(f"{name}: phrase staging, loader, request and built-in tone vectors matched")
+        alternate = tone["alternate_selector"]
+        for case in alternate["slots"]:
+            actual = trace_tone(name, case["slot"], alternate["value"], tone["low_memory_byte"])
+            assert actual["model_match"] and actual["events"] == PLAYBACK_DONE, (name, case["slot"])
+            assert all(actual[key] == value for key, value in case.items()), (name, case["slot"])
+        print(f"{name}: phrase staging, loader, request and both built-in tone selectors matched")
 
 
 if __name__ == "__main__":

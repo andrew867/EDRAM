@@ -28,9 +28,11 @@ Take `EAOSS0AF`, bank 1, phrase 4. Nortel calls this phrase `AVRE08`, “Has bee
 
 Speech uses unmasked G.711 A-law in these files. XOR each stored byte with `0x55` before passing it to a standard A-law decoder. The manifest tracks zero-fill for sparse regions. A wholly absent speech segment is flagged as unavailable. Recorded cues such as the calling-card bong also use phrase ranges. [Sample addressing and sparse data](FORMAT.md#menus) · [Recorded cue examples](research/TONE_PLAYBACK.md#phrase-tones-from-menu-to-wav)
 
-## SITs and the 750 Hz cues use phrase menus too
+## Archived SITs and 750 Hz cues use phrase menus
 
 In ESTD0AA bank 0 phrase 8, the first SIT component plays page 17 once, then the two-page range starting at page 18 four times. Two more attack/sustain pairs supply the other pitches. That is 288 ms per component at 8 kHz. The converter expands those bytes, including their level differences. In the 750 Hz cue, the last 128 bytes of page 15 contain four identical 32-byte blocks. Each decodes to three cycles at 8 kHz. [Byte walk-through and playback measurements](research/TONE_PLAYBACK.md)
+
+The recovered firmware also has built-in SIT waveforms. Its descriptors specify 274 or 380 ms per component, while the archived ESTD0AA page menus give 288 or 384 ms. The firmware decoder exports that built-in path separately and keeps the exact staged sample codes alongside each WAV preview. [Firmware decoder](README.md#decode-built-in-firmware-sits)
 
 ## Standalone tone banks have their own record boundaries
 

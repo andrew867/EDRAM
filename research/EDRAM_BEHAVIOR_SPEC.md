@@ -96,14 +96,14 @@ zero_pad_final_block();
 advance_to_next_phrase_or_control_token();
 ```
 
-The tested profile uses selector `0x4040` and runtime memory byte `[0x000001] = 1`. That byte is read by the repeat branch. With it set to zero in the harness, fixture slot 8 still filled the same number of blocks but produced different sample bytes. The actual value on a running target must be measured or recovered from the resident software. Other selectors can relocate the first record address. Continuous records use a value of `0xFFFFFF` and need a distinct playback policy.
+The tested profile uses selector `0x4040` and runtime memory byte `[0x000001] = 1`. That byte is read by the repeat branch. With it set to zero in the harness, fixture slot 8 still filled the same number of blocks but produced different sample bytes. The actual value on a running target must be measured or recovered from the resident software. Selector `0x5050` adds `0x80000` to the first record address. The in-buffer transition uses the next two addresses as stored. Both selectors were tested with bank-specific waveform overrides disabled. Continuous records use a value of `0xFFFFFF` and need a distinct playback policy.
 
 | Tone length | Descriptor value | Active codes | Nominal time |
 | --- | ---: | ---: | ---: |
 | Short | `0x000112` | 2,192 | 274 ms |
 | Long | `0x00017C` | 3,040 | 380 ms |
 
-All 32 combinations in each firmware reproduced the finite-cycle model byte for byte under this profile. The 274/380 ms figures agree with Nortel's EDRAM table. The archive's ordinary page-based voice-file SITs are a separate playback route. [Nortel 297-1001-527, Table 4-2](https://www.gbppr.net/bsp/297-1001-527.pdf#page=59)
+All 32 combinations in each firmware reproduced the finite-cycle model byte for byte under both tested selectors. The 274/380 ms figures agree with Nortel's EDRAM table. The archive's ordinary page-based voice-file SITs are a separate playback route. [Nortel 297-1001-527, Table 4-2](https://www.gbppr.net/bsp/297-1001-527.pdf#page=59)
 
 ## Sequencing and staging
 
@@ -155,6 +155,6 @@ The [measured vectors](../data/xacore/firmware/playback-vectors.json) contain ex
 - **Archived speech or page-based tone.** Play `ESTD0AA` slot 8 using its bank-local menu. Compare the 6,912 raw staged bytes and the resulting offline A-law PCM with the archive.
 - **Checksum rejection.** Change one bit of the menu checksum. Expect the native error `0x41` before staging output.
 - **Protected writes.** Send packets crossing either edge of the protected window and a packet entirely inside it. Compare writable bytes, protected bytes, the sum of unfiltered payloads, and the completion reply.
-- **Built-in tones.** Run slots 8-39 with the finite-cycle profile. Compare the active length and the full sequence of zero-padded staging blocks.
+- **Built-in tones.** Run slots 8-39 with each tested selector and the finite-cycle profile. Compare the active length and the full sequence of zero-padded staging blocks.
 
 The remaining hardware acceptance cases are the live serial framing, interrupt timing, law and gain on the wire, recording completion, continuous tones, and additional bank types and alternate selectors. Those cases need a card trace or the resident runtime.

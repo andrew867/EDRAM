@@ -34,6 +34,15 @@ Pass a directory to decode all supported loads inside it. The `--segments` optio
 | Test a new load on an NT1X80 card | [Bench checklist](BENCH_STATUS.md) |
 | Earlier experiments and superseded interpretations | [Archive](archive/README.md) |
 
+## Decode built-in firmware SITs
+
+~~~sh
+python edram.py --firmware-sit data/xacore/srecords/ED16AA07.srec -o decoded-firmware
+python edram.py --firmware-sit --sit-selector 0x5050 data/xacore/srecords/EDRMAE11.srec -o decoded-selector-5050
+~~~
+
+Each export includes 32 WAV previews, the raw bytes staged by the firmware model, a manifest with sample counts and SHA-256 hashes, and a player. The two recovered firmware builds are supported as S-records or mapped flat binaries. Use `--inspect` for a JSON-only preview. Announcement loads still play their stored page-based SITs. [Firmware SIT format](FORMAT.md#built-in-firmware-sits)
+
 ## Verify an extraction
 
 ~~~sh

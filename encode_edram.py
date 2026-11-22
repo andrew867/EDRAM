@@ -13,7 +13,10 @@ import edram
 import tone_bank
 
 
-TEMPLATE = Path(__file__).resolve().parent / "data" / "original" / "estd0aa.bin44"
+DATA = Path(__file__).resolve().parent / "data"
+TEMPLATE = DATA / "original" / "estd0aa.bin44"
+SIT_FIRMWARE = DATA / "xacore" / "srecords" / "ED16AA07.srec"
+CUE_SLOTS = {"cue:test": 1, "cue:prompt": 2}
 FIRST_VOICE_PHRASE = 40
 FIRST_VOICE_ADDRESS = 0x2100
 NAME_ADDRESS = 0x670
@@ -43,7 +46,31 @@ def read_voice(path):
     return bytes(alaw_encode(sample) for sample, in struct.iter_unpack("<h", pcm))
 
 
+def to_voice_law(raw, codec):
+    if codec == "alaw-unmasked":
+        return raw
+    pcm = edram.decode(raw, codec)
+    return bytes(alaw_encode(sample) for sample, in struct.iter_unpack("<h", pcm))
+
+
 def stored_tone(component, banks):
+    if component in CUE_SLOTS or re.fullmatch(r"sit:page:[0-9]+", component):
+        if component in CUE_SLOTS:
+            slot = CUE_SLOTS[component]
+        else:
+            number = int(component.rsplit(":", 1)[1])
+            if not 1 <= number <= 32:
+                raise ValueError("SIT number must be from 1 to 32")
+            slot = number + 7
+        if "template" not in banks:
+            image = edram.Image.read(TEMPLATE)
+            banks["template"] = image, {p.number: p for p in image.phrases() if p.bank == 0}
+        image, phrases = banks["template"]
+        return edram.render_codes(image, phrases[slot])[0]
+    if match := re.fullmatch(r"sit:firmware:([0-9]+)", component):
+        if "firmware" not in banks:
+            banks["firmware"] = edram.parse_firmware_sit(SIT_FIRMWARE.read_bytes())
+        return to_voice_law(banks["firmware"].sit(int(match[1])).codes, "mulaw-unmasked")
     if component in STORED_TONE_ALIASES:
         source, selector = STORED_TONE_ALIASES[component]
     elif match := re.fullmatch(r"(mwttone|edrmtone):([0-9]+)", component):
@@ -58,10 +85,7 @@ def stored_tone(component, banks):
         banks[source] = list(tone_bank.records(image))
     for entry, raw in banks[source]:
         if selector in (entry["index"], entry["tone_name"]) and entry["wav"]:
-            if entry["codec"] == "alaw-unmasked":
-                return raw
-            pcm = edram.decode(raw, entry["codec"])
-            return bytes(alaw_encode(value) for value, in struct.iter_unpack("<h", pcm))
+            return to_voice_law(raw, entry["codec"])
     raise ValueError(f"no playable stored tone: {component!r}")
 
 
@@ -130,14 +154,19 @@ def serialize(records, transport):
     return b"\n".join([*data, s_record(b"S6", checksum), b""])
 
 
-def build_load(name, phrases, transport):
-    """Build a named load from a mapping of phrase IDs to unmasked A-law codes."""
+def build_load(name, phrases, transport, *, repeats=None):
+    """Build a named load from unmasked A-law codes and optional range repeats."""
     if not re.fullmatch(r"[A-Z0-9_]{1,8}", name):
         raise ValueError("load name must contain one to eight uppercase letters, digits or underscores")
     if not phrases or any(not FIRST_VOICE_PHRASE <= number <= 63 or not data for number, data in phrases.items()):
         raise ValueError("supply at least one nonempty voice phrase with an ID from 40 to 63")
     if transport not in ("bin44", "txt80"):
         raise ValueError(f"unsupported transport: {transport}")
+
+    repeats = repeats or {}
+    if any(number not in phrases or not isinstance(count, int) or not 1 <= count <= 255
+           for number, count in repeats.items()):
+        raise ValueError("repeat counts must be 1 to 255 and refer to an authored phrase")
 
     image = edram.Image.read(TEMPLATE)
     source_phrases = image.phrases()
@@ -157,12 +186,17 @@ def build_load(name, phrases, transport):
         pages = len(padded) // edram.PAGE_SIZE
         if len(data) + len(padded) > edram.BANK_SIZE:
             raise ValueError(f"phrase {number} exceeds the remaining single-bank voice capacity")
+        count = repeats.get(number, 1)
+        if count > 1 and pages > 255:
+            raise ValueError(f"repeated phrase {number} exceeds the 255-page range limit")
+        if len(padded) * count > edram.MAX_PHRASE_SAMPLES:
+            raise ValueError(f"repeated phrase {number} exceeds the 10-minute output limit")
         entries = bytearray()
         while pages:
-            count = min(pages, 255)
-            entries.extend(struct.pack("<HBB", start_page, count, 1))
-            start_page += count
-            pages -= count
+            range_pages = min(pages, 255)
+            entries.extend(struct.pack("<HBB", start_page, range_pages, count))
+            start_page += range_pages
+            pages -= range_pages
         if submenu + len(entries) > NAME_ADDRESS:
             raise ValueError("voice submenus would overlap the load identifier")
         header = struct.pack("<HB", submenu, len(entries) // 4)
@@ -172,7 +206,7 @@ def build_load(name, phrases, transport):
         submenu += len(entries)
         data.extend(padded)
         present.extend(b"\x01" * len(padded))
-        expected[number] = padded
+        expected[number] = (padded, count)
 
     limit = 36 if transport == "bin44" else 24
     records = []
@@ -187,9 +221,9 @@ def build_load(name, phrases, transport):
     verified = {p.number: p for p in rebuilt.phrases()}
     if [p for p in verified.values() if p.number < FIRST_VOICE_PHRASE] != retained:
         raise ValueError("encoder verification failed for the retained template menus")
-    for number, codes in expected.items():
-        pcm, holes = edram.render(rebuilt, verified[number])
-        if holes or pcm != edram.decode(codes):
+    for number, (codes, count) in expected.items():
+        raw, holes = edram.render_codes(rebuilt, verified[number])
+        if holes or raw != codes * count:
             raise ValueError(f"encoder round trip failed for phrase {number}")
     return result
 
@@ -202,6 +236,8 @@ def main(argv=None):
                         help="phrase number 40 to 63 and its mono 8 kHz PCM WAV")
     parser.add_argument("--tone", action="append", default=[], nargs=2, metavar=("ID", "SPEC"),
                         help="phrase number 40 to 63 and a tone sequence such as 350+440@250,silence@100")
+    parser.add_argument("--repeat", action="append", default=[], nargs=2, metavar=("ID", "COUNT"),
+                        help="repeat the authored phrase's whole padded range 1 to 255 times")
     args = parser.parse_args(argv)
     if not args.phrase and not args.tone:
         parser.error("supply at least one --phrase or --tone")
@@ -215,8 +251,14 @@ def main(argv=None):
                 if not FIRST_VOICE_PHRASE <= number <= 63:
                     raise ValueError(f"phrase ID must be from 40 to 63: {number}")
                 phrases[number] = read(source)
+        repeats = {}
+        for phrase_id, count in args.repeat:
+            number = int(phrase_id)
+            if number in repeats:
+                raise ValueError(f"duplicate repeat for phrase ID: {number}")
+            repeats[number] = int(count)
         name = args.name or args.output.stem.upper()
-        raw = build_load(name, phrases, args.output.suffix.lower().lstrip("."))
+        raw = build_load(name, phrases, args.output.suffix.lower().lstrip("."), repeats=repeats)
         with args.output.open("xb") as output:
             output.write(raw)
     except (OSError, ValueError, wave.Error) as exc:

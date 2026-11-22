@@ -46,6 +46,12 @@ The final page of the low middle sustain (`0x1900`) repeats a 64-byte block with
 
 In `FSTD0BA`, bank 1 has a byte-identical copy of bank 0's SIT submenus and sample pages. The three misaligned directory entries and the fourth entry that lands on the previous SIT's last word have verified replacements. Use the [explicit repair](../FORMAT.md#malformed-references) to export the four corrected SITs from bank 1.
 
+## Built-in firmware SITs
+
+The two recovered 68k loads contain a separate three-component SIT directory. Under the tested `0x4040` profile, each descriptor addresses a waveform record whose samples loop for 2,192 or 3,040 frames. Under `0x5050`, the first record comes from the second embedded waveform table. The second and third records use the stored addresses. Both profiles were run through the native stage routine for all 32 SITs on both firmware builds with runtime byte `[0x000001] = 1`. [Firmware evidence](EDRAM_FIRMWARE_EVIDENCE.md) and [raw byte vectors](../data/xacore/firmware/playback-vectors.json)
+
+For example, ESTD0AA SIT 1 has 6,912 samples in its three ordinary page ranges. Firmware SIT 1 stages 6,576 active codes plus 80 zero codes at the end of its last page. For the three SIT 1 waveform records used under `0x4040`, the dominant frequency bin accounts for about 99.87% to 99.98% of waveform energy when expanded as unmasked mu-law, compared with about 99.69% to 99.78% under unmasked A-law. This supports the offline mu-law preview. The raw hashes are independent of companding. [Decoder usage](../README.md#decode-built-in-firmware-sits)
+
 ## Standalone records
 
 `MWTTONE` and `EDRMTONE` share 17 records. `EDRMTONE` adds 47 records, including two DTMF sets and two constant-fill records. The two-byte big-endian count at the start of each record is the number of 16-bit words of payload. Each payload word holds two eight-bit sample codes. The exporter checks the archived regions and their record boundaries, then expands samples with the region's identified companding law. In these images, records with headers below `0xB5EA` use unmasked μ-law, and the rest use unmasked A-law. The law assignment comes from the archived waveform analysis. The header has no codec selector.
@@ -142,7 +148,7 @@ An independent readback of the same five custom phrases in `.bin44` and `.txt80`
 | `--phrase 43 audio/estd0aa/bank_00/phrase_01.wav` | The 1,280 expanded factory cue codes were recovered exactly in a custom phrase. Both waveform copies and their order matched the factory menu's expansion. |
 | `--tone 44 dtmf:1` | 394 codes converted from μ-law to A-law, followed by 118 padding codes. The two carrier bins were preserved. |
 
-The encoder writes tone audio to ordinary announcement slots. Custom repeat-count authoring and standalone tone-bank writing remain open. [Encoder guide](../ENCODING.md#encode-tone-phrases) · [Bench status](../BENCH_STATUS.md)
+The encoder writes tone audio to ordinary announcement slots. It can reuse the archived cues, either SIT source, or standalone waveform payloads, and write a native whole-range repeat count. Standalone tone-service bank authoring still needs a hardware control. [Encoder guide](../ENCODING.md#encode-tone-phrases) · [Bench status](../BENCH_STATUS.md)
 
 ## What remains on the card
 

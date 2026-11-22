@@ -10,9 +10,11 @@ import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
 import struct
+
+import firmware_sit
 import tone_bank
 
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 RATE = 8000
 BANK_SIZE = 0x40000
 PAGE_SIZE = 256
@@ -204,10 +206,14 @@ class Image:
         start = bank * BANK_SIZE + segment.page * PAGE_SIZE
         size = segment.pages * PAGE_SIZE
         covered = sum(self.coverage[start:start + size])
-        # Sparse zero regions are common. Entirely missing speech is not silence.
+        # Preserve the archive convention for a wholly unwritten page 16.
         if not covered and segment.page not in (13, 16):
             raise FormatError(f"unavailable segment at 0x{start:x}, {size} bytes")
-        return self.read_bytes(start, size), size - covered
+        data = self.read_bytes(start, size)
+        # The native page-fill routine clears stage memory for address 0x0D00.
+        if segment.page == 13:
+            data = bytes(PAGE_SIZE) + data[PAGE_SIZE:]
+        return data, size - covered
 
 
 def alaw_sample(value: int) -> int:
@@ -238,14 +244,19 @@ PCM_TABLES = {
 }
 
 
-def render(image: Image, phrase: Phrase, codec="alaw-unmasked"):
+def render_codes(image: Image, phrase: Phrase):
     chunks = []
     implicit = 0
     for segment in phrase.segments:
         data, missing = image.segment_bytes(phrase.bank, segment)
-        chunks.append(decode(data, codec) * segment.repeats)
+        chunks.append(data * segment.repeats)
         implicit += missing * segment.repeats
     return b"".join(chunks), implicit
+
+
+def render(image: Image, phrase: Phrase, codec="alaw-unmasked"):
+    codes, implicit = render_codes(image, phrase)
+    return decode(codes, codec), implicit
 
 
 def tone_metadata(image, phrase, pcm, codec):
@@ -289,17 +300,22 @@ def check_voice_ranges(bank, segments, tone_ranges):
             raise ToneBankOverlap(f"page range at 0x{start:x} overlaps standalone tone records")
 
 
-def export(path: Path, output: Path, codec: str, segments=False, overwrite=False):
-    image = Image.read(path)
-    phrases = image.phrases(strict=False)
+def output_folder(path, output, overwrite):
     folder = output / path.stem
     if folder.exists() and any(folder.iterdir()) and not overwrite:
         raise FormatError(f"output already exists: {folder}; use --overwrite explicitly")
     folder.mkdir(parents=True, exist_ok=True)
+    return folder
+
+
+def export(path: Path, output: Path, codec: str, segments=False, overwrite=False):
+    image = Image.read(path)
+    phrases = image.phrases(strict=False)
+    folder = output_folder(path, output, overwrite)
     manifest = {"converter_version": VERSION, "source": path.name,
                 "source_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
                 "codec": codec, "sample_rate": RATE, "sample_width_bits": 16,
-                "playback_model": "stored codes and whole-block repetition; card equivalence unverified",
+                "playback_model": "stored codes, whole-range repetition and zero-coded page 13",
                 "timing_status": "256 addressed samples per page at nominal 8000 Hz",
                 "record_count": len(image.records), "addressed_bytes": sum(image.coverage),
                 "overwrite_policy": "records applied in file order; later writes replace earlier bytes",
@@ -359,10 +375,59 @@ def export(path: Path, output: Path, codec: str, segments=False, overwrite=False
     return manifest
 
 
+def parse_firmware_sit(raw: bytes, selector=0x4040):
+    if raw.lstrip().startswith(b"S"):
+        image = Image(parse_srec(raw), strict_overlaps=True)
+        raw = bytes(image.data[firmware_sit.LOAD_ADDRESS:])
+    try:
+        return firmware_sit.Firmware(raw, selector)
+    except ValueError as exc:
+        raise FormatError(str(exc)) from exc
+
+
+def export_firmware_sit(path, output, codec, selector=0x4040, *, inspect=False, overwrite=False):
+    source = path.read_bytes()
+    firmware = parse_firmware_sit(source, selector)
+    folder = None if inspect else output_folder(path, output, overwrite)
+    entries = []
+    for number in range(1, 33):
+        sit = firmware.sit(number)
+        codes = sit.codes
+        staged = codes.ljust(len(codes) + (-len(codes) % PAGE_SIZE), b"\0")
+        entry = {"number": number, "slot": sit.slot, "samples": len(codes),
+                 "duration_seconds": len(codes) / RATE, "staged_samples": len(staged),
+                 "active_sha256": hashlib.sha256(codes).hexdigest(),
+                 "staged_sha256": hashlib.sha256(staged).hexdigest(),
+                 "components": [asdict(part) for part in sit.components]}
+        if folder is not None:
+            label = f"sit_{number:02d}"
+            entry.update(wav=f"{label}.wav", raw=f"{label}.staged.bin")
+            write_wav(folder / entry["wav"], decode(codes, codec), f"{firmware.name} built-in SIT {number}",
+                      f"selector=0x{selector:04x}; preview_codec={codec}; stages={len(staged)} codes")
+            (folder / entry["raw"]).write_bytes(staged)
+        entries.append(entry)
+    manifest = {
+        "converter_version": VERSION, "source": path.name, "firmware": firmware.name,
+        "source_sha256": hashlib.sha256(source).hexdigest(), "flat_sha256": firmware.sha256,
+        "selector": selector, "low_memory_byte": firmware_sit.LOW_MEMORY_BYTE,
+        "preview_codec": codec, "sample_rate": RATE, "firmware_sits": entries,
+    }
+    if folder is not None:
+        (folder / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    return manifest
+
+
 def write_browser(output: Path, manifests):
     rows = []
     for manifest in manifests:
         source = manifest["source"]
+        for sit in manifest.get("firmware_sits", ()):
+            name = f"{source} / built-in SIT {sit['number']:02d} / slot {sit['slot']}"
+            url = html.escape((Path(Path(source).stem) / sit["wav"]).as_posix(), quote=True)
+            rows.append(f'<tr><td>{html.escape(name)}</td><td>{sit["duration_seconds"]:.3f}s</td>'
+                        f'<td><button data-src="{url}">Play</button> <a href="{url}" download>WAV</a></td></tr>')
+        if "firmware_sits" in manifest:
+            continue
         raw_paths = tone_bank.raw_bank_paths(manifest, BANK_SIZE, PAGE_SIZE)
         for phrase in manifest["phrases"]:
             if not phrase["wav"]:
@@ -399,12 +464,13 @@ document.querySelector('#filter').addEventListener('input',e=>{const q=e.target.
     (output / "listen.html").write_text(document, encoding="utf-8")
 
 
-def input_paths(inputs):
+def input_paths(inputs, *, firmware=False):
+    suffixes = (".bin", ".srec", ".s19", ".s28") if firmware else (".bin44", ".txt80", ".srec", ".s19", ".s28")
     paths = []
     for value in inputs:
         path = Path(value)
         if path.is_dir():
-            paths.extend(p for p in sorted(path.iterdir()) if p.suffix.lower() in (".bin44", ".txt80", ".srec", ".s19", ".s28"))
+            paths.extend(p for p in sorted(path.iterdir()) if p.suffix.lower() in suffixes)
         else:
             paths.append(path)
     paths = list(dict.fromkeys(p.resolve() for p in paths))
@@ -421,14 +487,35 @@ def main(argv=None):
     parser.add_argument("inputs", nargs="+", help="bin44/S-record files or directories")
     parser.add_argument("-o", "--output", type=Path, default=Path("edram-wav"))
     parser.add_argument("--inspect", action="store_true", help="validate and list tables without writing files")
-    parser.add_argument("--codec", choices=tuple(PCM_TABLES), default="alaw-unmasked")
+    parser.add_argument("--codec", choices=tuple(PCM_TABLES),
+                        help="WAV law (default: A-law for announcements, mu-law for firmware SIT preview)")
+    parser.add_argument("--firmware-sit", action="store_true", help="decode built-in SITs from firmware S-records or mapped flat binaries")
+    parser.add_argument("--sit-selector", type=lambda value: int(value, 0), choices=firmware_sit.SELECTORS,
+                        metavar="{0x4040,0x5050}", help="firmware SIT selector (default: 0x4040)")
     parser.add_argument("--raw-sit", "--raw-tones", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--segments", action="store_true", help="also export each referenced segment without repeats")
     parser.add_argument("--overwrite", action="store_true", help="allow replacing outputs in existing source folders")
     parser.add_argument("--version", action="version", version=VERSION)
     args = parser.parse_args(argv)
+    if args.sit_selector is not None and not args.firmware_sit:
+        parser.error("--sit-selector requires --firmware-sit")
+    if args.segments and args.firmware_sit:
+        parser.error("--segments is for announcement loads")
     try:
-        paths = input_paths(args.inputs)
+        paths = input_paths(args.inputs, firmware=args.firmware_sit)
+        if args.firmware_sit:
+            codec = args.codec or "mulaw-unmasked"
+            manifests = [export_firmware_sit(path, args.output, codec, args.sit_selector or 0x4040,
+                                             inspect=args.inspect, overwrite=args.overwrite) for path in paths]
+            if args.inspect:
+                for manifest in manifests:
+                    print(json.dumps(manifest))
+            else:
+                write_browser(args.output, manifests)
+                for manifest in manifests:
+                    print(f"{manifest['source']}: {len(manifest['firmware_sits'])} built-in SITs exported")
+            return
+        codec = args.codec or "alaw-unmasked"
         manifests = []
         for path in paths:
             if args.inspect:
@@ -438,7 +525,7 @@ def main(argv=None):
                                   "invalid_phrases": image.invalid_phrases,
                                   "tone_bank": [entry for entry, _ in tone_bank.records(image)]}))
             else:
-                manifest = export(path, args.output, args.codec, args.segments, args.overwrite)
+                manifest = export(path, args.output, codec, args.segments, args.overwrite)
                 manifests.append(manifest)
                 count = sum(p["status"] == "exported" for p in manifest["phrases"])
                 print(f"{path.name}: {count}/{len(manifest['phrases'])} phrases exported")

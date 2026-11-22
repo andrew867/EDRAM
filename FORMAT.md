@@ -48,11 +48,24 @@ All-`FF` and all-`00` directory entries are inactive. For an active slot, the fo
 
 The converter reads `page_count × 256` sample codes starting at `bank_base + page × 0x100` and repeats that range `repeat_count` times before advancing to the next entry. At 8 kHz, 256 sample codes represent 32 ms.
 
-For example, `ESTD0AA` bank 0 phrase 8 has directory bytes `34 01 06 20` at `0x0020`. It points to six entries starting at `0x0134`. The first two entries, `11 00 01 01` and `12 00 02 04`, say to play page `0x11` once, then play the two-page range `0x12 through 0x13` four times. The offline converter expands those sample codes to 2,304 frames, or 288 ms at 8 kHz. It uses the stored waveform and menu timing for every SIT. [Worked tone offsets](BYTE_MAP.md#follow-real-tone-data) · [SIT component layout](research/TONE_PLAYBACK.md#sit-component-layout)
+For example, `ESTD0AA` bank 0 phrase 8 has directory bytes `34 01 06 20` at `0x0020`. It points to six entries starting at `0x0134`. The first two entries, `11 00 01 01` and `12 00 02 04`, say to play page `0x11` once, then play the two-page range `0x12 through 0x13` four times. The offline converter expands those sample codes to 2,304 frames, or 288 ms at 8 kHz. The announcement-load decoder uses the stored waveform and menu timing. [Worked tone offsets](BYTE_MAP.md#follow-real-tone-data) · [SIT component layout](research/TONE_PLAYBACK.md#sit-component-layout)
 
-Pages 13 and 16 in decimal commonly supply silence. Unaddressed parts of a referenced segment are supplied as zero codes and counted in the manifest. The converter flags a wholly absent non-silence segment as unavailable. [Page filenames and unwritten ranges](BYTE_MAP.md#why-a-page-can-be-missing-from-segments)
+The native player emits 256 zero codes for page 13 even when source bytes are present. The decoder applies the same rule within a page range. It also supplies zero codes for unaddressed bytes and counts them in the manifest. Wholly unwritten page 16 remains an accepted archive silence reference, and any present page 16 bytes are copied normally. The converter flags a wholly absent non-silence segment as unavailable. [Page filenames and unwritten ranges](BYTE_MAP.md#why-a-page-can-be-missing-from-segments)
 
 Standard SIT menus 8 through 39 combine attack pages 17, 20, 23, 26 and 29 with repeated two-page components beginning at 18, 21, 24, 27 and 30. IDs are bank-local, and phrase 8 in another pack may contain speech. SIT labels require the corresponding menu structure.
+
+## Built-in firmware SITs
+
+The firmware directories in `ED16AA07` and `EDRMAE11` have built-in SIT slots 8 through 39, shown by the decoder as SITs 1 through 32. Each entry points to three eight-byte descriptors. Each descriptor starts with a zero word, a big-endian 24-bit waveform address, and a big-endian 24-bit duration in eight-sample units. Its waveform record starts with a big-endian word count. The sample payload is twice that count in bytes.
+
+| Duration field | Active samples | At 8 kHz |
+| --- | ---: | ---: |
+| `0x000112` | 2,192 | 274 ms |
+| `0x00017C` | 3,040 | 380 ms |
+
+In the tested profile, the firmware loops the waveform to fill each duration, joins the components within the same output buffer, and zero-pads the last 256-byte staging block. Selector `0x4040` uses the descriptor addresses as stored. With `0x5050`, the first component's record address is increased by `0x80000`. The next two use their stored addresses. Both tests used runtime byte `[0x000001] = 1` with no bank-specific waveform override. [Behavior specification](research/EDRAM_BEHAVIOR_SPEC.md#built-in-tone-playback) and [firmware evidence](research/EDRAM_FIRMWARE_EVIDENCE.md)
+
+Use `edram.py --firmware-sit` to export these sequences. The raw `.staged.bin` has the exact padded codes. The WAV uses active samples only. `--codec` controls WAV expansion independently of selector, with unmasked mu-law as the preview default. On-wire companding and gain need a card capture, especially for the alternate selector's first component. [Usage](README.md#decode-built-in-firmware-sits)
 
 ## Standalone tone banks
 

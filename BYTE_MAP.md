@@ -35,7 +35,7 @@ This is the bank 0 map for `ESTD0AA`, the encoder’s reference. Image banks are
 | `0x065C–0x066F` | Twenty explicitly stored `FF` bytes between the last submenu and identifier. |
 | `0x0670–0x067F` | Identifier area. `ESTD0AA` contains `ESTD0AA .bin` and four `FF` bytes. |
 | `0x0680–0x0CFF` | Unwritten range in this load. |
-| `0x0D00–0x0FFF` | Page 13 is a silence reference. Pages 14 and 15 hold the reused 750 Hz cue material. |
+| `0x0D00–0x0FFF` | The card stages zeros for page 13 regardless of its contents. Pages 14 and 15 hold the reused 750 Hz cue material. |
 | `0x1000–0x10FF` | Unwritten page 16 in this load. `EMCCS0CA` uses `0x1000–0x1027` for two validated submenus, so the gap is load-dependent. |
 | `0x1100–0x1FFF` | SIT attack and sustain pages referenced by the phrase menus. |
 | `0x2000–0x20FF` | Unwritten page 32 in this load. Other loads reference page 32. |
@@ -78,7 +78,9 @@ This cue goes through the same phrase directory and submenu as speech. The repea
 
 Unmasked A-law expands the first eight codes of that block to `-40, 72, 104, 120, 120, 72, -40, -72`. The full block contains three cycles in 32 samples. At 8 kHz that gives `3 × 8000 / 32 = 750 Hz`. The WAV uses both full pages and the submenu's repeat counts, so it has `(2 + 3) × 256 = 1,280` frames, or 160 ms. [ESTD0AA source](data/original/estd0aa.bin44) · [750 Hz test WAV](audio/estd0aa/bank_00/phrase_01.wav)
 
-**SIT uses the same fields.** In phrase 8, the directory entry at image `0x0020` (file `0x00026`) is `34 01 06 20`. Its first two submenu entries at image `0x0134` (file `0x0017A`) are `11 00 01 01` and `12 00 02 04`. That plays page `0x11` once, then the whole `0x12` to `0x13` range four times. The remaining entries use the same pattern with pages `0x17` and `0x18` to `0x19`, then `0x1D` and `0x1E` to `0x1F`. Each component contributes `(1 + 2 × 4) × 256 = 2,304` frames, or 288 ms in the offline export. [SIT WAV](audio/estd0aa/bank_00/phrase_08_sit_01.wav) · [Playback measurements](research/TONE_PLAYBACK.md#phrase-tones-from-menu-to-wav)
+**The archived ESTD0AA SIT uses the same fields.** In phrase 8, the directory entry at image `0x0020` (file `0x00026`) is `34 01 06 20`. Its first two submenu entries at image `0x0134` (file `0x0017A`) are `11 00 01 01` and `12 00 02 04`. That plays page `0x11` once, then the whole `0x12` to `0x13` range four times. The remaining entries use the same pattern with pages `0x17` and `0x18` to `0x19`, then `0x1D` and `0x1E` to `0x1F`. Each component contributes `(1 + 2 × 4) × 256 = 2,304` frames, or 288 ms in the offline export. [SIT WAV](audio/estd0aa/bank_00/phrase_08_sit_01.wav) · [Playback measurements](research/TONE_PLAYBACK.md#phrase-tones-from-menu-to-wav)
+
+The built-in firmware SIT directory instead selects three waveform records and explicit sample durations. The bytes in this worked example are the announcement-load playback route. [Built-in firmware SITs](FORMAT.md#built-in-firmware-sits)
 
 ### Receiver off-hook howler in MWTTONE and EDRMTONE
 
