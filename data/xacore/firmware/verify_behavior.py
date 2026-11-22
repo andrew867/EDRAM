@@ -19,6 +19,8 @@ FIRMWARE = Path(__file__).resolve().parent
 ROOT = FIRMWARE.parents[2]
 sys.path.insert(0, str(ROOT))
 import edram
+import encode_edram
+import tone_bank
 
 VARIANTS = {
     "ED16AA07": dict(
@@ -63,13 +65,14 @@ class Machine:
         self.put(CONTEXT + 0x36, BANK)
         self.put(CONTEXT + 0x3A, BANK)
         self.events = []
+        self.trap_advance = True
         self.hooks = {}
         self.uc.hook_add(UC_HOOK_CODE, self.visit)
 
     def visit(self, _uc, address, _size, _data):
         if address in self.hooks:
             self.hooks[address]()
-        elif address == self.addr["advance"]:
+        elif address == self.addr["advance"] and self.trap_advance:
             self.events.append(["sequence_advance", None])
             self.return_now()
         elif address == self.addr["error"]:
@@ -197,25 +200,24 @@ def trace_tone(name, slot, selector, low_memory_byte):
     }
 
 
-def trace_load(name, case):
-    machine = Machine(name)
-    fill = b"\xA5" * BANK_SIZE
-    machine.uc.mem_write(BANK, fill)
-    begin = bytearray(22)
-    begin[11] = case["bank_number"]
-    begin[14:22] = b"TSTBANK1"
-    packets = [(0x78, begin)]
-    if "writes" in case:
-        for offset, payload_hex in case["writes"]:
-            message = bytearray(12) + bytes.fromhex(payload_hex)
-            message[1] = len(message)
-            message[9:12] = offset.to_bytes(3, "little")
-            packets.append((0x7E, message))
-        finish = bytearray(13)
-        finish[9:13] = case["supplied_sum"].to_bytes(4, "big")
-        packets.append((0x77, finish))
-    packets.append((0x7F, b"\x00" * 16))
-    queue = iter(packets)
+def load_announcement(machine, bank_number, load_name, writes, supplied_sum):
+    def packets():
+        begin = bytearray(22)
+        begin[11] = bank_number
+        begin[14:22] = load_name.encode("ascii").ljust(8)
+        yield 0x78, begin
+        if writes is not None:
+            for offset, payload in writes:
+                message = bytearray(12) + payload
+                message[1] = len(message)
+                message[9:12] = offset.to_bytes(3, "little")
+                yield 0x7E, message
+            finish = bytearray(13)
+            finish[9:13] = supplied_sum.to_bytes(4, "big")
+            yield 0x77, finish
+        yield 0x7F, bytes(16)
+
+    queue = packets()
     replies = []
 
     def receive():
@@ -232,12 +234,18 @@ def trace_load(name, case):
 
     machine.hooks[0xFE56] = receive
     machine.hooks[0xFE8C] = reply
-    machine.call(machine.addr["load"], 1, budget=1_600_000)
+    machine.call(machine.addr["load"], 1, budget=18_000_000)
     assert all(args[1:] == [3, 12] for args in replies), replies
-    result = {
-        "replies": [args[0] for args in replies],
-        "return": machine.uc.reg_read(UC_M68K_REG_D0) & 0xFF,
-    }
+    return [args[0] for args in replies], machine.uc.reg_read(UC_M68K_REG_D0) & 0xFF
+
+
+def trace_load(name, case):
+    machine = Machine(name)
+    fill = b"\xA5" * BANK_SIZE
+    machine.uc.mem_write(BANK, fill)
+    writes = ((offset, bytes.fromhex(payload)) for offset, payload in case["writes"]) if "writes" in case else None
+    replies, returned = load_announcement(machine, case["bank_number"], "TSTBANK1", writes, case.get("supplied_sum"))
+    result = {"replies": replies, "return": returned}
     if "writes" in case:
         result.update(
             payload_sum=machine.get(machine.addr["payload_sum"]),
@@ -249,6 +257,57 @@ def trace_load(name, case):
             first_page_cleared=machine.read(BANK, PAGE_SIZE) == bytes(PAGE_SIZE),
         )
     return result
+
+
+def verify_native_tone_bank(name, bank, replacements=None):
+    machine = builtin_machine(name, 0x4040, 1)
+    rebuilt = encode_edram.build_tone_bank(bank, replacements)
+    image = edram.Image(edram.parse_srec(rebuilt))
+    footer = int(rebuilt.split()[-1][4:12], 16)
+    bank_number = 2
+    index = bank_number - 1
+    base = BANK + index * BANK_SIZE
+    writes = ((r.address, r.data) for r in image.records)
+    replies, returned = load_announcement(machine, bank_number, bank.upper(), writes, footer)
+    assert replies == [0x70] * (len(image.records) + 2) and returned == index, (name, bank)
+    assert machine.get(0x1CD70 + index * 32, 1) == (2 if bank == "mwttone" else 3)
+    entries = {}
+    for entry, raw in tone_bank.records(image):
+        offset = entry["header_address"]
+        record = (len(raw) // 2).to_bytes(2, "big") + raw
+        assert machine.read(base + offset, len(record)) == record, (name, bank, entry["index"])
+        entries[offset] = entry["index"], raw
+
+    selected = {}
+    directory = machine.addr["directory"]
+    for slot in range(40, 64):
+        descriptor_offset = int.from_bytes(machine.read(directory + 4 * slot, 2), "little")
+        descriptor = machine.read(directory + descriptor_offset, 8)
+        assert descriptor[:2] == bytes(2) and descriptor[5:] == bytes([0xFF]) * 3
+        offset = int.from_bytes(descriptor[2:5], "big") - BANK
+        if offset not in entries:
+            continue
+        tone_index, raw = entries[offset]
+        selected[slot] = tone_index
+        playlist = bytes((0x80 + index, slot))
+        machine.uc.mem_write(CONTEXT, playlist.ljust(0x68, bytes(1)))
+        machine.put(CONTEXT + 0x28, CONTEXT)
+        machine.put(CONTEXT + 0x2E, len(playlist))
+        machine.trap_advance = False
+        try:
+            machine.call(machine.addr["advance"])
+        finally:
+            machine.trap_advance = True
+        assert machine.get(CONTEXT + 0x58) == base + offset, (name, bank, slot)
+        pages = (3 * len(raw) + PAGE_SIZE - 1) // PAGE_SIZE
+        actual = b"".join(machine.page() for _ in range(pages))
+        staged_size = pages * PAGE_SIZE
+        repetitions = (staged_size + len(raw) - 1) // len(raw)
+        expected = (raw * repetitions)[:staged_size]
+        assert actual == expected and not machine.events, (name, bank, slot)
+    assert selected[42] == 10 and selected[49] == 9
+    assert len(selected) == (10 if bank == "mwttone" else 24)
+    return len(selected)
 
 
 def trace_request(name, frame):
@@ -325,6 +384,11 @@ def verify(vectors):
             for case in vectors["builtin_cues"]:
                 assert trace_cue(name, case["slot"], selector) == case, (name, selector, case["slot"])
         print(f"{name}: phrase staging, loader, request and built-in cues and SITs matched")
+        playback_cases = sum(
+            verify_native_tone_bank(name, bank, replacements)
+            for bank, replacements in (("mwttone", None), ("edrmtone", None), ("edrmtone", {9: "edrmtone:14"}))
+        )
+        print(f"{name}: three native tone banks loaded, {playback_cases} continuous slot cases matched")
 
 
 if __name__ == "__main__":

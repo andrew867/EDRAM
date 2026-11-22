@@ -3,6 +3,7 @@
 import hashlib
 from itertools import chain
 from pathlib import Path
+import struct
 
 
 TEST_MENU = ((14, 1, 2), (15, 1, 3))
@@ -43,8 +44,8 @@ SHARED_START = 0x2100
 SHARED_END = 0x5E94
 EXTRA_START = 0x5E9E
 EXTRA_END = 0x11444
-SHARED_SHA256 = "aba6ae51368b1a70186db98c67d16429bd85b8d83278c49fb0327e90e7d18452"
-EXTRA_SHA256 = "ccc25cd2d7fb860e1f9356f274dc09349bd35a74fb89247d36d28e31b106a5ea"
+SHARED_LAYOUT = "158f839bd26ff5689bdbdf8fe9a18d251455c62d4a75cf080280468358abb96d"
+EXTRA_LAYOUT = "9cdc95c78c1856a8eea7294ce0427569aed2b7d2e673a65d0b9b0f33d5fa38ba"
 
 SHARED_LABELS = (
     ("350 + 480 Hz", (350, 480)), ("440 + 620 Hz", (440, 620)),
@@ -137,26 +138,30 @@ def contiguous_records(data):
         offset = end
 
 
-def matched_region(image, start, end, digest):
-    data = image.read_bytes(start, end - start)
-    if hashlib.sha256(data).hexdigest() == digest:
-        return image.read_bytes(start, end - start, required=True)
-    return None
+def matched_records(image, start, end, parse, layout):
+    """Require the known complete record layout, allowing changed sample codes."""
+    try:
+        data = image.read_bytes(start, end - start, required=True)
+        parsed = list(parse(data))
+    except ValueError:
+        return None
+    geometry = b"".join(struct.pack(">II", offset, len(raw)) for offset, raw in parsed)
+    return parsed if hashlib.sha256(geometry).hexdigest() == layout else None
 
 
 def records(image):
-    """Yield manifest metadata and encoded sample bytes for verified archive regions."""
+    """Yield metadata and the original encoded samples for recognized tone bank layouts."""
     tag = image.read_bytes(0x670, 10)
     if tag not in (b"TONE00AA10", b"TONE00AB10"):
         return
-    shared = matched_region(image, SHARED_START, SHARED_END, SHARED_SHA256)
+    shared = matched_records(image, SHARED_START, SHARED_END, padded_records, SHARED_LAYOUT)
     if shared is None:
         return
-    groups = [(SHARED_START, SHARED_LABELS, padded_records(shared))]
+    groups = [(SHARED_START, SHARED_LABELS, shared)]
     if tag == b"TONE00AB10":
-        extra = matched_region(image, EXTRA_START, EXTRA_END, EXTRA_SHA256)
+        extra = matched_records(image, EXTRA_START, EXTRA_END, contiguous_records, EXTRA_LAYOUT)
         if extra is not None:
-            groups.append((EXTRA_START, EXTRA_LABELS, contiguous_records(extra)))
+            groups.append((EXTRA_START, EXTRA_LABELS, extra))
     index = 0
     for start, labels, parsed in groups:
         for (name, frequencies), (offset, raw) in zip(labels, parsed, strict=True):

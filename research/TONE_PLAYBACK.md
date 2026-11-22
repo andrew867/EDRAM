@@ -142,21 +142,13 @@ For each key, measure the share of spectral power outside its two carrier bins, 
 
 Either law can leave the dominant frequencies visible. The comparison supports the law assignments for these stored blocks. The card's selection between the two sets is still open.
 
-## What the encoder can reproduce
+## Native tone-bank loading and playback
 
-An independent readback of the same five custom phrases in `.bin44` and `.txt80` found identical menus and sample codes. The reserved 750 Hz test cue, three-burst prompt, and first two SITs retained their original menus and codes in both outputs. Each newly generated submenu entry used a repeat count of one.
+Both recovered applications recognize `TONE00AA10` as bank type 2 and `TONE00AB10` as bank type 3. With selector `0x4040`, the playlist sequencer uses the firmware descriptor table and adds the selected bank's offset to the descriptor address. Slot 42 selects the howler at `bank_base + 0x3BCA`. Slots 49, 50, 52 and 57 select the milliwatt at `bank_base + 0x379E`. These descriptors have duration `0xFFFFFF`. The application reads the word count and loops the companded payload continuously.
 
-| Test input | Observed output |
-| --- | --- |
-| `--tone 40 750@160` | 1,280 generated A-law samples. The dominant carrier was 750 Hz. |
-| `--tone 41 howler` | The 2,000 stored μ-law samples converted to A-law, followed by 48 padding codes. All four carriers were present. Against direct μ-law expansion, the conversion had a maximum difference of 132 signed PCM units and about 42.4 dB signal-to-error ratio over the original block. |
-| `--tone 42 dtmf:1:2` | The 394 stored A-law codes were identical, followed by 118 padding codes. |
-| `--phrase 43 audio/estd0aa/bank_00/phrase_01.wav` | The 1,280 expanded factory cue codes were recovered exactly in a custom phrase. Both waveform copies and their order matched the factory menu's expansion. |
-| `--tone 44 dtmf:1` | 394 codes converted from μ-law to A-law, followed by 118 padding codes. The two carrier bins were preserved. |
+The OEM loader acknowledged every packet from both byte-identical factory rebuilds and a generated EDRMTONE with OEM record 14 substituted into record 9. The 17 MWTTONE records and 64 EDRMTONE records retained their expected length words and sample bytes in card RAM. For each matching continuous slot, the 68k playback check compared three complete waveform cycles and the remainder of the last staging page. It checked 10 MWTTONE slots and 24 slots in each EDRMTONE build on both firmware images. The two DTMF sets were verified in loaded RAM. Switch-side DTMF dispatch and physical output still need verification. [Encoder guide](../ENCODING.md#rebuild-a-native-standalone-tone-bank) · [Runnable verifier](../data/xacore/firmware/verify_behavior.py)
 
-The encoder writes tone audio to ordinary announcement slots. It can reuse the archived cues, either SIT source, or standalone waveform payloads, and write a native whole-range repeat count. Standalone tone-service bank authoring still needs a hardware control. [Encoder guide](../ENCODING.md#encode-tone-phrases) · [Bench status](../BENCH_STATUS.md)
-
-## What remains on the card
+## Nortel documentation
 
 An Ameritech patent describes prerecorded tones alongside words and silence in Northern Telecom's NT1X80AA memory. The Nortel guide names `MWTTONE.AA01` as the data file for the milliwatt and receiver-off-hook feature, with separate PM firmware: `EDRMAE01` or later for NT1X80AA, or `ED16AA01` or later for NT1X80BA. The announcement/tone archive supplies the data files. For SIT specifically, Nortel documents that SITLOAD downloads voice-file data into announcement RAM and that OFCENG.PM_PCM_PROTOCOL_SELECTION selects the coding law. These sources establish what gets loaded and what the waveform bytes carry. The recovered firmware applies range repeats in the ordinary playback path and waveform repeats and finite durations in the built-in SIT path. Gain, physical companding, and any additional processing after staging still need a hardware capture. [US6442246B1, description of Fig. 2](https://patents.google.com/patent/US6442246B1/en) · [Nortel DRAM and EDRAM Guide, Tone feature and chapter 14](https://www.gbppr.net/bsp/297-1001-527.pdf)
 

@@ -98,7 +98,7 @@ zero_pad_final_block();
 advance_to_next_phrase_or_control_token();
 ```
 
-The tested profile uses selector `0x4040` and runtime memory byte `[0x000001] = 1`. That byte is read by the repeat branch. With it set to zero in the harness, fixture slot 8 still filled the same number of blocks but produced different sample bytes. The actual value on a running target must be measured or recovered from the resident software. Selector `0x5050` adds `0x80000` to the first record address. The in-buffer transition uses the next two addresses as stored. Both selectors were tested with bank-specific waveform overrides disabled. Continuous records use a value of `0xFFFFFF` and need a distinct playback policy.
+The tested profile uses selector `0x4040` and runtime memory byte `[0x000001] = 1`. That byte is read by the repeat branch. With it set to zero in the harness, fixture slot 8 still filled the same number of blocks but produced different sample bytes. The actual value on a running target must be measured or recovered from the resident software. Selector `0x5050` adds `0x80000` to the first record address. The in-buffer transition uses the next two addresses as stored. Both selectors were tested with bank-specific waveform overrides disabled. Continuous records use duration `0xFFFFFF`. When selector `0x4040` selects a type 2 or type 3 bank, the first descriptor's address is relocated by `0x40000 * bank_index`. Stream the selected record's payload cyclically across staging-block boundaries until interrupted. In both builds slot 42 uses the howler at bank offset `0x3BCA` and slot 49 uses the milliwatt at `0x379E`.
 
 | Tone length | Descriptor value | Active codes | Nominal time |
 | --- | ---: | ---: | ---: |
@@ -160,4 +160,4 @@ The [measured vectors](../data/xacore/firmware/playback-vectors.json) contain ex
 - **Built-in cues.** Run slots 1 and 2 with each tested selector. Compare the ordered absolute page addresses, the output hashes, and 1,280 and 7,936 staged codes, respectively.
 - **Built-in SITs.** Run slots 8-39 with each tested selector and the finite-cycle profile. Compare the active length and the full sequence of zero-padded staging blocks.
 
-The remaining hardware acceptance cases are the live serial framing, interrupt timing, law and gain on the wire, recording completion, continuous tones, and additional bank types and alternate selectors. Those cases need a card trace or the resident runtime.
+The remaining hardware acceptance cases are the live serial framing, interrupt timing, law and gain on the wire, recording completion, service timing on the line, and additional bank types and alternate selectors. Those cases need a card trace or the resident runtime.

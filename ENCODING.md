@@ -15,38 +15,41 @@ The output targets the factory-style announcement load path. Hardware acceptance
 
 ## Encode tone phrases
 
-Combine repeatable `--phrase ID WAV` and `--tone ID SPEC` arguments. Each ID identifies a distinct phrase. Separate components within a tone phrase with commas. The whole phrase is padded to the next 256-sample page.
+Combine repeatable `--phrase ID WAV` and `--tone ID SPEC` arguments. A tone phrase takes stored OEM A-law codes. Separate multiple sources within one phrase with commas. The announcement format pads the sequence to the next 256-sample page.
 
 ~~~sh
-python encode_edram.py LABTONE.bin44 --phrase 40 greeting-8k.wav \
-    --tone 41 "750@160,silence@96,350+440@250" \
-    --tone 42 howler --tone 43 "dtmf:5:2"
+python encode_edram.py LABTONE.bin44 --phrase 40 greeting-8k.wav --tone 41 cue:page:test --tone 42 sit:page:1
+python encode_edram.py LABRPT.txt80 --tone 40 cue:page:test --repeat 40 4
 ~~~
 
-| Tone component | Audio placed in the phrase |
+| Tone component | Stored source |
 | --- | --- |
-| `750@160` or `350+440@250` | One or more simultaneous frequencies in Hz for a whole number of milliseconds. Frequencies must be above 0 Hz and below 4,000 Hz. |
-| `silence@96` | 96 ms of silence. |
-| `howler` or `milliwatt` | The shared bank's receiver off-hook howler or 1004 Hz carrier, at the stored length. |
-| `dtmf:5` or `dtmf:5:2` | Key 5 from either archived DTMF set. Keys 0 through 9, A through D, star, and pound are available. Set 1 is the default. |
-| `mwttone:11` or `edrmtone:62` | Any playable record by its one-based number in the Tone banks view. |
-| `cue:test` or `cue:prompt` | The 750 Hz test cue or three-burst prompt from the OEM firmware. Both use the same steady waveform bytes. |
-| `cue:page:test` or `cue:page:prompt` | The page-based test or prompt from ESTD0AA, including its stored attack and sustain. |
-| `sit:page:1` | The archived ESTD0AA SIT 1 in bank slot 8. It contains three 288 ms components. Use SIT numbers 1 through 32. |
-| `sit:firmware:1` | Built-in SIT 1 from the recovered ED16AA07 firmware using selector `0x4040`. It contains three 274 ms components. Use SIT numbers 1 through 32. Append `:5050` to select the alternate first record. |
+| `cue:page:test` or `cue:page:prompt` | ESTD0AA page-based cues. The original sample levels and page skips or repeats carry into the phrase. |
+| `sit:page:1` through `sit:page:32` | ESTD0AA page-based SIT sequences from slots 8 through 39. |
+| `dtmf:5:2` | Key 5 from the A-law DTMF set. This embeds the waveform in an ordinary phrase with page padding. |
+| `edrmtone:47` | An A-law tone-bank waveform by its one-based record index. |
 
-A frequency and duration specify new audio for a custom load. The encoder generates those samples as part of authoring that load. They use a short edge taper and a combined PCM peak limit of 5,000 before quantization. Archived A-law records retain their codes. Archived mu-law records are decoded and requantized to the announcement load's A-law format. Each stored record contributes its recorded samples, so the switch's tone-service cadence and output level are outside this encoding path.
+The voice bank format uses A-law. The encoder rejects μ-law and mixed-law tone sources, including `howler`, `milliwatt`, `cue:test` and `sit:firmware:1`. The [firmware exporter](README.md#decode-built-in-firmware-sits) provides the original built-in tone bytes. For native milliwatt and howler loads, use `--tone-bank` below.
 
-The output uses regular announcement phrase playback in `.bin44` or `.txt80`. The encoder retains the factory tone and SIT slots below 40. Firmware sources contribute their active sample codes. An A-law component keeps its codes. A mu-law component is expanded and requantized to the announcement load's A-law. SIT 1 uses 6,576 active samples. When stored as a single phrase it occupies 6,656 samples after page padding. To inspect the exact firmware staging codes and compare playback paths, use the [decoder's firmware mode](README.md#decode-built-in-firmware-sits).
+`--repeat ID COUNT` stores one range and writes its native repeat count. A two-page range AB with count 4 emits ABABABAB. Padding belongs to each repetition. The count is 1 through 255 and a repeated range may span up to 255 pages.
 
-### Repeat an authored page range
+## Rebuild a native standalone tone bank
 
 ~~~sh
-python encode_edram.py LABSIT.bin44 --tone 40 "sit:page:1" --tone 41 "sit:firmware:1"
-python encode_edram.py LABRPT.txt80 --tone 40 "750@48,silence@16" --repeat 40 4
+python encode_edram.py MWTTONE.txt80 --tone-bank mwttone
+python encode_edram.py EDRMTONE.txt80 --tone-bank edrmtone
+python edram.py EDRMTONE.txt80 --raw-tones -o decoded-tones
 ~~~
 
-`--repeat ID COUNT` writes one native range descriptor and stores its samples once. A two-page range AB with count 4 emits ABABABAB. Padding belongs to each repetition. The count is 1 through 255 and a repeated range may span up to 255 pages. The decoder reads the authored file back and verifies the expanded codes and reserved menus. [Tone playback notes](research/TONE_PLAYBACK.md)
+Both rebuilds reproduce their archived input byte for byte, including addresses, native record lengths, sample codes, S-record checksums, and footer. The optional raw export contains the big-endian word count followed by its exact companded payload for every recognized tone, including constant-fill records.
+
+EDRMTONE also supports a same-size substitution from an OEM record with the same companding law and nominal frequencies. For example, to use the OEM record 14 level variant of the 1004 Hz carrier in record 9:
+
+~~~sh
+python encode_edram.py LABTONE.txt80 --tone-bank edrmtone --replace-tone 9 edrmtone:14
+~~~
+
+The substitution retains the original tone-bank identifier and destination address and recalculates transport checksums. The firmware routes the carrier through the original slot with the replacement codes. Both recovered 68k builds loaded and replayed the tested substitution at selector `0x4040`. MWTTONE is available for unchanged rebuilds. Its archived aggregate S6 value disagrees with the sum computed from the included records, so generating a modified MWTTONE file requires a verified host-side checksum rule. [Firmware evidence](research/EDRAM_FIRMWARE_EVIDENCE.md#standalone-tone-bank-playback)
 
 ## Moving a load onto a switch
 

@@ -76,7 +76,11 @@ class ToneBankTests(unittest.TestCase):
             self.assertTrue(all(entry["codec"] == codec and len(raw) == 394 for entry, raw in group))
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            manifest = edram.export(source, root, "alaw-unmasked")
+            manifest = edram.export(source, root, "alaw-unmasked", raw_tones=True)
+            for entry, (_, payload) in zip(manifest["tone_bank"], stored, strict=True):
+                raw = (root / source.stem / entry["raw"]).read_bytes()
+                self.assertEqual(raw, (len(payload) // 2).to_bytes(2, "big") + payload)
+                self.assertEqual(hashlib.sha256(raw).hexdigest(), entry["record_sha256"])
             self.assertEqual(sum(bool(t["wav"]) for t in manifest["tone_bank"]), 62)
             phrase = next(p for p in manifest["phrases"] if (p["bank"], p["number"]) == (0, 41))
             self.assertIsNone(phrase["wav"])

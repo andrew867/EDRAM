@@ -308,7 +308,7 @@ def output_folder(path, output, overwrite):
     return folder
 
 
-def export(path: Path, output: Path, codec: str, segments=False, overwrite=False):
+def export(path: Path, output: Path, codec: str, segments=False, overwrite=False, *, raw_tones=False):
     image = Image.read(path)
     phrases = image.phrases(strict=False)
     folder = output_folder(path, output, overwrite)
@@ -360,6 +360,13 @@ def export(path: Path, output: Path, codec: str, segments=False, overwrite=False
                 entry.update(status="unavailable", reason=str(exc))
             manifest["segments"].append(entry)
     for entry, payload in standalone:
+        if raw_tones:
+            record = image.read_bytes(entry["header_address"], len(payload) + 2, required=True)
+            entry["raw"] = f"tone-bank/tone_{entry['index']:02d}.record.bin"
+            target = folder / entry["raw"]
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(record)
+            entry["record_sha256"] = hashlib.sha256(record).hexdigest()
         if entry["wav"]:
             pcm = decode(payload, entry["codec"])
             write_wav(folder / entry["wav"], pcm, entry["tone_name"],
@@ -520,7 +527,8 @@ def main(argv=None):
                         help="decode built-in SITs and 750 Hz cues from firmware images")
     parser.add_argument("--sit-selector", type=lambda value: int(value, 0), choices=firmware_sit.SELECTORS,
                         metavar="{0x4040,0x5050}", help="firmware SIT selector (default: 0x4040)")
-    parser.add_argument("--raw-sit", "--raw-tones", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument("--raw-tones", "--raw-sit", action="store_true",
+                        help="export native standalone headers and companded sample bytes")
     parser.add_argument("--segments", action="store_true", help="also export each referenced segment without repeats")
     parser.add_argument("--overwrite", action="store_true", help="allow replacing outputs in existing source folders")
     parser.add_argument("--version", action="version", version=VERSION)
@@ -553,7 +561,7 @@ def main(argv=None):
                                   "invalid_phrases": image.invalid_phrases,
                                   "tone_bank": [entry for entry, _ in tone_bank.records(image)]}))
             else:
-                manifest = export(path, args.output, codec, args.segments, args.overwrite)
+                manifest = export(path, args.output, codec, args.segments, args.overwrite, raw_tones=args.raw_tones)
                 manifests.append(manifest)
                 count = sum(p["status"] == "exported" for p in manifest["phrases"])
                 print(f"{path.name}: {count}/{len(manifest['phrases'])} phrases exported")

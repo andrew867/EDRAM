@@ -1,22 +1,20 @@
 #!/usr/bin/env python3
-"""Build a single-bank factory-style EDRAM voice load from PCM WAVs and tone sequences."""
+"""Build a factory-style EDRAM announcement load or rebuild a native tone-service bank."""
 
 import argparse
 from itertools import groupby
-import math
 from pathlib import Path
 import re
 import struct
 import wave
 
 import edram
-import firmware_sit
 import tone_bank
 
 
 DATA = Path(__file__).resolve().parent / "data"
 TEMPLATE = DATA / "original" / "estd0aa.bin44"
-SIT_FIRMWARE = DATA / "xacore" / "srecords" / "ED16AA07.srec"
+TONE_BANK_COUNTS = {"mwttone": 17, "edrmtone": 64}
 CUE_SLOTS = {"test": 1, "prompt": 2}
 FIRST_VOICE_PHRASE = 40
 FIRST_VOICE_ADDRESS = 0x2100
@@ -47,42 +45,56 @@ def read_voice(path):
     return bytes(alaw_encode(sample) for sample, in struct.iter_unpack("<h", pcm))
 
 
-def to_voice_law(raw, codec):
-    if codec == "alaw-unmasked":
-        return raw
-    pcm = edram.decode(raw, codec)
-    return bytes(alaw_encode(sample) for sample, in struct.iter_unpack("<h", pcm))
+def read_bank(bank, cache):
+    if bank not in TONE_BANK_COUNTS:
+        raise ValueError(f"unsupported native tone bank: {bank}")
+    if bank not in cache:
+        source = (DATA / "original" / f"{bank}.txt80").read_bytes()
+        image = edram.Image(edram.parse_srec(source), strict_overlaps=True)
+        records = list(tone_bank.records(image))
+        if len(records) != TONE_BANK_COUNTS[bank]:
+            raise ValueError(f"{bank}: incomplete or unrecognized tone bank")
+        cache[bank] = source, image, records
+    return cache[bank]
 
 
-def stored_tone(component, banks):
-    if cue := re.fullmatch(r"cue:(page:)?(test|prompt)", component):
-        slot = CUE_SLOTS[cue[2]]
-        if not cue[1]:
-            return firmware_tone(banks, 0x4040, slot=slot)
-        return template_phrase(banks, slot)
-    if match := re.fullmatch(r"sit:page:([0-9]+)", component):
-        number = int(match[1])
-        if not 1 <= number <= 32:
-            raise ValueError("SIT number must be from 1 to 32")
-        return template_phrase(banks, number + 7)
-    if match := re.fullmatch(r"sit:firmware:([0-9]+)(?::(4040|5050))?", component):
-        return firmware_tone(banks, int(match[2] or "4040", 16), number=int(match[1]))
+def find_bank_tone(component, cache):
     if component in STORED_TONE_ALIASES:
-        source, selector = STORED_TONE_ALIASES[component]
+        bank, selector = STORED_TONE_ALIASES[component]
     elif match := re.fullmatch(r"(mwttone|edrmtone):([0-9]+)", component):
-        source, selector = match[1], int(match[2])
+        bank, selector = match[1], int(match[2])
     elif match := re.fullmatch(r"dtmf:([0-9a-d*#])(?::([12]))?", component):
-        source, selector = "edrmtone", f"DTMF {match[1].upper()}, set {match[2] or '1'}"
+        bank, selector = "edrmtone", f"DTMF {match[1].upper()}, set {match[2] or '1'}"
     else:
         raise ValueError(f"unknown stored tone: {component!r}")
 
-    if source not in banks:
-        image = edram.Image.read(TEMPLATE.with_name(source + ".txt80"))
-        banks[source] = list(tone_bank.records(image))
-    for entry, raw in banks[source]:
+    for entry, raw in read_bank(bank, cache)[2]:
         if selector in (entry["index"], entry["tone_name"]) and entry["wav"]:
-            return to_voice_law(raw, entry["codec"])
+            return entry, raw
     raise ValueError(f"no playable stored tone: {component!r}")
+
+
+def stored_tone(component, cache):
+    if cue := re.fullmatch(r"cue:(page:)?(test|prompt)", component):
+        if not cue[1]:
+            raise ValueError(f"{component}: native firmware cue uses mu-law; use cue:page:{cue[2]} "
+                             "for the archived A-law announcement cue")
+        return template_phrase(cache, CUE_SLOTS[cue[2]])
+    if match := re.fullmatch(r"sit:(page|firmware):([0-9]+)(?::(4040|5050))?", component):
+        number = int(match[2])
+        if not 1 <= number <= 32:
+            raise ValueError("SIT number must be from 1 to 32")
+        if match[1] == "firmware":
+            raise ValueError(f"{component}: native firmware SIT includes mu-law codes; "
+                             f"use sit:page:{number} for the archived A-law announcement SIT")
+        if match[3]:
+            raise ValueError(f"{component}: page-based SIT has no firmware selector")
+        return template_phrase(cache, number + 7)
+    entry, raw = find_bank_tone(component, cache)
+    if entry["codec"] != "alaw-unmasked":
+        raise ValueError(f"{component}: stored mu-law cannot be placed in an A-law phrase byte for byte; "
+                         "use --tone-bank for the native tone service")
+    return raw
 
 
 def template_phrase(cache, slot):
@@ -93,48 +105,15 @@ def template_phrase(cache, slot):
     return edram.render_codes(image, phrases[slot])[0]
 
 
-def firmware_tone(cache, selector, *, slot=None, number=None):
-    if selector not in cache:
-        cache[selector] = edram.parse_firmware_sit(SIT_FIRMWARE.read_bytes(), selector)
-    firmware = cache[selector]
-    tone = firmware.cue(slot) if slot is not None else firmware.sit(number)
-    return b"".join(to_voice_law(codes, law) for codes, law in firmware_sit.coded_chunks(tone))
-
-
-def synthesize_tone(frequencies, frames):
-    steps = [math.tau * frequency / edram.RATE for frequency in frequencies]
-    peak = 5000 / len(steps)
-    ramp = round(edram.RATE * 0.002)
-    samples = bytearray()
-    for frame in range(frames):
-        envelope = min(1.0, frame / ramp, (frames - 1 - frame) / ramp)
-        sample = round(peak * envelope * sum(math.sin(step * frame) for step in steps))
-        samples.append(alaw_encode(sample))
-    return samples
-
-
 def read_tone(spec):
-    """Encode a comma-separated sequence of generated and archived tones."""
+    """Concatenate stored OEM A-law waveform codes for ordinary phrase playback."""
     codes = bytearray()
-    banks = {}
+    cache = {}
     for item in spec.split(","):
         component = item.strip().casefold()
-        frequency_text, separator, duration = component.partition("@")
-        if not separator:
-            codes.extend(stored_tone(component, banks))
-        else:
-            if not re.fullmatch(r"[0-9]+", duration) or int(duration) == 0:
-                raise ValueError(f"tone duration must be a positive whole number of milliseconds: {item!r}")
-            frames = int(duration) * edram.RATE // 1000
-            if len(codes) + frames > PHRASE_CAPACITY:
-                raise ValueError("tone sequence exceeds the bank's voice capacity")
-            if frequency_text == "silence":
-                codes.extend(bytes([SILENCE_CODE]) * frames)
-            else:
-                frequencies = tuple(float(f) for f in frequency_text.split("+"))
-                if any(not 0 < frequency < edram.RATE / 2 for frequency in frequencies):
-                    raise ValueError(f"tone frequencies must be greater than 0 Hz and below {edram.RATE // 2} Hz")
-                codes.extend(synthesize_tone(frequencies, frames))
+        if "@" in component:
+            raise ValueError("tone phrases require stored OEM waveform names")
+        codes.extend(stored_tone(component, cache))
         if len(codes) > PHRASE_CAPACITY:
             raise ValueError("tone sequence exceeds the bank's voice capacity")
     return bytes(codes)
@@ -149,21 +128,63 @@ def with_record_checksum(fields):
     return fields + bytes([~sum(fields) & 0xff])
 
 
-def serialize(records, transport):
-    checksum = word_checksum(data for _, data in records).to_bytes(4, "big")
+def serialize(records, transport, *, checksum=None):
+    if checksum is None:
+        checksum = word_checksum(data for _, data in records)
+    footer = checksum.to_bytes(4, "big")
     if transport == "bin44":
         def g_record(kind, fields):
             return (kind + with_record_checksum(fields)).ljust(43, b"\0") + b"\x16"
 
         data = [g_record(b"G0" if i == 0 else b"G2", bytes([len(payload)]) + address.to_bytes(3, "big") + payload)
                 for i, (address, payload) in enumerate(records)]
-        return b"".join(data) + g_record(b"G6", b"\x01" + checksum)
+        return b"".join(data) + g_record(b"G6", b"\x01" + footer)
 
     def s_record(kind, fields):
         return kind + with_record_checksum(bytes([len(fields) + 1]) + fields).hex().upper().encode("ascii")
 
     data = [s_record(b"S2", address.to_bytes(3, "big") + payload) for address, payload in records]
-    return b"\n".join([*data, s_record(b"S6", checksum), b""])
+    return b"\n".join([*data, s_record(b"S6", footer), b""])
+
+
+def build_tone_bank(bank, replacements=None):
+    """Re-encode an OEM tone bank and optionally replace same-layout EDRMTONE payloads."""
+    cache = {}
+    source, image, stored = read_bank(bank, cache)
+    footer = int(source.split()[-1][4:12], 16)
+    if replacements and bank != "edrmtone":
+        raise ValueError("MWTTONE replacements require a verified aggregate checksum rule")
+
+    patches = {}
+    expected = {entry["index"]: raw for entry, raw in stored}
+    for index, selector in (replacements or {}).items():
+        if not 1 <= index <= len(stored) or not stored[index - 1][0]["wav"]:
+            raise ValueError(f"{bank}: invalid playable tone index {index}")
+        dest, original = stored[index - 1]
+        replacement, raw = find_bank_tone(selector.casefold(), cache)
+        if replacement["codec"] != dest["codec"] or len(raw) != len(original):
+            raise ValueError(f"{bank}:{index} replacement must have the same law and sample count")
+        if replacement["frequencies_hz"] != dest["frequencies_hz"]:
+            raise ValueError(f"{bank}:{index} replacement must have the same nominal frequencies")
+        patches[dest["sample_address"]] = raw
+        expected[index] = raw
+
+    updated = image.data.copy()
+    for address, raw in patches.items():
+        updated[address:address + len(raw)] = raw
+    records = [(r.address, bytes(updated[r.address:r.address + len(r.data)])) for r in image.records]
+    if bank == "edrmtone" and word_checksum(r.data for r in image.records) != footer:
+        raise ValueError("EDRMTONE template aggregate checksum mismatch")
+
+    trailing = source[len(source.rstrip(b"\n")):]
+    rebuilt = serialize(records, "txt80", checksum=None if patches else footer).rstrip(b"\n") + trailing
+    if not patches and rebuilt != source:
+        raise ValueError(f"{bank}: native transport round trip changed the original file")
+    decoded = edram.Image(edram.parse_srec(rebuilt), strict_overlaps=True)
+    actual = {entry["index"]: raw for entry, raw in tone_bank.records(decoded)}
+    if decoded.data != updated or decoded.coverage != image.coverage or actual != expected:
+        raise ValueError(f"{bank}: native tone bank round trip changed the image")
+    return rebuilt
 
 
 def build_load(name, phrases, transport, *, repeats=None):
@@ -247,10 +268,32 @@ def main(argv=None):
     parser.add_argument("--phrase", action="append", default=[], nargs=2, metavar=("ID", "WAV"),
                         help="phrase number 40 to 63 and its mono 8 kHz PCM WAV")
     parser.add_argument("--tone", action="append", default=[], nargs=2, metavar=("ID", "SPEC"),
-                        help="phrase number 40 to 63 and a tone sequence such as 350+440@250,silence@100")
+                        help="phrase number 40 to 63 and stored A-law tones such as cue:page:test,sit:page:1")
     parser.add_argument("--repeat", action="append", default=[], nargs=2, metavar=("ID", "COUNT"),
                         help="repeat the authored phrase's whole padded range 1 to 255 times")
+    parser.add_argument("--tone-bank", choices=TONE_BANK_COUNTS, help="rebuild an OEM standalone .txt80 bank")
+    parser.add_argument("--replace-tone", action="append", default=[], nargs=2, metavar=("INDEX", "SOURCE"),
+                        help="replace an EDRMTONE record with a compatible OEM waveform variant")
     args = parser.parse_args(argv)
+    if args.tone_bank:
+        if args.phrase or args.tone or args.repeat or args.name or args.output.suffix.lower() != ".txt80":
+            parser.error("--tone-bank takes a .txt80 output and optional --replace-tone")
+        try:
+            replacements = {}
+            for index, selector in args.replace_tone:
+                index = int(index)
+                if index in replacements:
+                    raise ValueError(f"duplicate tone record index: {index}")
+                replacements[index] = selector
+            raw = build_tone_bank(args.tone_bank, replacements)
+            with args.output.open("xb") as output:
+                output.write(raw)
+        except (OSError, ValueError) as exc:
+            parser.exit(1, f"{parser.prog}: {exc}\n")
+        print(f"{args.output}: {len(raw)} bytes, native tone bank round trip passed")
+        return
+    if args.replace_tone:
+        parser.error("--replace-tone requires --tone-bank")
     if not args.phrase and not args.tone:
         parser.error("supply at least one --phrase or --tone")
     try:

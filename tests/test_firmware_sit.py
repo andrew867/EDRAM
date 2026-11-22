@@ -92,27 +92,19 @@ class FirmwareSITTests(unittest.TestCase):
             with self.subTest(spec=spec), self.assertRaisesRegex(ValueError, "1 to 32"):
                 encode_edram.read_tone(spec)
 
-    def test_both_sit_sources_and_explicit_repeat_in_each_transport(self):
-        page_codes = encode_edram.read_tone("sit:page:1")
-        firmware_codes = encode_edram.read_tone("sit:firmware:1")
+    def test_archived_sits_and_explicit_repeat_in_each_transport(self):
+        short_sit = encode_edram.read_tone("sit:page:1")
+        long_sit = encode_edram.read_tone("sit:page:32")
         image = edram.Image.read(encode_edram.TEMPLATE)
         reserved = {p.number: p for p in image.phrases() if p.number < 40}
-        self.assertEqual(page_codes, edram.render_codes(image, reserved[8])[0])
+        self.assertEqual(short_sit, edram.render_codes(image, reserved[8])[0])
+        self.assertEqual(long_sit, edram.render_codes(image, reserved[39])[0])
         self.assertEqual(encode_edram.read_tone("cue:page:test"), edram.render_codes(image, reserved[1])[0])
         self.assertEqual(encode_edram.read_tone("cue:page:prompt"), edram.render_codes(image, reserved[2])[0])
-        cue = encode_edram.read_tone("cue:test")
-        self.assertEqual(cue, cue[:256] * 5)
-        self.assertNotEqual(cue, edram.render_codes(image, reserved[1])[0])
-        alternate = encode_edram.read_tone("sit:firmware:1:5050")
-        firmware = edram.parse_firmware_sit(encode_edram.SIT_FIRMWARE.read_bytes(), 0x5050)
-        self.assertEqual(alternate[:2192], firmware.sit(1).codes[:2192])
-        self.assertEqual(alternate[2192:], firmware_codes[2192:])
-        self.assertEqual(len(page_codes), 6912)
-        self.assertEqual(len(firmware_codes), 6576)
-        cycle = b"\x82" * 256 + b"\x96" * 256
+        cycle = short_sit[:512]
         for transport, parse in (("bin44", edram.parse_bin44), ("txt80", edram.parse_srec)):
             with self.subTest(transport=transport):
-                raw = encode_edram.build_load("LABSIT", {40: page_codes, 41: firmware_codes, 42: cycle},
+                raw = encode_edram.build_load("LABSIT", {40: short_sit, 41: long_sit, 42: cycle},
                                               transport, repeats={42: 3})
                 load = edram.Image(parse(raw), strict_overlaps=True)
                 phrases = {p.number: p for p in load.phrases()}
@@ -120,8 +112,8 @@ class FirmwareSITTests(unittest.TestCase):
                     self.assertEqual(phrases[slot], reserved[slot])
                     self.assertEqual(edram.render_codes(load, phrases[slot]),
                                      edram.render_codes(image, reserved[slot]))
-                self.assertEqual(edram.render_codes(load, phrases[40]), (page_codes, 0))
-                self.assertEqual(edram.render_codes(load, phrases[41]), (firmware_codes + bytes(80), 0))
+                self.assertEqual(edram.render_codes(load, phrases[40]), (short_sit, 0))
+                self.assertEqual(edram.render_codes(load, phrases[41]), (long_sit, 0))
                 self.assertEqual(edram.render_codes(load, phrases[42]), (cycle * 3, 0))
                 seg, = phrases[42].segments
                 self.assertEqual((seg.pages, seg.repeats), (2, 3))

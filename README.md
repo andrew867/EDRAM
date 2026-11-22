@@ -26,7 +26,7 @@ python edram.py data/original/estd0aa.bin44 -o decoded --segments
 python edram.py data/original/estd0aa.bin44 --inspect
 ~~~
 
-Pass a directory to decode all supported loads inside it. The `--segments` option also writes each distinct referenced page range once. Each load gets a folder with WAVs, `phrases.csv`, and `manifest.json`. The manifest has source and PCM hashes, page addresses and repeat counts, counts of unwritten sample addresses, and reasons for rejected references. Standalone tone payloads go in `tone-bank/`. Use a fresh output directory for a clean comparison.
+Pass a directory to decode all supported loads inside it. The `--segments` option also writes each distinct referenced page range once. Each load gets a folder with WAVs, `phrases.csv`, and `manifest.json`. The manifest has source and PCM hashes, page addresses and repeat counts, counts of unwritten sample addresses, and reasons for rejected references. Standalone tone previews go in `tone-bank/`. Use `--raw-tones` for the original word-count headers and sample bytes. The [encoder](ENCODING.md#rebuild-a-native-standalone-tone-bank) can rebuild native MWTTONE and EDRMTONE loads. Use a fresh output directory for a clean comparison.
 
 | What you need | Start here |
 | --- | --- |

@@ -75,7 +75,7 @@ Use `edram.py --firmware-tones` to export the cues and SITs. Each raw `.staged.b
 
 The archived S-record images with identifiers `TONE00AA10` and `TONE00AB10` at `0x0670` contain waveform records outside the phrase tables. Each starts with a two-byte big-endian word count, followed by twice that many bytes of companded sample data. The common records sit in a zero-padded region from `0x2100` through `0x5e93`. `TONE00AB10` also has a contiguous chain from `0x5e9e` through `0x11443`.
 
-The exporter recognizes these regions by byte fingerprint and checks that every length word and sample byte is present in the load. The manifests record the exact header address, sample address, byte count, source hash, and selected codec for each record. Phrase and segment WAV export skips ranges that overlap identified standalone records. See [tone playback measurements](research/TONE_PLAYBACK.md) for the law assignment and measured frequencies.
+The exporter checks each region against the known layout of record addresses and lengths and verifies that all bytes are present. The same layout applies when a waveform has been replaced in place. The manifests record the exact header address, sample address, byte count, source hash, and selected codec for each record. Phrase and segment WAV export skips ranges that overlap identified standalone records. See [tone playback measurements](research/TONE_PLAYBACK.md) for the law assignment and measured frequencies.
 
 ## Malformed references
 
