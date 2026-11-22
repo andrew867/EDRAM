@@ -1,0 +1,10 @@
+bank,number,status,duration_seconds,samples,wav,implicit_zero_samples,reason
+0,0,exported,1.024,8192,bank_00/phrase_00.wav,8192,
+0,1,unavailable,0.16,1280,,,"unavailable segment at 0xf00, 256 bytes"
+0,2,unavailable,0.992,7936,,,"unavailable segment at 0xe00, 256 bytes"
+0,3,exported,0.512,4096,bank_00/phrase_03.wav,4096,
+0,8,exported,0.992,7936,bank_00/phrase_08.wav,0,
+0,9,exported,8.992,71936,bank_00/phrase_09.wav,0,
+0,18,exported,14.016,112128,bank_00/phrase_18.wav,0,
+0,24,exported,16.0,128000,bank_00/phrase_24.wav,0,
+0,30,exported,10.016,80128,bank_00/phrase_30.wav,0,

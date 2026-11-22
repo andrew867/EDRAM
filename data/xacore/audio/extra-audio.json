@@ -1,0 +1,537 @@
+[
+  {
+    "load": "ANN1",
+    "reference_tones": [
+      {
+        "phrase": 1,
+        "wav": "reference-tones/phrase_01_factory_overlay.wav",
+        "pages_from_factory": [
+          14,
+          15
+        ],
+        "duration_seconds": 0.16,
+        "implicit_zero_samples": 0,
+        "pcm_sha256": "e91c99bf87485d02f5af2abe37e717484c98cfd5dae8e7b4c3dc3eca534327d1"
+      },
+      {
+        "phrase": 2,
+        "wav": "reference-tones/phrase_02_factory_overlay.wav",
+        "pages_from_factory": [
+          14,
+          15
+        ],
+        "duration_seconds": 0.992,
+        "implicit_zero_samples": 5632,
+        "pcm_sha256": "170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14"
+      }
+    ],
+    "orphan_audio": []
+  },
+  {
+    "load": "ANN2",
+    "reference_tones": [
+      {
+        "phrase": 1,
+        "wav": "reference-tones/phrase_01_factory_overlay.wav",
+        "pages_from_factory": [
+          14,
+          15
+        ],
+        "duration_seconds": 0.16,
+        "implicit_zero_samples": 0,
+        "pcm_sha256": "e91c99bf87485d02f5af2abe37e717484c98cfd5dae8e7b4c3dc3eca534327d1"
+      },
+      {
+        "phrase": 2,
+        "wav": "reference-tones/phrase_02_factory_overlay.wav",
+        "pages_from_factory": [
+          14,
+          15
+        ],
+        "duration_seconds": 0.992,
+        "implicit_zero_samples": 5632,
+        "pcm_sha256": "170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14"
+      }
+    ],
+    "orphan_audio": []
+  },
+  {
+    "load": "ANN3",
+    "reference_tones": [
+      {
+        "phrase": 1,
+        "wav": "reference-tones/phrase_01_factory_overlay.wav",
+        "pages_from_factory": [
+          14,
+          15
+        ],
+        "duration_seconds": 0.16,
+        "implicit_zero_samples": 0,
+        "pcm_sha256": "e91c99bf87485d02f5af2abe37e717484c98cfd5dae8e7b4c3dc3eca534327d1"
+      },
+      {
+        "phrase": 2,
+        "wav": "reference-tones/phrase_02_factory_overlay.wav",
+        "pages_from_factory": [
+          14,
+          15
+        ],
+        "duration_seconds": 0.992,
+        "implicit_zero_samples": 5632,
+        "pcm_sha256": "170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14"
+      }
+    ],
+    "orphan_audio": []
+  },
+  {
+    "load": "ANN4",
+    "reference_tones": [
+      {
+        "phrase": 1,
+        "wav": "reference-tones/phrase_01_factory_overlay.wav",
+        "pages_from_factory": [
+          14,
+          15
+        ],
+        "duration_seconds": 0.16,
+        "implicit_zero_samples": 0,
+        "pcm_sha256": "e91c99bf87485d02f5af2abe37e717484c98cfd5dae8e7b4c3dc3eca534327d1"
+      },
+      {
+        "phrase": 2,
+        "wav": "reference-tones/phrase_02_factory_overlay.wav",
+        "pages_from_factory": [
+          14,
+          15
+        ],
+        "duration_seconds": 0.992,
+        "implicit_zero_samples": 5632,
+        "pcm_sha256": "170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14"
+      }
+    ],
+    "orphan_audio": [
+      {
+        "wav": "orphan-pages.wav",
+        "pages": [
+          912,
+          913,
+          914,
+          915,
+          916,
+          917,
+          918,
+          919,
+          920,
+          921,
+          922,
+          923,
+          924,
+          925,
+          926,
+          927,
+          928,
+          929,
+          930,
+          931,
+          932,
+          933,
+          934,
+          935,
+          936,
+          937,
+          938,
+          939,
+          940,
+          941,
+          942,
+          944,
+          945,
+          946,
+          947,
+          948,
+          949,
+          950,
+          951,
+          952,
+          953,
+          954,
+          955,
+          956,
+          957,
+          958,
+          959,
+          960,
+          961,
+          962,
+          963,
+          964,
+          965,
+          966,
+          967,
+          968,
+          969,
+          970,
+          971,
+          972,
+          973,
+          974,
+          975,
+          976,
+          977,
+          978,
+          979,
+          980,
+          981,
+          982,
+          983,
+          984,
+          985,
+          986,
+          987,
+          988,
+          989,
+          990,
+          991,
+          992,
+          993,
+          994,
+          995,
+          996,
+          997,
+          998,
+          999,
+          1000,
+          1001,
+          1002,
+          1003,
+          1004,
+          1005,
+          1006
+        ],
+        "duration_seconds": 3.008,
+        "pcm_sha256": "0afc731f9c247e596abcad6aed56179f71ba459096956265e0c9cf17a6c15422"
+      }
+    ]
+  },
+  {
+    "load": "ANN5",
+    "reference_tones": [
+      {
+        "phrase": 1,
+        "wav": "reference-tones/phrase_01_factory_overlay.wav",
+        "pages_from_factory": [
+          14,
+          15
+        ],
+        "duration_seconds": 0.16,
+        "implicit_zero_samples": 0,
+        "pcm_sha256": "e91c99bf87485d02f5af2abe37e717484c98cfd5dae8e7b4c3dc3eca534327d1"
+      },
+      {
+        "phrase": 2,
+        "wav": "reference-tones/phrase_02_factory_overlay.wav",
+        "pages_from_factory": [
+          14,
+          15
+        ],
+        "duration_seconds": 0.992,
+        "implicit_zero_samples": 5632,
+        "pcm_sha256": "170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14"
+      }
+    ],
+    "orphan_audio": [
+      {
+        "wav": "orphan-pages.wav",
+        "pages": [
+          912,
+          913,
+          914,
+          915,
+          916,
+          917,
+          918,
+          919,
+          920,
+          921,
+          922,
+          923,
+          924,
+          925,
+          926,
+          927,
+          928,
+          929,
+          930,
+          931,
+          932,
+          933,
+          934,
+          935,
+          936,
+          937,
+          938,
+          939,
+          940,
+          941,
+          942,
+          944,
+          945,
+          946,
+          947,
+          948,
+          949,
+          950,
+          951,
+          952,
+          953,
+          954,
+          955,
+          956,
+          957,
+          958,
+          959,
+          960,
+          961,
+          962,
+          963,
+          964,
+          965,
+          966,
+          967,
+          968,
+          969,
+          970,
+          971,
+          972,
+          973,
+          974,
+          975
+        ],
+        "duration_seconds": 2.016,
+        "pcm_sha256": "74431dfd223e476ad706a690677b4750fe638c20e68018f65a6f804799f99c81"
+      }
+    ]
+  },
+  {
+    "load": "ANN6",
+    "reference_tones": [
+      {
+        "phrase": 1,
+        "wav": "reference-tones/phrase_01_factory_overlay.wav",
+        "pages_from_factory": [
+          14,
+          15
+        ],
+        "duration_seconds": 0.16,
+        "implicit_zero_samples": 0,
+        "pcm_sha256": "e91c99bf87485d02f5af2abe37e717484c98cfd5dae8e7b4c3dc3eca534327d1"
+      },
+      {
+        "phrase": 2,
+        "wav": "reference-tones/phrase_02_factory_overlay.wav",
+        "pages_from_factory": [
+          14,
+          15
+        ],
+        "duration_seconds": 0.992,
+        "implicit_zero_samples": 5632,
+        "pcm_sha256": "170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14"
+      }
+    ],
+    "orphan_audio": [
+      {
+        "wav": "orphan-pages.wav",
+        "pages": [
+          944,
+          945,
+          946,
+          947,
+          948,
+          949,
+          950,
+          951,
+          952,
+          953,
+          954,
+          955,
+          956,
+          957,
+          958,
+          959,
+          960,
+          961,
+          962,
+          963,
+          964,
+          965,
+          966,
+          967,
+          968,
+          969,
+          970,
+          971,
+          972,
+          973,
+          974,
+          975
+        ],
+        "duration_seconds": 1.024,
+        "pcm_sha256": "04c31544abade60244a99b6658bb2d60827d95cf326ec83fc8d8876f990481a2"
+      }
+    ]
+  },
+  {
+    "load": "ANN7",
+    "reference_tones": [
+      {
+        "phrase": 1,
+        "wav": "reference-tones/phrase_01_factory_overlay.wav",
+        "pages_from_factory": [
+          14,
+          15
+        ],
+        "duration_seconds": 0.16,
+        "implicit_zero_samples": 0,
+        "pcm_sha256": "e91c99bf87485d02f5af2abe37e717484c98cfd5dae8e7b4c3dc3eca534327d1"
+      },
+      {
+        "phrase": 2,
+        "wav": "reference-tones/phrase_02_factory_overlay.wav",
+        "pages_from_factory": [
+          14,
+          15
+        ],
+        "duration_seconds": 0.992,
+        "implicit_zero_samples": 5632,
+        "pcm_sha256": "170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14"
+      }
+    ],
+    "orphan_audio": []
+  },
+  {
+    "load": "ANN8",
+    "reference_tones": [
+      {
+        "phrase": 1,
+        "wav": "reference-tones/phrase_01_factory_overlay.wav",
+        "pages_from_factory": [
+          14,
+          15
+        ],
+        "duration_seconds": 0.16,
+        "implicit_zero_samples": 0,
+        "pcm_sha256": "e91c99bf87485d02f5af2abe37e717484c98cfd5dae8e7b4c3dc3eca534327d1"
+      },
+      {
+        "phrase": 2,
+        "wav": "reference-tones/phrase_02_factory_overlay.wav",
+        "pages_from_factory": [
+          14,
+          15
+        ],
+        "duration_seconds": 0.992,
+        "implicit_zero_samples": 5632,
+        "pcm_sha256": "170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14"
+      }
+    ],
+    "orphan_audio": []
+  },
+  {
+    "load": "DTM_BK3",
+    "reference_tones": [
+      {
+        "phrase": 1,
+        "wav": "reference-tones/phrase_01_factory_overlay.wav",
+        "pages_from_factory": [
+          14,
+          15
+        ],
+        "duration_seconds": 0.16,
+        "implicit_zero_samples": 0,
+        "pcm_sha256": "e91c99bf87485d02f5af2abe37e717484c98cfd5dae8e7b4c3dc3eca534327d1"
+      },
+      {
+        "phrase": 2,
+        "wav": "reference-tones/phrase_02_factory_overlay.wav",
+        "pages_from_factory": [
+          14,
+          15
+        ],
+        "duration_seconds": 0.992,
+        "implicit_zero_samples": 5632,
+        "pcm_sha256": "170889db5165cf56d232e43d9ec4cbadc5ca32d5d01df77a4c29e02bcc2f1f14"
+      }
+    ],
+    "orphan_audio": [
+      {
+        "wav": "orphan-pages.wav",
+        "pages": [
+          496,
+          497,
+          498,
+          499,
+          500,
+          501,
+          502,
+          503,
+          504,
+          505,
+          506,
+          507,
+          508,
+          509,
+          510,
+          511,
+          512,
+          513,
+          514,
+          515,
+          516,
+          517,
+          518,
+          519,
+          520,
+          521,
+          522,
+          523,
+          524,
+          525,
+          526,
+          528,
+          529,
+          530,
+          531,
+          532,
+          533,
+          534,
+          535,
+          536,
+          537,
+          538,
+          539,
+          540,
+          541,
+          542,
+          543,
+          544,
+          545,
+          546,
+          547,
+          548,
+          549,
+          550,
+          551,
+          552,
+          553,
+          554,
+          555,
+          556,
+          557,
+          558
+        ],
+        "duration_seconds": 1.984,
+        "pcm_sha256": "c4d3a97659095bfdffbc97530177304b22eaa1d1ede0e99ee0b61307fbd30d8f"
+      }
+    ]
+  }
+]

@@ -10,6 +10,8 @@ Clone or download the repository and open [audio/listen.html](audio/listen.html)
 
 Every Play button and WAV download points to a file decoded from the archived loads. That includes speech, SITs, the 750 Hz cues, DTMF, milliwatt tones, and the receiver off-hook howler. Tone names, frequencies, and transcripts annotate those recordings. The WAVs keep the stored levels and the lengths implied by the menus. [Worked byte map](BYTE_MAP.md#follow-real-tone-data) · [Nortel phrase catalog](references/NORTEL_PHRASES.md)
 
+The [XA-Core player](data/xacore/audio/listen.html) covers the recovered PTSI Cellular announcements, the DTM test recordings, and the reconstructed cue tones. The [phrase catalog](data/xacore/audio/catalog.csv) identifies the load, slot, and source of each clip.
+
 ## Decode a load
 
 ~~~sh
@@ -27,6 +29,7 @@ Pass a directory to decode all supported loads inside it. The `--segments` optio
 | Create a custom single-bank voice load | [Encoder guide](ENCODING.md) |
 | Pack or inspect a tape image | [SLM tape guide](SLM_TAPE.md) and [nine-track and IOM DAT comparison](SLM_TAPE.md#ibm-tape-labels-and-the-observed-slm-format) |
 | Extract an XA-Core disk or inspect recovered loads | [XA-Core disk extraction and EDRAM files](data/xacore/README.md) |
+| Analyze the NT1X80 firmware or map custom announcements | [XA-Core firmware](research/XA_CORE_FIRMWARE.md) and [CLLI mapping](research/XA_CORE_CLLI.md) |
 | Test a new load on an NT1X80 card | [Bench checklist](BENCH_STATUS.md) |
 | Earlier experiments and superseded interpretations | [Archive](archive/README.md) |
 

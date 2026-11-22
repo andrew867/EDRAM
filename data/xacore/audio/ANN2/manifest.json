@@ -1,0 +1,730 @@
+{
+  "converter_version": "0.2.0",
+  "source": "ANN2.bin44",
+  "source_sha256": "5b43e4e2e422d2f89b04db61e34c88e9f001770359e678a01b05b2043277aaff",
+  "codec": "alaw-unmasked",
+  "sample_rate": 8000,
+  "sample_width_bits": 16,
+  "playback_model": "stored codes and whole-block repetition; card equivalence unverified",
+  "timing_status": "256 addressed samples per page at nominal 8000 Hz",
+  "record_count": 6929,
+  "addressed_bytes": 248832,
+  "overwrite_policy": "records applied in file order; later writes replace earlier bytes",
+  "overwrites": [],
+  "invalid_phrases": [],
+  "zero_fill_policy": "unaddressed portions of referenced segments are zero codes; wholly absent non-silence segments are unavailable",
+  "phrases": [
+    {
+      "bank": 0,
+      "number": 0,
+      "menu_address": 256,
+      "checksum": 208,
+      "segments": [
+        {
+          "page": 13,
+          "pages": 1,
+          "repeats": 32
+        }
+      ],
+      "samples": 8192,
+      "duration_seconds": 1.024,
+      "wav": "bank_00/phrase_00.wav",
+      "label": "phrase_00",
+      "implicit_zero_samples": 8192,
+      "pcm_sha256": "0b9dbe8f4f16d28f53058cdd8875617c91226f4415da84bafa2e8324cc3e5735",
+      "status": "exported"
+    },
+    {
+      "bank": 0,
+      "number": 1,
+      "menu_address": 260,
+      "checksum": 229,
+      "segments": [
+        {
+          "page": 15,
+          "pages": 1,
+          "repeats": 5
+        }
+      ],
+      "samples": 1280,
+      "duration_seconds": 0.16,
+      "wav": null,
+      "label": "phrase_01",
+      "status": "unavailable",
+      "reason": "unavailable segment at 0xf00, 256 bytes"
+    },
+    {
+      "bank": 0,
+      "number": 2,
+      "menu_address": 268,
+      "checksum": 53,
+      "segments": [
+        {
+          "page": 13,
+          "pages": 1,
+          "repeats": 16
+        },
+        {
+          "page": 14,
+          "pages": 1,
+          "repeats": 1
+        },
+        {
+          "page": 15,
+          "pages": 1,
+          "repeats": 2
+        },
+        {
+          "page": 13,
+          "pages": 1,
+          "repeats": 1
+        },
+        {
+          "page": 14,
+          "pages": 1,
+          "repeats": 1
+        },
+        {
+          "page": 15,
+          "pages": 1,
+          "repeats": 2
+        },
+        {
+          "page": 13,
+          "pages": 1,
+          "repeats": 1
+        },
+        {
+          "page": 14,
+          "pages": 1,
+          "repeats": 1
+        },
+        {
+          "page": 15,
+          "pages": 1,
+          "repeats": 2
+        },
+        {
+          "page": 13,
+          "pages": 1,
+          "repeats": 4
+        }
+      ],
+      "samples": 7936,
+      "duration_seconds": 0.992,
+      "wav": null,
+      "label": "phrase_02",
+      "status": "unavailable",
+      "reason": "unavailable segment at 0xe00, 256 bytes"
+    },
+    {
+      "bank": 0,
+      "number": 3,
+      "menu_address": 268,
+      "checksum": 212,
+      "segments": [
+        {
+          "page": 13,
+          "pages": 1,
+          "repeats": 16
+        }
+      ],
+      "samples": 4096,
+      "duration_seconds": 0.512,
+      "wav": "bank_00/phrase_03.wav",
+      "label": "phrase_03",
+      "implicit_zero_samples": 4096,
+      "pcm_sha256": "3468ec416ec18acc28af2a9037832554f99f249c626f2989375ede7626f7264f",
+      "status": "exported"
+    },
+    {
+      "bank": 0,
+      "number": 8,
+      "menu_address": 516,
+      "checksum": 201,
+      "segments": [
+        {
+          "page": 16,
+          "pages": 31,
+          "repeats": 1
+        }
+      ],
+      "samples": 7936,
+      "duration_seconds": 0.992,
+      "wav": "bank_00/phrase_08.wav",
+      "label": "phrase_08",
+      "implicit_zero_samples": 0,
+      "pcm_sha256": "bd6bd47e2664739e43f2768c6421771437f55e01da391ac7f8ecec02f5741df0",
+      "status": "exported"
+    },
+    {
+      "bank": 0,
+      "number": 9,
+      "menu_address": 516,
+      "checksum": 103,
+      "segments": [
+        {
+          "page": 16,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 48,
+          "pages": 32,
+          "repeats": 1
+        },
+        {
+          "page": 80,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 112,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 144,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 176,
+          "pages": 32,
+          "repeats": 1
+        },
+        {
+          "page": 208,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 240,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 272,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 304,
+          "pages": 32,
+          "repeats": 1
+        },
+        {
+          "page": 336,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 368,
+          "pages": 31,
+          "repeats": 1
+        }
+      ],
+      "samples": 96000,
+      "duration_seconds": 12.0,
+      "wav": "bank_00/phrase_09.wav",
+      "label": "phrase_09",
+      "implicit_zero_samples": 0,
+      "pcm_sha256": "7951f5a88dc3225290998f3f057d53393bea7dd72657990c13f025e1a3a46fec",
+      "status": "exported"
+    },
+    {
+      "bank": 0,
+      "number": 21,
+      "menu_address": 564,
+      "checksum": 45,
+      "segments": [
+        {
+          "page": 400,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 432,
+          "pages": 32,
+          "repeats": 1
+        },
+        {
+          "page": 464,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 496,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 528,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 560,
+          "pages": 32,
+          "repeats": 1
+        },
+        {
+          "page": 592,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 624,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 656,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 688,
+          "pages": 32,
+          "repeats": 1
+        }
+      ],
+      "samples": 80128,
+      "duration_seconds": 10.016,
+      "wav": "bank_00/phrase_21.wav",
+      "label": "phrase_21",
+      "implicit_zero_samples": 0,
+      "pcm_sha256": "b486dbe7f75f8c18b74c4899a3f9f9169fecf4805c9c77c1755505727036ebbc",
+      "status": "exported"
+    },
+    {
+      "bank": 0,
+      "number": 24,
+      "menu_address": 576,
+      "checksum": 132,
+      "segments": [
+        {
+          "page": 496,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 528,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 560,
+          "pages": 32,
+          "repeats": 1
+        },
+        {
+          "page": 592,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 624,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 656,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 688,
+          "pages": 32,
+          "repeats": 1
+        },
+        {
+          "page": 720,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 752,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 784,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 816,
+          "pages": 32,
+          "repeats": 1
+        },
+        {
+          "page": 848,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 880,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 912,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 944,
+          "pages": 32,
+          "repeats": 1
+        },
+        {
+          "page": 976,
+          "pages": 31,
+          "repeats": 1
+        }
+      ],
+      "samples": 128000,
+      "duration_seconds": 16.0,
+      "wav": "bank_00/phrase_24.wav",
+      "label": "phrase_24",
+      "implicit_zero_samples": 0,
+      "pcm_sha256": "707f164acc25e021768f617a9f80446cac068cef1ffdcd45b80099d370c60bdd",
+      "status": "exported"
+    },
+    {
+      "bank": 0,
+      "number": 31,
+      "menu_address": 604,
+      "checksum": 142,
+      "segments": [
+        {
+          "page": 720,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 752,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 784,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 816,
+          "pages": 32,
+          "repeats": 1
+        },
+        {
+          "page": 848,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 880,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 912,
+          "pages": 31,
+          "repeats": 1
+        },
+        {
+          "page": 944,
+          "pages": 32,
+          "repeats": 1
+        },
+        {
+          "page": 976,
+          "pages": 31,
+          "repeats": 1
+        }
+      ],
+      "samples": 71936,
+      "duration_seconds": 8.992,
+      "wav": "bank_00/phrase_31.wav",
+      "label": "phrase_31",
+      "implicit_zero_samples": 0,
+      "pcm_sha256": "1f83ed850e70b90bb28652b3c073b71feb63874ad998ed8fe7a5a3b1dce25b56",
+      "status": "exported"
+    }
+  ],
+  "segments": [
+    {
+      "bank": 0,
+      "page": 13,
+      "pages": 1,
+      "wav": "segments/bank_00_page_000d_pages_001.wav",
+      "status": "exported",
+      "implicit_zero_samples": 256
+    },
+    {
+      "bank": 0,
+      "page": 14,
+      "pages": 1,
+      "wav": null,
+      "status": "unavailable",
+      "reason": "unavailable segment at 0xe00, 256 bytes"
+    },
+    {
+      "bank": 0,
+      "page": 15,
+      "pages": 1,
+      "wav": null,
+      "status": "unavailable",
+      "reason": "unavailable segment at 0xf00, 256 bytes"
+    },
+    {
+      "bank": 0,
+      "page": 16,
+      "pages": 31,
+      "wav": "segments/bank_00_page_0010_pages_031.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 48,
+      "pages": 32,
+      "wav": "segments/bank_00_page_0030_pages_032.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 80,
+      "pages": 31,
+      "wav": "segments/bank_00_page_0050_pages_031.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 112,
+      "pages": 31,
+      "wav": "segments/bank_00_page_0070_pages_031.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 144,
+      "pages": 31,
+      "wav": "segments/bank_00_page_0090_pages_031.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 176,
+      "pages": 32,
+      "wav": "segments/bank_00_page_00b0_pages_032.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 208,
+      "pages": 31,
+      "wav": "segments/bank_00_page_00d0_pages_031.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 240,
+      "pages": 31,
+      "wav": "segments/bank_00_page_00f0_pages_031.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 272,
+      "pages": 31,
+      "wav": "segments/bank_00_page_0110_pages_031.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 304,
+      "pages": 32,
+      "wav": "segments/bank_00_page_0130_pages_032.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 336,
+      "pages": 31,
+      "wav": "segments/bank_00_page_0150_pages_031.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 368,
+      "pages": 31,
+      "wav": "segments/bank_00_page_0170_pages_031.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 400,
+      "pages": 31,
+      "wav": "segments/bank_00_page_0190_pages_031.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 432,
+      "pages": 32,
+      "wav": "segments/bank_00_page_01b0_pages_032.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 464,
+      "pages": 31,
+      "wav": "segments/bank_00_page_01d0_pages_031.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 496,
+      "pages": 31,
+      "wav": "segments/bank_00_page_01f0_pages_031.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 528,
+      "pages": 31,
+      "wav": "segments/bank_00_page_0210_pages_031.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 560,
+      "pages": 32,
+      "wav": "segments/bank_00_page_0230_pages_032.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 592,
+      "pages": 31,
+      "wav": "segments/bank_00_page_0250_pages_031.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 624,
+      "pages": 31,
+      "wav": "segments/bank_00_page_0270_pages_031.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 656,
+      "pages": 31,
+      "wav": "segments/bank_00_page_0290_pages_031.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 688,
+      "pages": 32,
+      "wav": "segments/bank_00_page_02b0_pages_032.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 720,
+      "pages": 31,
+      "wav": "segments/bank_00_page_02d0_pages_031.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 752,
+      "pages": 31,
+      "wav": "segments/bank_00_page_02f0_pages_031.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 784,
+      "pages": 31,
+      "wav": "segments/bank_00_page_0310_pages_031.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 816,
+      "pages": 32,
+      "wav": "segments/bank_00_page_0330_pages_032.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 848,
+      "pages": 31,
+      "wav": "segments/bank_00_page_0350_pages_031.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 880,
+      "pages": 31,
+      "wav": "segments/bank_00_page_0370_pages_031.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 912,
+      "pages": 31,
+      "wav": "segments/bank_00_page_0390_pages_031.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 944,
+      "pages": 32,
+      "wav": "segments/bank_00_page_03b0_pages_032.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    },
+    {
+      "bank": 0,
+      "page": 976,
+      "pages": 31,
+      "wav": "segments/bank_00_page_03d0_pages_031.wav",
+      "status": "exported",
+      "implicit_zero_samples": 0
+    }
+  ]
+}
