@@ -29,7 +29,7 @@ All addresses below refer to ED16AA07 unless both versions are listed. Names are
 | 0x01A42E / 0x01A400 | Iterates 32 bank positions at a 256 KiB stride and compares the computed sum with the directory entry. |
 | 0x01A7DC / 0x01A7AE | Copies whole 256-byte pages. The underlying routine uses unrolled 68k longword moves. |
 
-The disk's 259-byte wrapper and G records are host-side file formats. The firmware routine at 0x011978 sees the peripheral message and contained payload. Its protected region explains why replacing omitted cue bytes with source silence would lose information. Four disk backups contain audio bytes outside the pages referenced by the active menus. The actual playback interrupt path, repeat-counter consumption and PCM output hardware still need a trace.
+The disk's 259-byte wrapper and G records are host-side file formats. The firmware routine at 0x011978 sees the peripheral message and contained payload. Its protected region explains why replacing omitted cue bytes with source silence would lose information. Four disk backups contain audio bytes outside the pages referenced by the active menus. The [behavior specification](EDRAM_BEHAVIOR_SPEC.md) traces the loader, application queue, page repeats, and built-in tone path. The [firmware evidence](EDRAM_FIRMWARE_EVIDENCE.md) gives routine addresses and reproduction steps. On-wire PCM and interrupt timing still need a card trace.
 
 [Nortel 297-1001-527](https://www.gbppr.net/bsp/297-1001-527.pdf), chapters 3 and 12, documents loading firmware and announcement files separately and uploading customer-recorded content.
 

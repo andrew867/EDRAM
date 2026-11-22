@@ -30,6 +30,7 @@ Pass a directory to decode all supported loads inside it. The `--segments` optio
 | Pack or inspect a tape image | [SLM tape guide](SLM_TAPE.md) and [nine-track and IOM DAT comparison](SLM_TAPE.md#ibm-tape-labels-and-the-observed-slm-format) |
 | Extract an XA-Core disk or inspect recovered loads | [XA-Core disk extraction and EDRAM files](data/xacore/README.md) |
 | Analyze the NT1X80 firmware or map custom announcements | [XA-Core firmware](research/XA_CORE_FIRMWARE.md) and [CLLI mapping](research/XA_CORE_CLLI.md) |
+| Reimplement the loader and playback behavior | [EDRAM behavior specification](research/EDRAM_BEHAVIOR_SPEC.md), [C playback reference](reference/edram/playback.c), and [firmware evidence](research/EDRAM_FIRMWARE_EVIDENCE.md) |
 | Test a new load on an NT1X80 card | [Bench checklist](BENCH_STATUS.md) |
 | Earlier experiments and superseded interpretations | [Archive](archive/README.md) |
 
