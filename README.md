@@ -25,7 +25,7 @@ Pass a directory to decode all supported loads inside it. The `--segments` optio
 | Exact fields, checksums and byte offsets | [Format reference](FORMAT.md) and [worked byte map](BYTE_MAP.md) |
 | Stored tone levels and SIT timing | [Tone measurements](research/TONE_PLAYBACK.md) |
 | Create a custom single-bank voice load | [Encoder guide](ENCODING.md) |
-| Pack or inspect a tape image | [SLM tape guide](SLM_TAPE.md) |
+| Pack or inspect a tape image | [SLM tape guide](SLM_TAPE.md) and [nine-track and IOM DAT comparison](SLM_TAPE.md#ibm-tape-labels-and-the-observed-slm-format) |
 | Test a new load on an NT1X80 card | [Bench checklist](BENCH_STATUS.md) |
 | Earlier experiments and superseded interpretations | [Archive](archive/README.md) |
 

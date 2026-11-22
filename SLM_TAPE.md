@@ -2,9 +2,27 @@
 
 `slm_tape.py` inventories, extracts, and combines the observed Nortel 512-byte SLM tape files. It runs on Linux and Windows with Python 3.10 or newer. It also builds an experimental tape entry around a `.bin44` voice load. The file-level encoder and tape image pass offline round trips. Restoring a new voice entry on a DMS-100 or SL-100 remains a bench test.
 
+## IBM tape labels and the observed SLM format
+
+Nortel 297-1001-118 specifies the same IBM standard label scheme for **IOC nine-track reels** and **IOM DAT cartridges**. It cites IBM's *OS/VS Tape Labels* (GC26-3795-3). The two archived SLM-format images use familiar names such as `VOL1`, `HDR1`, and `EOF1`, with a different layout, encoding, and order. In this guide, *SLM format* means the 512-byte layout observed in those two images. [Nortel 297-1001-118.04.02, chapters 2 and 3](http://www.dms-100.net/files/telephony/nortel/docs/pdf/297-1001-118.04.02.pdf#page=17) · [Nortel baseline PDF mirror](https://www.gbppr.net/bsp/297-1001-118.pdf) · [IBM standard label organization](https://www.ibm.com/docs/en/zos/3.1.0?topic=labels-label-definitions-organization)
+
+| Feature | IOC nine-track and IOM DAT, per Nortel | SLM format, observed in the archive |
+| --- | --- | --- |
+| Label record | 80 bytes. EBCDIC identifier starts at offset 0. | 512 bytes. `00 01` at offset 0 and pair-swapped ASCII identifier at offset 2. |
+| Volume and first file | `VOL1`, `HDR1`, `HDR2`, optional user headers, then a filemark. | `VOL1`, filemark, `HDR1`, filemark. |
+| After file data | Filemark, `EOF1` and `EOF2`, optional user trailers, then a filemark. Multiple-volume sets can use `EOV1` and `EOV2`. | Filemark, `EOF1`, filemark. The next file starts with its own `HDR1`. |
+| End of volume | Two filemarks after the final trailer group in the single-volume example. | Three consecutive image filemarks at the end of both dumps, including the mark that closes the final `EOF1`. |
+| Data block size | 18 to 2048 bytes in the DMS manual. | 512 bytes per tape data record in both dumps. |
+| File metadata | `HDR1` carries the dataset ID and sequence. `HDR2` carries the record format and block and logical record lengths. Numeric label fields use EBCDIC digits. | A single `HDR1` carries a 32-byte filename and binary sizes and counts, including the `LFS0` fields. `EOF1` repeats those fields and gives the final block remainder. |
+| Label checksum | The documented IBM fields have no equivalent checksum word. | A 16-bit additive checksum occupies the final two bytes of each label. |
+
+The manual describes 1600 BPI phase encoding and eight data bits plus odd parity for the IOC reel. IOM DAT uses DDS cartridges and supports two byte orders. Its default swaps adjacent bytes, illustrated by the manual's `VOL1TEST` appearing as `OV1LETTS`. The illustration shows character order. The chapter 3 labels use EBCDIC, so a byte swap changes the order of those codes. The manual also describes IBM-compatible block and record descriptors for variable-length datasets. The observed SLM files store one contiguous fixed-record byte stream across the 512-byte tape blocks. [Nortel 297-1001-118.04.02, chapters 2 through 4](http://www.dms-100.net/files/telephony/nortel/docs/pdf/297-1001-118.04.02.pdf#page=17)
+
+The SLM samples share the IBM label names and volume, header, data, and trailer roles. Their byte layouts require a separate reader and writer. The DAT cartridge type alone does not identify which layout a DMS wrote. Nortel documents DC600, DC6250, and DC6525 cartridges for earlier SLM generations and DAT for XA-Core. The archived SL-100 backup includes `_XA` and `_MS` datasets in the observed SLM layout. Whether a given SLM or XA-Core software release can also read or write the IBM-labeled IOM DAT format for interchange remains unverified. [Nortel 297-8001-546, pp. 1-102 and 1-119](https://www.gbppr.net/bsp/297-8001-546.pdf) · [XA-Core Maintenance Manual, 297-8991-510, pp. 4-185 and 4-285](https://www.gbppr.net/bsp/297-8991-510.pdf)
+
 ## Recording media and image framing
 
-A physical tape drive handles the recording medium. The host transfers records and filemarks. On Linux, the `st` driver supports variable-record I/O through devices such as `/dev/nst0`. A read in variable-block mode obtains one record and a write makes one record. `MTWEOF` writes a filemark. Check the drive and cartridge generation on both ends. Nortel lists different cartridges for different SLM generations, and the XA-Core product guide lists DAT as a mass-storage option. [Linux SCSI tape driver](https://docs.kernel.org/scsi/st.html) · [Nortel 297-8001-546](https://www.gbppr.net/bsp/297-8001-546.pdf) · [SL-100 product guide](https://www.manualslib.com/manual/1184407/Nortel-Sl-100.html?page=28)
+A physical tape drive handles the recording medium. The host transfers records and filemarks. On Linux, the `st` driver supports variable-record I/O through devices such as `/dev/nst0`. A read in variable-block mode obtains one record and a write makes one record. `MTWEOF` writes a filemark. Check the drive and cartridge generation on both ends. [Linux SCSI tape driver](https://docs.kernel.org/scsi/st.html)
 
 An E11 image wraps a record in two identical little-endian 32-bit lengths. A single zero word is a tape mark. A single `0xffffffff` word can indicate end of medium. SIMH's standard image variant pads odd-length records before the trailing word. These SLM images use only even 512-byte records, so the two representations coincide. A 512-byte tape record occupies 520 bytes in the image, excluding tape marks. The `.xz` suffix is a compression layer over the entire image. [Open SIMH image formats](https://opensimh.org/simdocs/simh_doc.html)
 
@@ -56,7 +74,17 @@ The checksum formula matches all 338 labels. Across 168 files, `size = logical r
 
 For `CBM12PGT$PATCH`, 353 logical records of 128 bytes produce 45,184 file bytes, stored in 89 tape blocks with 128 bytes used in the last block. Its pair-swapped payload begins with an intelligible `BADMBI PPC` marker. The 2019 `_XA` file has 227,831 logical records of 1020 bytes and a final remainder of 36. All examined padding bytes after the declared size were zero.
 
-Nortel's *Magnetic Tape Reference Manual*, 297-1001-118, documents 9-track and IOM DAT magnetic tape, tape-mark conventions, and the IBM-style 80-byte EBCDIC labels in those formats. The 512-byte word-swapped `LFS0` layout above comes from the SLM samples. The two layouts need separate readers and label generators. [Nortel 297-1001-118, chapters 2 and 3](https://www.gbppr.net/bsp/297-1001-118.pdf)
+### Identify the layout from the first record
+
+In an uncompressed E11 or SIMH image, read the four-byte little-endian block length first. The label starts immediately after it. These examples show the beginning of the image. The first row was read from the archived patch tape. The other two rows are signatures derived from the manual using EBCDIC code page 037.
+
+| Example | First 10 bytes | Interpretation |
+| --- | --- | --- |
+| Archived SLM volume `PATS` | `00 02 00 00 00 01 4f 56 31 4c` | Length 512, then a binary prefix and pair-swapped ASCII `VOL1`. |
+| IBM label in normal byte order | `50 00 00 00 e5 d6 d3 f1 …` | Length 80, then EBCDIC `VOL1`. The next bytes hold the volume serial. |
+| IBM label with IOM DAT pair swapping | `50 00 00 00 d6 e5 f1 d3 …` | Length 80, then the same EBCDIC codes in swapped order. |
+
+The patch image has a trailing length at image offset `0x204`, a filemark at `0x208`, and the first `HDR1` frame at `0x20c`. The header contains raw `46 4c 30 53` at label offset `0xa4`, which becomes `LFS0` after swapping pairs. The matching label, filemark, and checksum structure identifies this layout more reliably than the label ID alone. `slm_tape.py` reads and writes the 512-byte layout. An 80-byte IBM-labeled dump needs a reader for that format. [Patch tape and capture log](http://www.dms-100.net/files/telephony/nortel/DMS100/tapes/0314-patches/)
 
 ## Work with an existing image
 
@@ -115,7 +143,7 @@ The example inherits file code `0x000b` and an overhead field of 2 from a patch 
 
 ## Write, restore, and verify on the bench
 
-1. Use a compatible DDS drive and scratch cartridge. Write the uncompressed image with a DDS-compatible `tapecopy` build. Read it back and compare the directory and extracted voice bytes. An extra terminal filemark may be introduced by a tape utility when it closes the output.
+1. Use a compatible drive and scratch cartridge for the target shelf. For a DDS drive, use a DDS-compatible `tapecopy` build. Write the uncompressed image. Read it back and compare the directory and extracted voice bytes. An extra terminal filemark may be introduced by a tape utility when it closes the output.
 
    ```sh
    mt -f /dev/nst0 rewind
