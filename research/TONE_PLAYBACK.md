@@ -56,7 +56,11 @@ The two recovered 68k loads contain a separate three-component SIT directory. Un
 
 For example, ESTD0AA SIT 1 has 6,912 samples in its three ordinary page ranges. Firmware SIT 1 stages 6,576 active codes plus 80 zero codes at the end of its last page. For the three SIT 1 waveform records used under `0x4040`, the dominant frequency bin accounts for about 99.87% to 99.98% of waveform energy when expanded as unmasked mu-law, compared with about 99.69% to 99.78% under unmasked A-law. All five records used at the stored addresses have lower out-of-carrier energy under unmasked mu-law. The two relocated first-pitch records have lower out-of-carrier energy under unmasked A-law. The WAV exporter selects the law per record. The raw hashes are independent of companding. [Decoder usage](../README.md#decode-built-in-firmware-sits)
 
-The 68 checked-in firmware WAVs were compared sample for sample with FFmpeg's G.711 decoders after applying the standard masks to each component's stored codes. With 100 ms windows at the start and end of each SIT 1 component, the RMS differences are below 0.004 dB under both selectors.
+The firmware WAVs were compared sample for sample with FFmpeg's G.711 decoders after applying the standard masks to each component's stored codes. With 100 ms windows at the start and end of each SIT 1 component, the RMS differences are below 0.004 dB under both selectors.
+
+### Levels under the two tested selectors
+
+The default card preview dispatches ESTD0AA slot 8 to firmware SIT 1. At `0x4040` the three parts measure approximately −29.81, −29.75 and −29.73 dBFS RMS. At `0x5050` the relocated first part measures −18.90 dBFS, and the later two retain their original levels. The change is between pitches. Each part uses the level stored in its own waveform record. A live capture is needed to establish on-wire level. [Card preview and selector options](../README.md#preview-a-load-on-the-card)
 
 ### Built-in 750 Hz cues
 

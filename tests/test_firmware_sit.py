@@ -1,4 +1,6 @@
+from contextlib import redirect_stdout
 import hashlib
+import io
 import json
 from pathlib import Path
 import struct
@@ -145,14 +147,17 @@ class FirmwareSITTests(unittest.TestCase):
         self.assertEqual(custom.read(0x440700, 0x900), firmware.startup_read(0x440700, 0x900))
 
     def test_card_cli_exports_native_continuous_records(self):
-        firmware = XA_CORE / "srecords" / "ED16AA07.srec"
         path = encode_edram.DATA / "original" / "mwttone.txt80"
         with tempfile.TemporaryDirectory() as tmp:
-            edram.main(["--card-playback", str(firmware), "--first-bank", "1", "--slot", "42",
+            edram.main(["--first-bank", "1", "--slot", "42",
                         "--slot", "49", str(path), "-o", tmp])
             folder = Path(tmp) / path.stem
             manifest = json.loads((folder / "manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(manifest["bank_type"], 2)
+            self.assertEqual(manifest["firmware"], "ED16AA07")
+            self.assertEqual(manifest["selector"], 0x4040)
+            self.assertEqual(manifest["load_header"]["offset"], 0x670)
+            self.assertEqual(bytes.fromhex(manifest["load_header"]["hex"]), b"TONE00AA10\xff\xff")
             self.assertEqual(len(manifest["startup_copies"]), 4)
             for part, address, samples in zip(manifest["card_slots"], (0x3BCA, 0x379E), (2000, 996), strict=True):
                 entry, = part["components"]
@@ -165,6 +170,25 @@ class FirmwareSITTests(unittest.TestCase):
                 with wave.open(str(folder / part["wav"])) as wav:
                     self.assertEqual(wav.getnframes(), samples)
                     self.assertEqual(wav.readframes(samples), edram.decode(raw[2:], firmware_sit.MULAW))
+
+    def test_default_inspection_uses_firmware_sit_and_file_only_retains_page_menu(self):
+        def manifest(*options):
+            output = io.StringIO()
+            with redirect_stdout(output):
+                edram.main([str(encode_edram.TEMPLATE), "--inspect", *options])
+            return json.loads(output.getvalue())
+
+        card = manifest("--slot", "8")
+        self.assertEqual((card["firmware"], card["selector"], card["first_bank"], card["bank_type"]),
+                         ("ED16AA07", 0x4040, 0, 1))
+        self.assertEqual(card["load_header"]["ascii"], "ESTD0AA .bin")
+        sit, = card["card_slots"]
+        self.assertEqual((sit["label"], sit["samples"]), ("Built-in SIT 01", 6576))
+
+        archive = manifest("--as-stored")
+        stored = next(p for p in archive["phrases"] if (p["bank"], p["number"]) == (0, 8))
+        self.assertEqual(sum(s["pages"] * s["repeats"] * edram.PAGE_SIZE for s in stored["segments"]), 6912)
+        self.assertEqual(manifest("--segments"), archive)
 
     def test_repeat_rejects_unaddressable_ranges(self):
         for codes, repeats, error in ((b"\x82", {41: 2}, "refer to an authored phrase"),

@@ -33,7 +33,7 @@ This is the bank 0 map for `ESTD0AA`, the encoder’s reference. Image banks are
 | `0x0000–0x00FF` | Phrase directory with 64 entries of four bytes each. Each active entry has a submenu pointer, an entry count, and a checksum. |
 | `0x0100–0x065B` | Active submenus. Each entry is four bytes with a little-endian page number, page count, and repeat count. |
 | `0x065C–0x066F` | Twenty explicitly stored `FF` bytes between the last submenu and identifier. |
-| `0x0670–0x067F` | Identifier area. `ESTD0AA` contains `ESTD0AA .bin` and four `FF` bytes. |
+| `0x0670–0x067F` | Identifier area. `ESTD0AA` contains `ESTD0AA .bin` and four `FF` bytes. The first 12 bytes select the firmware's bank type and `.bin` checksum branch. [Header fields](FORMAT.md#load-header-and-bank-type) |
 | `0x0680–0x0CFF` | Unwritten range in this load. |
 | `0x0D00–0x0FFF` | The card stages zeros for page 13 regardless of its contents. Pages 14 and 15 hold the reused 750 Hz cue material. |
 | `0x1000–0x10FF` | Unwritten page 16 in this load. `EMCCS0CA` uses `0x1000–0x1027` for two validated submenus, so the gap is load-dependent. |
@@ -131,7 +131,7 @@ The 501 bytes from the coverage audit are another quantity. They were explicitly
 
 Offsets in this section describe the addressed load file. At runtime the completed firmware download seeds protected RAM. The announcement writer skips offsets `0x0700–0x0FFF` relative to the load start, and the firmware can select its own directory. Use [card playback](README.md#preview-a-load-on-the-card) to resolve a slot after those steps.
 
-`--segments` exports one single-pass WAV for each distinct referenced `(bank, starting page, page count)` range. In `bank_00_page_0012_pages_002.wav`, `0012` is **hexadecimal**, and `002` is a **decimal page count**. That file contains pages `0x12` and `0x13` together. Repeat counts live in the phrase submenus and are applied when building the full phrase. [ESTD0AA segment WAVs](audio/estd0aa/segments) · [Segment and phrase manifest](audio/estd0aa/manifest.json)
+`--as-stored --segments` exports one single-pass WAV for each distinct referenced `(bank, starting page, page count)` range. In `bank_00_page_0012_pages_002.wav`, `0012` is **hexadecimal**, and `002` is a **decimal page count**. That file contains pages `0x12` and `0x13` together. Repeat counts live in the phrase submenus and are applied when building the full phrase. [ESTD0AA segment WAVs](audio/estd0aa/segments) · [Segment and phrase manifest](audio/estd0aa/manifest.json)
 
 | Page in `ESTD0AA`, bank 0 | Image range | Reason for the export result |
 | --- | --- | --- |

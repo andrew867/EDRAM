@@ -26,6 +26,29 @@ Reconstruct addressed memory rather than concatenating payloads. Omitted regions
 
 The txt80 files contain S2 ASCII data with standard byte count, 24-bit address and one's-complement checksum. Their final S6 records have count 5 and carry a four-byte value. The bin44 payload sum also verifies `edrmtone.txt80`. The observed `mwttone.txt80` footer differs from the sum of its included records, although its individual record checksums pass. Newly encoded text loads use the sum verified against `edrmtone.txt80`. The parser also accepts ordinary S1/S3 data and S7/S8/S9 termination framing.
 
+## Load header and bank type
+
+The host reader gets addressed payloads from G-record or S-record framing. Once those bytes are in RAM, the EDRAM application reads 12 bytes beginning at the first loaded bank's `0x0670`. This field selects the registration type for the banks in the load and which internal slots use the firmware directory.
+
+| Bank offset | Width | Use |
+| --- | ---: | --- |
+| `0x0670` | 4 bytes | First half of the internal identifier. In the non-`.bin` branch, `TONE` or `U1X7` enables the special suffix checks. |
+| `0x0674` | 4 bytes | Second half of the identifier. The loader compares all four bytes, including padding. |
+| `0x0678` | 4 bytes | `.bin` selects the branch that verifies the supplied payload word sum. The ordinary `TONE` samples have `31 30 FF FF` here. |
+
+Under `.bin`, suffix bytes `30 41 41 20`, `30 41 42 20`, `30 42 41 20` and `53 30 43 41` register type 1. For `TONE` or `U1X7` in the other branch, `6AA0`, `6AB0`, `6BA0` and `6CA0` register type 1, `00AA` registers type 2, and `00AB` registers type 3. Other identifiers remain type 0 in the modeled fresh-load path.
+
+| Example bytes at `0x0670` | Type | Playback routing |
+| --- | ---: | --- |
+| `LABANN  .bin` | 0 | Slots 0–3 use firmware cues or silence. Slots 4–63 use the bank's own menus. |
+| `ESTD0AA .bin` | 1 | Slots 0–39 use the firmware directory. Slots 40–63 use the bank's own menus. |
+| `TONE00AA10` plus two `FF` bytes | 2 | MWTTONE. The firmware directory addresses the appropriate records in RAM. |
+| `TONE00AB10` plus two `FF` bytes | 3 | EDRMTONE. The firmware directory addresses the appropriate records in RAM. |
+
+The archived `fstd0ba.bin44` contains `fstdbbn .bin` at `0x0670`. Its suffix registers type 0, so its SIT slots follow the bank-local menus. The manifest reports the classification from the internal bytes even when the file is renamed.
+
+The card preview includes both the exact 12 bytes and the resolved type in its manifest and `--inspect` output. The default preview uses bundled `ED16AA07` at selector `0x4040` with the load beginning at physical bank 0. The `.bin` aggregate check above describes the real firmware loader. The preview models an accepted load. [Firmware registration and routing](research/EDRAM_BEHAVIOR_SPEC.md#built-in-tone-playback)
+
 ## Menus
 
 Each `0x40000`-byte bank begins with a 256-byte phrase directory. The **phrase number is the slot index**, so its four-byte entry starts at `bank_base + 4 × phrase_number`. The entry gives a byte offset to the first submenu word and how many words to read in order.
@@ -73,7 +96,7 @@ The waveform records at their stored addresses expand as unmasked G.711 mu-law. 
 
 The firmware's two 750 Hz cues use ordinary absolute page descriptors. Slot 1 plays page `0x400800` five times for 160 ms. Slot 2 uses the same waveform for all three bursts, with silence from startup-cleared page `0x400700`. The waveform expands as unmasked mu-law. Both recovered builds stage identical cue bytes under the tested selectors.
 
-Use `edram.py --firmware-tones` to export the cues, continuous slots and SITs. Each finite clip's `.staged.bin` contains the exact padded codes. A continuous clip's `.record.bin` contains its original word count and payload, and its WAV contains one waveform cycle record. Use `--card-playback` with a load to apply startup RAM, the protected write exclusion, and bank-type routing. The on-wire law and gain need a card capture. [Usage](README.md#decode-built-in-firmware-sits)
+Use `edram.py --firmware-tones` to export the cues, continuous slots and SITs. Each finite clip's `.staged.bin` contains the exact padded codes. A continuous clip's `.record.bin` contains its original word count and payload, and its WAV contains one waveform cycle record. The default load preview applies startup RAM, the protected write exclusion, and bank-type routing. Use `--as-stored` to follow the file's own menus. The on-wire law and gain need a card capture. [Usage](README.md#decode-built-in-firmware-sits)
 
 ## Standalone tone banks
 
@@ -94,15 +117,15 @@ The archived `FSTD0BA` bank 1 SIT directory differs from bank 0 in four slots. T
 
 For slots 8, 11, and 20, the raw pointer starts two bytes into the intended submenu word. The raw checksum sums to zero because the shifted window drops `11 00` at the start of the first word and picks up the same two bytes from the next SIT. Subtracting two from the pointer changes the sum to `FE`. The replacement therefore changes the pointer **and** the checksum. Slot 16 starts one full word early. The original checksum still passes, but its menu begins with the previous SIT's last page and omits the final two-page sustain. The literal export is 736 ms. The corrected menu gives 960 ms, matching bank 0 and the other factory copies.
 
-The [repair tool](repair_fstd0ba.py) accepts the hash of the archived `FSTD0BA` and writes a new `.bin44` using the four bank 0 directory entries. It checks the repaired entries against their own bank 1 submenus and rebuilds the transport checksums. Eight addressed bytes change, all in the directory. The archive and default decode retain the original data.
+The [repair tool](repair_fstd0ba.py) accepts the hash of the archived `FSTD0BA` and writes a new `.bin44` using the four bank 0 directory entries. It checks the repaired entries against their own bank 1 submenus and rebuilds the transport checksums. Eight addressed bytes change, all in the directory. The archive keeps the original addressed bytes. Card playback of this type 0 file follows its bank-local SIT menus.
 
 ~~~sh
 python repair_fstd0ba.py data/original/fstd0ba.bin44 FSTD0BA-fixed.bin44
-python edram.py FSTD0BA-fixed.bin44 -o decoded --segments
+python edram.py --as-stored --segments FSTD0BA-fixed.bin44 -o decoded-archive
 ~~~
 
 All four recovered bank 1 WAVs match the corresponding bank 0 PCM. The repair has been checked offline. [Regression test](tests/test_repair_fstd0ba.py) · [SIT component layout](research/TONE_PLAYBACK.md#sit-component-layout)
 
 ## Decoding status
 
-Phrase samples, including SITs and cues, expand one code per sample. The default uses standard G.711 A-law after XOR 0x55. Standalone tone records use the companding law identified for each region and retain the stored sample count and all source codes. Tone names and measured frequencies are metadata.
+Each stored code expands to one PCM sample. Ordinary page-based announcements use G.711 A-law after XOR `0x55` by default. Card playback uses the identified storage law for each resolved firmware or standalone waveform record. Raw output retains the original companded sample codes. Tone names and measured frequencies are metadata.

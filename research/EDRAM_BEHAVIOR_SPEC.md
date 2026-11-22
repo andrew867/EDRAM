@@ -89,7 +89,7 @@ The sequencer uses the loaded bank's type and the requested slot to pick its dir
 | Recognized factory announcement type 1 | 0 through 39 | Bank-local page menus from 40 |
 | `TONE00AA10` or `TONE00AB10`, types 2 and 3 | 0 through 63 | Use the applicable descriptor and selected RAM address |
 
-The loader classifies the bank from bytes `0x0670–0x067B` after loading it. For the `.bin` branch, the suffix at `0x0674` selects type 1 when it is `0AA `, `0AB `, `0BA `, or `S0CA`. The other branch recognizes the `TONE` and `U1X7` tags with `6AA0`, `6AB0`, `6BA0`, or `6CA0` for type 1 and `00AA` or `00AB` for types 2 and 3. The registration applies the type to all banks in the load.
+The loader classifies the bank from bytes `0x0670–0x067B` after loading it. For the `.bin` branch, the suffix at `0x0674` selects type 1 when it is `0AA `, `0AB `, `0BA `, or `S0CA`. The other branch recognizes the `TONE` and `U1X7` tags with `6AA0`, `6AB0`, `6BA0`, or `6CA0` for type 1 and `00AA` or `00AB` for types 2 and 3. The registration applies the type to all banks in the load. The default decoder preview uses this classification. [Load header byte layout](../FORMAT.md#load-header-and-bank-type)
 
 Slots 0 through 3 use absolute page ranges. Slots 4 through 7 use continuous waveform records. Slots 8 through 39 have three consecutive eight-byte descriptors. Tone-service slots 40 through 63 use continuous descriptors. A leading zero word identifies the waveform-record format.
 

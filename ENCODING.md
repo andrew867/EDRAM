@@ -29,7 +29,7 @@ python encode_edram.py LABRPT.txt80 --tone 40 cue:page:test --repeat 40 4
 | `dtmf:5:2` | Key 5 from the A-law DTMF set. This embeds the waveform in an ordinary phrase with page padding. |
 | `edrmtone:47` | An A-law tone-bank waveform by its one-based record index. |
 
-The voice bank format uses A-law. The encoder rejects μ-law and mixed-law tone sources, including `howler`, `milliwatt`, `cue:test` and `sit:firmware:1`. The [firmware exporter](README.md#decode-built-in-firmware-sits) provides the original built-in tone bytes. The card plays its built-in slot 1 cue directly after a custom announcement is loaded. Factory type 1 banks also dispatch slots 4 through 39 through the firmware directory. In a custom bank with an ordinary name, those higher reserved slots follow the bank-local menus. The encoded custom slots 40 through 63 carry their stored A-law sample codes in writable pages. Use [card playback](README.md#preview-a-load-on-the-card) to check which address and law a slot will use. For native milliwatt and howler loads, use `--tone-bank` below.
+The voice bank format uses A-law. The encoder rejects μ-law and mixed-law tone sources, including `howler`, `milliwatt`, `cue:test` and `sit:firmware:1`. The [firmware exporter](README.md#decode-built-in-firmware-sits) provides the original built-in tone bytes. The card plays its built-in slot 1 cue directly after a custom announcement is loaded. Factory type 1 banks also dispatch slots 4 through 39 through the firmware directory. In a custom bank with an ordinary name, those higher reserved slots follow the bank-local menus. The encoded custom slots 40 through 63 carry their stored A-law sample codes in writable pages. The default [card preview](README.md#preview-a-load-on-the-card) shows which address and law a slot will use. The internal load name and format bytes at `0x0670` control bank classification. For native milliwatt and howler loads, use `--tone-bank` below. [Header fields](FORMAT.md#load-header-and-bank-type)
 
 `--repeat ID COUNT` stores one range and writes its native repeat count. A two-page range AB with count 4 emits ABABABAB. Padding belongs to each repetition. The count is 1 through 255 and a repeated range may span up to 255 pages.
 
@@ -38,7 +38,7 @@ The voice bank format uses A-law. The encoder rejects μ-law and mixed-law tone 
 ~~~sh
 python encode_edram.py MWTTONE.txt80 --tone-bank mwttone
 python encode_edram.py EDRMTONE.txt80 --tone-bank edrmtone
-python edram.py EDRMTONE.txt80 --raw-tones -o decoded-tones
+python edram.py --as-stored --raw-tones EDRMTONE.txt80 -o decoded-tone-records
 ~~~
 
 Both rebuilds reproduce their archived input byte for byte, including addresses, native record lengths, sample codes, S-record checksums, and footer. The optional raw export contains the big-endian word count followed by its exact companded payload for every recognized tone, including constant-fill records.

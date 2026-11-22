@@ -32,7 +32,7 @@ Speech uses unmasked G.711 A-law in these files. XOR each stored byte with `0x55
 
 In ESTD0AA bank 0 phrase 8, the first SIT component plays page 17 once, then the two-page range starting at page 18 four times. Two more attack/sustain pairs supply the other pitches. That is 288 ms per component at 8 kHz. The converter expands those bytes, including their level differences. In the 750 Hz cue, the last 128 bytes of page 15 contain four identical 32-byte blocks. Each decodes to three cycles at 8 kHz. [Byte walk-through and playback measurements](research/TONE_PLAYBACK.md)
 
-During a successful firmware download, the card copies the built-in SIT, continuous-tone and 750 Hz waveforms into protected RAM. Card playback resolves the selected bank and descriptor against that RAM. The SIT descriptors specify 274 or 380 ms per component. The decoder selects mu-law or A-law for each waveform record and exports exact staged codes alongside the WAV. Both firmware cues use a steady 750 Hz sample page. [Firmware decoder](README.md#decode-built-in-firmware-sits)
+During a successful firmware download, the card copies the built-in SIT, continuous-tone and 750 Hz waveforms into protected RAM. The default card preview resolves the selected bank and descriptor against that RAM. The `--as-stored` mode follows the addressed data in the archive. The SIT descriptors specify 274 or 380 ms per component. The decoder selects mu-law or A-law for each waveform record and exports exact staged codes alongside the WAV. Both firmware cues use a steady 750 Hz sample page. [Header and bank routing](FORMAT.md#load-header-and-bank-type) · [Firmware decoder](README.md#decode-built-in-firmware-sits)
 
 ## Standalone tone banks have their own record boundaries
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Extract Nortel EDRAM phrases from addressed bin44 and Motorola S-record files."""
+"""Decode Nortel EDRAM loads as played by the card or as stored in the file."""
 from __future__ import annotations
 
 import argparse
@@ -15,6 +15,9 @@ import firmware_sit
 import tone_bank
 
 VERSION = "0.3.1"
+DEFAULT_FIRMWARE = Path(__file__).resolve().parent / "data" / "xacore" / "srecords" / "ED16AA07.srec"
+LOAD_HEADER_OFFSET = 0x0670
+LOAD_HEADER_SIZE = 12
 RATE = 8000
 BANK_SIZE = 0x40000
 PAGE_SIZE = 256
@@ -432,7 +435,9 @@ class CardPlayback:
 
         if self.memory[target + 0x2A4:target + 0x2A8] == b"UPLD":
             raise FormatError("UPLD playback needs the installed card's RAM-bank routing state")
-        header = bytes(self.memory[target + 0x670:target + 0x67C])
+        start = target + LOAD_HEADER_OFFSET
+        self.load_header = bytes(self.memory[start:start + LOAD_HEADER_SIZE])
+        header = self.load_header
         suffix = header[4:8]
         self.bank_type = 0
         if header[8:12] == b".bin":
@@ -580,6 +585,8 @@ def export_card_playback(path, output, firmware, first_bank=0, slots=None, codec
     manifest = {"converter_version": VERSION, "source": path.name, "firmware": firmware.name,
                 "source_sha256": hashlib.sha256(source).hexdigest(), "flat_sha256": firmware.sha256,
                 "selector": firmware.selector, "first_bank": first_bank, "bank_type": playback.bank_type,
+                "load_header": {"offset": LOAD_HEADER_OFFSET, "hex": playback.load_header.hex(),
+                                "ascii": playback.load_header.decode("ascii", errors="backslashreplace")},
                 "low_memory_byte": firmware_sit.LOW_MEMORY_BYTE, "sample_rate": RATE,
                 "startup_copies": [asdict(copy) for copy in firmware.startup_copies],
                 "card_slots": entries}
@@ -677,14 +684,16 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("inputs", nargs="+", help="bin44/S-record files or directories")
     parser.add_argument("-o", "--output", type=Path, default=Path("edram-wav"))
-    parser.add_argument("--inspect", action="store_true", help="validate and list tables without writing files")
+    parser.add_argument("--inspect", action="store_true", help="list resolved slots or file tables without writing files")
     parser.add_argument("--codec", choices=tuple(PCM_TABLES),
                         help="override the WAV law (A-law for announcements, per waveform for firmware by default)")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--firmware-sit", "--firmware-tones", action="store_true",
                       help="decode built-in cues, SITs and continuous tones from firmware images")
     mode.add_argument("--card-playback", type=Path, metavar="FIRMWARE",
-                      help="preview a load in RAM after firmware startup and slot dispatch")
+                      help="override the firmware for card playback (default: bundled ED16AA07)")
+    mode.add_argument("--as-stored", action="store_true",
+                      help="decode addressed bytes and menus directly from the load file")
     parser.add_argument("--first-bank", type=int, help="zero-based RAM bank for the load (default: 0)")
     parser.add_argument("--slot", type=int, action="append", metavar="0..63",
                         help="restrict card playback to a slot, repeatable")
@@ -692,19 +701,21 @@ def main(argv=None):
                         choices=firmware_sit.SELECTORS,
                         metavar="{0x4040,0x5050}", help="firmware playback selector (default: 0x4040)")
     parser.add_argument("--raw-tones", "--raw-sit", action="store_true",
-                        help="export native standalone headers and companded sample bytes")
-    parser.add_argument("--segments", action="store_true", help="also export each referenced segment without repeats")
+                        help="export all standalone waveform records as stored in the file")
+    parser.add_argument("--segments", action="store_true", help="export the file as stored, including each segment without repeats")
     parser.add_argument("--overwrite", action="store_true", help="allow replacing outputs in existing source folders")
     parser.add_argument("--version", action="version", version=VERSION)
     args = parser.parse_args(argv)
-    firmware_mode = args.firmware_sit or args.card_playback
-    if args.sit_selector is not None and not firmware_mode:
-        parser.error("--playback-selector requires a firmware mode")
-    if (args.first_bank is not None or args.slot) and not args.card_playback:
-        parser.error("--first-bank and --slot require --card-playback")
+    archive_options = args.segments or args.raw_tones
+    as_stored = args.as_stored or (archive_options and not (args.card_playback or args.firmware_sit))
+    card_playback = not (as_stored or args.firmware_sit)
+    if args.sit_selector is not None and as_stored:
+        parser.error("--playback-selector requires firmware or card playback")
+    if (args.first_bank is not None or args.slot) and not card_playback:
+        parser.error("--first-bank and --slot require card playback")
     if args.slot and any(not 0 <= slot < 64 for slot in args.slot):
         parser.error("--slot must be between 0 and 63")
-    if args.segments and firmware_mode:
+    if args.segments and not as_stored:
         parser.error("--segments is for file-only announcement exports")
     try:
         paths = input_paths(args.inputs, firmware=args.firmware_sit)
@@ -722,8 +733,9 @@ def main(argv=None):
                           f"{len(manifest['firmware_continuous'])} continuous tones exported")
             return
         codec = args.codec or "alaw-unmasked"
-        if args.card_playback:
-            firmware = parse_firmware_sit(args.card_playback.read_bytes(), args.sit_selector or 0x4040)
+        if card_playback:
+            firmware_path = args.card_playback or DEFAULT_FIRMWARE
+            firmware = parse_firmware_sit(firmware_path.read_bytes(), args.sit_selector or 0x4040)
             slots = sorted(set(args.slot)) if args.slot else None
             manifests = [export_card_playback(path, args.output, firmware, args.first_bank or 0, slots, codec,
                                               inspect=args.inspect, overwrite=args.overwrite) for path in paths]

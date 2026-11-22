@@ -2,7 +2,7 @@
 
 **First alpha** · [v0.2.0-alpha.1](https://github.com/andrew867/EDRAM/releases/tag/v0.2.0-alpha.1) · [Release notes](CHANGELOG.md)
 
-Decode speech and tones directly from the sample bytes in Nortel DMS-100 and SL-100 loads. The converter reconstructs the addressed image from `.bin44` or `.txt80` records, expands the stored G.711 codes to 8 kHz, 16-bit mono PCM, and follows the phrase menu's page and repeat counts. Standalone tones use the sample range given by each record header. Python 3.10 or newer is sufficient.
+Decode speech and tones directly from the sample bytes in Nortel DMS-100 and SL-100 loads. By default the converter loads `.bin44` or `.txt80` records into modeled card RAM, follows firmware slot routing, and expands the selected G.711 codes to 8 kHz, 16-bit mono PCM. Use `--as-stored` to decode files directly. Python 3.10 or newer is sufficient.
 
 ## Listen to the firmware tones
 
@@ -19,14 +19,25 @@ This player presents the bytes and menus of the archived announcement and tone l
 
 The [XA-Core player](data/xacore/audio/listen.html) covers the recovered PTSI Cellular announcements and DTM test recordings, and links to both firmware players. The [phrase catalog](data/xacore/audio/catalog.csv) identifies the load, slot, and source of each clip.
 
+## Preview a load on the card
+
+~~~sh
+python edram.py data/original/estd0aa.bin44 -o card-voice
+python edram.py --inspect --slot 8 data/original/estd0aa.bin44
+python edram.py --first-bank 1 --slot 42 --slot 49 data/original/mwttone.txt80 -o card-tones
+python edram.py --card-playback data/xacore/srecords/EDRMAE11.srec --playback-selector 0x5050 --slot 8 data/original/estd0aa.bin44 -o card-5050
+~~~
+
+The default card preview models an accepted load with bundled firmware `ED16AA07`. Use `--card-playback FIRMWARE` to choose a different supported image. It seeds RAM banks 0 through 7, applies the load writes, and follows the slot routing selected by the loaded bank's internal tag. Each input file is previewed as a separate load. `--first-bank` uses zero-based physical RAM numbering and defaults to bank 0. `--playback-selector` defaults to `0x4040`. At `0x5050` the first waveform reference moves two banks above the address in the firmware descriptor. The preview reports unavailable records when its input lacks the resolved waveform. The manifest includes the original header at `0x0670`, the resulting bank type, addresses, sample laws and firmware digest. [Firmware startup and playback routing](research/EDRAM_BEHAVIOR_SPEC.md#firmware-download-and-startup)
+
 ## Decode a load as stored
 
 ~~~sh
-python edram.py data/original/estd0aa.bin44 -o decoded --segments
-python edram.py data/original/estd0aa.bin44 --inspect
+python edram.py --as-stored --segments data/original/estd0aa.bin44 -o decoded-archive
+python edram.py --as-stored --inspect data/original/estd0aa.bin44
 ~~~
 
-Pass a directory to decode all supported loads inside it. The `--segments` option also writes each distinct referenced page range once. Each load gets a folder with WAVs, `phrases.csv`, and `manifest.json`. The manifest has source and PCM hashes, page addresses and repeat counts, counts of unwritten sample addresses, and reasons for rejected references. Standalone tone previews go in `tone-bank/`. Use `--raw-tones` for the original word-count headers and sample bytes. The [encoder](ENCODING.md#rebuild-a-native-standalone-tone-bank) can rebuild native MWTTONE and EDRMTONE loads. Use a fresh output directory for a clean comparison.
+Pass a directory to decode all supported loads inside it. The `--segments` option also writes each distinct referenced page range once. Each load gets a folder with WAVs, `phrases.csv`, and `manifest.json`. The manifest has source and PCM hashes, page addresses and repeat counts, counts of unwritten sample addresses, and reasons for rejected references. Standalone tone previews go in `tone-bank/`. Use `--raw-tones` for the original word-count headers and sample bytes. `--segments` and `--raw-tones` select file-only decoding when no firmware mode is specified. The [encoder](ENCODING.md#rebuild-a-native-standalone-tone-bank) can rebuild native MWTTONE and EDRMTONE loads. Use a fresh output directory for a clean comparison.
 
 | What you need | Start here |
 | --- | --- |
@@ -41,15 +52,6 @@ Pass a directory to decode all supported loads inside it. The `--segments` optio
 | Test a new load on an NT1X80 card | [Bench checklist](BENCH_STATUS.md) |
 | Earlier experiments and superseded interpretations | [Archive](archive/README.md) |
 
-## Preview a load on the card
-
-~~~sh
-python edram.py --card-playback data/xacore/srecords/ED16AA07.srec --slot 1 --slot 8 data/original/estd0aa.bin44 -o card-voice
-python edram.py --card-playback data/xacore/srecords/ED16AA07.srec --first-bank 1 --slot 42 --slot 49 data/original/mwttone.txt80 -o card-tones
-~~~
-
-The card preview models an accepted load. It seeds RAM banks 0 through 7, applies the load writes, and follows the slot routing selected by the loaded bank's internal tag. Each input file is previewed as a separate load. `--first-bank` uses zero-based physical RAM numbering. `--playback-selector` defaults to `0x4040`. At `0x5050` the first waveform reference moves two banks above the address in the firmware descriptor. The preview reports unavailable records when its input lacks the resolved waveform. The manifest includes addresses, sample laws, and the firmware digest. [Firmware startup and playback routing](research/EDRAM_BEHAVIOR_SPEC.md#firmware-download-and-startup)
-
 ## Decode built-in firmware SITs
 
 ~~~sh
@@ -63,12 +65,12 @@ Each firmware export includes 38 WAVs and a manifest with startup addresses, sam
 
 ~~~sh
 python verify_corpus.py data/original audio --check-player
-python edram.py data/original -o decoded --segments
-python verify_corpus.py data/original decoded --check-player
+python edram.py --as-stored --segments data/original -o decoded-archive
+python verify_corpus.py data/original decoded-archive --check-player
 python -m unittest discover -s tests -v
 ~~~
 
-The reference run verifies 5,377 WAVs against the PCM decoded from 61 loads and checks all 59 binary G6 payload sums. The searchable archive indexes all 5,377 WAVs. A fresh decoder run builds a smaller player for full phrases and standalone tone records. The verifier also reports missing payloads, invalid menus, and ranges that cross standalone tone records. Actual card timing and level still need a hardware capture. [Verification report](VALIDATION.json) · [Independent FFmpeg check](research/TONE_PLAYBACK.md#independent-waveform-check)
+The reference run verifies 5,377 WAVs against the PCM decoded from 61 loads and checks all 59 binary G6 payload sums. The searchable archive indexes all 5,377 WAVs. A fresh file-only export builds a smaller player for full stored phrases and standalone tone records. The verifier also reports missing payloads, invalid menus, and ranges that cross standalone tone records. Actual card timing and level still need a hardware capture. [Verification report](VALIDATION.json) · [Independent FFmpeg check](research/TONE_PLAYBACK.md#independent-waveform-check)
 
 ## Transcribe and rebuild the player
 
