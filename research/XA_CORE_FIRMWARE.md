@@ -11,7 +11,7 @@
 
 Open the [mapped ELF or flat binary files](../data/xacore/firmware/) in IDA or Ghidra. They carry a big-endian Motorola 68k mapping and name 0x000412 as a practical entry for analysis. For a raw .bin import, set the base address to **0x000400** and create code at 0x000412 and 0x000418. Each flat file is 116,054 bytes and fills absent S2 ranges with zero. [firmware/address-map.json](../data/xacore/firmware/address-map.json) records all 38 supplied byte ranges per load, the two jump targets, the output hashes and the original S6 footer. The footer supplies no verified entry address. Both outputs were checked against every byte of every S2 record.
 
-These loads call code outside the supplied address ranges. The ELF mappings and entry labels facilitate analysis. The images lack the surrounding ROM/runtime and have no verified hardware reset vector.
+The application handshake calls `0x0418` after a successful firmware download and initializes the protected waveform RAM before the executive handoff. The ELF mappings name `0x0412` for analysis. The reset vector and resident continuation at `0x020D20` are outside the recovered images. [Startup trace](EDRAM_FIRMWARE_EVIDENCE.md#firmware-download-and-startup)
 
 Ghidra 12.2 analyzed the images with the big-endian `68000:BE:32:default` language. It identified 168 functions in ED16AA07 and 166 in EDRMAE11. The [ED16AA07 decompilation](../data/xacore/firmware/ED16AA07.ghidra.c.txt) and [EDRMAE11 decompilation](../data/xacore/firmware/EDRMAE11.ghidra.c.txt) include the entry stubs and ten selected routines per image. Ghidra inferred the variable types and calling conventions. The function names are annotations.
 

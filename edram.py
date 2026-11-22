@@ -392,25 +392,140 @@ def parse_firmware_sit(raw: bytes, selector=0x4040):
         raise FormatError(str(exc)) from exc
 
 
+class CardPlayback:
+    """A load placed in the RAM initialized by the verified firmware startup path."""
+
+    def __init__(self, image, firmware, first_bank=0):
+        self.firmware = firmware
+        self.first_bank = first_bank
+        self.bank_count = (len(image.data) + BANK_SIZE - 1) // BANK_SIZE
+        limit = firmware_sit.STARTUP_BANKS
+        if not 0 <= first_bank < limit or first_bank + self.bank_count > limit:
+            raise FormatError(f"the load must fit within startup-initialized RAM banks 0 to {limit - 1}")
+
+        lo, hi = firmware_sit.PROTECTED_START, firmware_sit.PROTECTED_END
+        self.memory = bytearray(limit * BANK_SIZE)
+        for bank, protected in enumerate(firmware.protected):
+            base = bank * BANK_SIZE
+            self.memory[base + lo:base + hi] = protected
+
+        target = first_bank * BANK_SIZE
+        high_water = 0
+        cleared = set()
+        for record in image.records:
+            start = record.address
+            end = start + len(record.data)
+            high_water = max(high_water, end - 1)
+            bank = first_bank + high_water // BANK_SIZE
+            if bank not in cleared:
+                base = bank * BANK_SIZE
+                self.memory[base:base + lo] = bytes(lo)
+                self.memory[base + hi:base + BANK_SIZE] = bytes(BANK_SIZE - hi)
+                cleared.add(bank)
+            # The write exclusion is relative to the first bank in the transaction.
+            before = min(lo, end)
+            after = max(hi, start)
+            if start < before:
+                self.memory[target + start:target + before] = record.data[:before - start]
+            if after < end:
+                self.memory[target + after:target + end] = record.data[after - start:]
+
+        if self.memory[target + 0x2A4:target + 0x2A8] == b"UPLD":
+            raise FormatError("UPLD playback needs the installed card's RAM-bank routing state")
+        header = bytes(self.memory[target + 0x670:target + 0x67C])
+        suffix = header[4:8]
+        self.bank_type = 0
+        if header[8:12] == b".bin":
+            self.bank_type = int(suffix in (b"0AA ", b"0AB ", b"0BA ", b"S0CA"))
+        elif header[:4] in (b"TONE", b"U1X7"):
+            self.bank_type = {b"6AA0": 1, b"6AB0": 1, b"6BA0": 1, b"6CA0": 1,
+                              b"00AA": 2, b"00AB": 3}.get(suffix, 0)
+        self.tone_records = {
+            firmware_sit.BANK_BASE + target + entry["header_address"]: (entry, raw)
+            for entry, raw in tone_bank.records(image)
+        } if self.bank_type > 1 else {}
+        # Reuse the voice menu parser with fully addressed RAM bytes.
+        self.loaded_image = Image([Record(0, bytes(self.memory), "RAM", 0)])
+
+    def read(self, address, size):
+        start = address - firmware_sit.BANK_BASE
+        if start < 0 or start + size > len(self.memory):
+            raise FormatError(f"address 0x{address:06x} is outside initialized card RAM")
+        return bytes(self.memory[start:start + size])
+
+    def waveform(self, address):
+        try:
+            if address in self.tone_records:
+                entry, raw = self.tone_records[address]
+                codec = entry["codec"]
+            else:
+                raw, codec = self.firmware.waveform(address)
+        except ValueError as exc:
+            raise FormatError(f"no known waveform record at 0x{address:06x}") from exc
+        record = (len(raw) // 2).to_bytes(2, "big") + raw
+        if self.read(address, len(record)) != record:
+            raise FormatError(f"waveform at 0x{address:06x} differs from the known startup or load record")
+        return raw, codec
+
+    def slots(self, bank):
+        top = (4, 40, 64, 64)[self.bank_type]
+        return [slot for slot in range(64)
+                if slot < top or self.directory_entry(bank, slot) not in (bytes(4), b"\xff" * 4)]
+
+    def directory_entry(self, bank, slot):
+        return self.read(firmware_sit.BANK_BASE + bank * BANK_SIZE + slot * 4, 4)
+
+    def phrase(self, bank, slot, codec="alaw-unmasked"):
+        if not self.first_bank <= bank < self.first_bank + self.bank_count or not 0 <= slot < 64:
+            raise FormatError("requested slot is outside the loaded banks")
+        if slot < 4:
+            return self.firmware.cue(slot, read=self.read)
+        if self.bank_type > 1 or (self.bank_type == 1 and slot < 40):
+            bank_offset = bank * BANK_SIZE if self.bank_type > 1 else 0
+            if 8 <= slot < 40:
+                return self.firmware.sit(slot - 7, bank_offset=bank_offset, waveform=self.waveform)
+            return self.firmware.continuous(slot, bank_offset=bank_offset, waveform=self.waveform)
+
+        offset = bank * BANK_SIZE
+        phrase = self.loaded_image.parse_phrase(offset, slot, self.directory_entry(bank, slot))
+        base = firmware_sit.BANK_BASE + offset
+        ranges = ((base + part.page * PAGE_SIZE, part.pages, part.repeats) for part in phrase.segments)
+        return self.firmware.pages(slot, ranges, read=self.read, codec=codec)
+
+    def label(self, tone):
+        if isinstance(tone, firmware_sit.SIT):
+            return f"Built-in SIT {tone.number:02d}"
+        if isinstance(tone, firmware_sit.Continuous):
+            entry = self.tone_records.get(tone.components[0].record_address)
+            return entry[0]["tone_name"] if entry else firmware_sit.CONTINUOUS_SLOTS.get(
+                tone.slot, f"Continuous slot {tone.slot:02d}")
+        return firmware_sit.PAGE_SLOTS.get(tone.slot, f"Phrase {tone.slot:02d}")
+
+
 def render_firmware_tone(tone, codec=None):
     return b"".join(decode(codes, codec or law) for codes, law in firmware_sit.coded_chunks(tone))
 
 
 def firmware_tone_entry(tone, firmware, label, title, folder, codec):
     codes = tone.codes
-    staged = codes.ljust(len(codes) + (-len(codes) % PAGE_SIZE), b"\0")
+    loop = isinstance(tone, firmware_sit.Continuous)
+    raw = tone.record_bytes if loop else codes.ljust(len(codes) + (-len(codes) % PAGE_SIZE), b"\0")
     pcm = render_firmware_tone(tone, codec)
     entry = {"slot": tone.slot, "label": title, "samples": len(codes),
-             "duration_seconds": len(codes) / RATE, "staged_samples": len(staged),
              "active_sha256": hashlib.sha256(codes).hexdigest(),
-             "staged_sha256": hashlib.sha256(staged).hexdigest(),
              "pcm_sha256": hashlib.sha256(pcm).hexdigest(),
              "components": [asdict(part) for part in tone.components]}
+    if loop:
+        entry.update(continuous=True, preview_seconds=len(codes) / RATE,
+                     record_sha256=hashlib.sha256(raw).hexdigest())
+    else:
+        entry.update(duration_seconds=len(codes) / RATE, staged_samples=len(raw),
+                     staged_sha256=hashlib.sha256(raw).hexdigest())
     if folder is not None:
-        entry.update(wav=f"{label}.wav", raw=f"{label}.staged.bin")
+        entry.update(wav=f"{label}.wav", raw=f"{label}.{'record' if loop else 'staged'}.bin")
         write_wav(folder / entry["wav"], pcm, f"{firmware.name} {title}",
                   f"selector=0x{firmware.selector:04x}; WAV law={codec or 'per component'}")
-        (folder / entry["raw"]).write_bytes(staged)
+        (folder / entry["raw"]).write_bytes(raw)
     return entry
 
 
@@ -429,13 +544,45 @@ def export_firmware_sit(path, output, codec=None, selector=0x4040, *, inspect=Fa
                             title, folder, codec)
         for slot, title in firmware_sit.CUES.items()
     ]
+    continuous = [firmware_tone_entry(firmware.continuous(slot), firmware, f"loop_{slot:02d}",
+                                      title, folder, codec)
+                  for slot, title in firmware_sit.CONTINUOUS_SLOTS.items()]
     manifest = {
         "converter_version": VERSION, "source": path.name, "firmware": firmware.name,
         "source_sha256": hashlib.sha256(source).hexdigest(), "flat_sha256": firmware.sha256,
         "selector": selector, "low_memory_byte": firmware_sit.LOW_MEMORY_BYTE,
         "preview_codec": codec or "per-component", "sample_rate": RATE,
-        "firmware_sits": sits, "firmware_cues": cues,
+        "firmware_sits": sits, "firmware_cues": cues, "firmware_continuous": continuous,
+        "startup_copies": [asdict(copy) for copy in firmware.startup_copies],
     }
+    if folder is not None:
+        (folder / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    return manifest
+
+
+def export_card_playback(path, output, firmware, first_bank=0, slots=None, codec="alaw-unmasked",
+                         *, inspect=False, overwrite=False):
+    source = path.read_bytes()
+    parse = parse_bin44 if source[:1] == b"G" else parse_srec
+    playback = CardPlayback(Image(parse(source)), firmware, first_bank)
+    folder = None if inspect else output_folder(path, output, overwrite)
+    entries = []
+    for bank in range(first_bank, first_bank + playback.bank_count):
+        for slot in slots or playback.slots(bank):
+            try:
+                tone = playback.phrase(bank, slot, codec)
+            except ValueError as exc:
+                entries.append({"bank": bank, "slot": slot, "status": "unavailable", "reason": str(exc)})
+                continue
+            entry = firmware_tone_entry(tone, firmware, f"bank_{bank:02d}_slot_{slot:02d}",
+                                        playback.label(tone), folder, None)
+            entries.append({"bank": bank, "status": "exported", **entry})
+    manifest = {"converter_version": VERSION, "source": path.name, "firmware": firmware.name,
+                "source_sha256": hashlib.sha256(source).hexdigest(), "flat_sha256": firmware.sha256,
+                "selector": firmware.selector, "first_bank": first_bank, "bank_type": playback.bank_type,
+                "low_memory_byte": firmware_sit.LOW_MEMORY_BYTE, "sample_rate": RATE,
+                "startup_copies": [asdict(copy) for copy in firmware.startup_copies],
+                "card_slots": entries}
     if folder is not None:
         (folder / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     return manifest
@@ -445,15 +592,25 @@ def write_browser(output: Path, manifests):
     rows = []
     for manifest in manifests:
         source = manifest["source"]
-        for tone in (*manifest.get("firmware_cues", ()), *manifest.get("firmware_sits", ())):
-            name = f'{manifest["firmware"]} / 0x{manifest["selector"]:04x} / {tone["label"]}'
-            folder = Path(Path(source).stem)
-            url = html.escape((folder / tone["wav"]).as_posix(), quote=True)
-            raw_url = html.escape((folder / tone["raw"]).as_posix(), quote=True)
-            rows.append(f'<tr><td>{html.escape(name)}</td><td>{tone["duration_seconds"]:.3f}s</td>'
-                        f'<td><button data-src="{url}">Play</button> <a href="{url}" download>WAV</a> '
-                        f'<a href="{raw_url}" download>Raw codes</a></td></tr>')
-        if "firmware_sits" in manifest:
+        if "firmware" in manifest:
+            tones = manifest.get("card_slots", [*manifest.get("firmware_cues", ()),
+                                 *manifest.get("firmware_continuous", ()), *manifest.get("firmware_sits", ())])
+            for tone in tones:
+                if "wav" not in tone:
+                    continue
+                name = f'{manifest["firmware"]} / 0x{manifest["selector"]:04x} / {tone["label"]}'
+                if "bank" in tone:
+                    name = f'{source} / RAM bank {tone["bank"]} / slot {tone["slot"]:02d} / {name}'
+                folder = Path(Path(source).stem)
+                url = html.escape((folder / tone["wav"]).as_posix(), quote=True)
+                raw_url = html.escape((folder / tone["raw"]).as_posix(), quote=True)
+                loop = tone.get("continuous", False)
+                timing = "Continuous" if loop else f'{tone["duration_seconds"]:.3f}s'
+                button = "Loop" if loop else "Play"
+                raw_label = "Native record" if loop else "Staged codes"
+                rows.append(f'<tr><td>{html.escape(name)}</td><td>{timing}</td>'
+                            f'<td><button data-src="{url}" data-loop="{str(loop).lower()}">{button}</button> '
+                            f'<a href="{url}" download>WAV</a> <a href="{raw_url}" download>{raw_label}</a></td></tr>')
             continue
         raw_paths = tone_bank.raw_bank_paths(manifest, BANK_SIZE, PAGE_SIZE)
         for phrase in manifest["phrases"]:
@@ -473,9 +630,9 @@ def write_browser(output: Path, manifests):
             url = html.escape(clip["path"], quote=True)
             rows.append(f'<tr><td>{html.escape(name)}</td><td>{clip["seconds"]:.4f}s</td>'
                         f'<td><button data-src="{url}">Play</button> <a href="{url}" download>WAV</a></td></tr>')
-    firmware_only = bool(manifests) and all("firmware_sits" in m for m in manifests)
-    title = "Nortel EDRAM firmware tones" if firmware_only else "EDRAM announcement archive"
-    description = ("8 kHz PCM decoded from firmware waveforms. Raw downloads contain the staged sample codes."
+    firmware_only = bool(manifests) and all("firmware" in m for m in manifests)
+    title = "Nortel EDRAM card playback" if firmware_only else "EDRAM announcement archive"
+    description = ("8 kHz PCM from card RAM. Continuous WAVs contain one native waveform record."
                    if firmware_only else
                    "8 kHz, 16-bit mono PCM. WAVs expand the stored sample bytes at the addressed locations. IDs are bank-local.")
     document = '''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
@@ -490,7 +647,7 @@ header{position:sticky;top:0;background:#101820;padding:1rem 0} audio{width:100%
 <audio id="player" controls></audio><div id="playing">Select a recording</div></header>
 <table><tbody>ROWS</tbody></table><script>
 const p=document.querySelector('#player');
-document.addEventListener('click',e=>{if(e.target.dataset.src){p.src=e.target.dataset.src;p.play();document.querySelector('#playing').textContent=e.target.closest('tr').cells[0].textContent;}});
+document.addEventListener('click',e=>{if(e.target.dataset.src){p.loop=e.target.dataset.loop==='true';p.src=e.target.dataset.src;p.play();document.querySelector('#playing').textContent=e.target.closest('tr').cells[0].textContent;}});
 document.querySelector('#filter').addEventListener('input',e=>{const q=e.target.value.toLowerCase();document.querySelectorAll('tr').forEach(r=>r.hidden=!r.textContent.toLowerCase().includes(q));});
 </script></html>'''
     document = (document.replace("PAGE_TITLE", title).replace("PAGE_DESCRIPTION", description)
@@ -523,20 +680,32 @@ def main(argv=None):
     parser.add_argument("--inspect", action="store_true", help="validate and list tables without writing files")
     parser.add_argument("--codec", choices=tuple(PCM_TABLES),
                         help="override the WAV law (A-law for announcements, per waveform for firmware by default)")
-    parser.add_argument("--firmware-sit", "--firmware-tones", action="store_true",
-                        help="decode built-in SITs and 750 Hz cues from firmware images")
-    parser.add_argument("--sit-selector", type=lambda value: int(value, 0), choices=firmware_sit.SELECTORS,
-                        metavar="{0x4040,0x5050}", help="firmware SIT selector (default: 0x4040)")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--firmware-sit", "--firmware-tones", action="store_true",
+                      help="decode built-in cues, SITs and continuous tones from firmware images")
+    mode.add_argument("--card-playback", type=Path, metavar="FIRMWARE",
+                      help="preview a load in RAM after firmware startup and slot dispatch")
+    parser.add_argument("--first-bank", type=int, help="zero-based RAM bank for the load (default: 0)")
+    parser.add_argument("--slot", type=int, action="append", metavar="0..63",
+                        help="restrict card playback to a slot, repeatable")
+    parser.add_argument("--sit-selector", "--playback-selector", type=lambda value: int(value, 0),
+                        choices=firmware_sit.SELECTORS,
+                        metavar="{0x4040,0x5050}", help="firmware playback selector (default: 0x4040)")
     parser.add_argument("--raw-tones", "--raw-sit", action="store_true",
                         help="export native standalone headers and companded sample bytes")
     parser.add_argument("--segments", action="store_true", help="also export each referenced segment without repeats")
     parser.add_argument("--overwrite", action="store_true", help="allow replacing outputs in existing source folders")
     parser.add_argument("--version", action="version", version=VERSION)
     args = parser.parse_args(argv)
-    if args.sit_selector is not None and not args.firmware_sit:
-        parser.error("--sit-selector requires --firmware-sit")
-    if args.segments and args.firmware_sit:
-        parser.error("--segments is for announcement loads")
+    firmware_mode = args.firmware_sit or args.card_playback
+    if args.sit_selector is not None and not firmware_mode:
+        parser.error("--playback-selector requires a firmware mode")
+    if (args.first_bank is not None or args.slot) and not args.card_playback:
+        parser.error("--first-bank and --slot require --card-playback")
+    if args.slot and any(not 0 <= slot < 64 for slot in args.slot):
+        parser.error("--slot must be between 0 and 63")
+    if args.segments and firmware_mode:
+        parser.error("--segments is for file-only announcement exports")
     try:
         paths = input_paths(args.inputs, firmware=args.firmware_sit)
         if args.firmware_sit:
@@ -548,10 +717,25 @@ def main(argv=None):
             else:
                 write_browser(args.output, manifests)
                 for manifest in manifests:
-                    print(f"{manifest['source']}: {len(manifest['firmware_sits'])} SITs "
-                          f"and {len(manifest['firmware_cues'])} built-in cues exported")
+                    print(f"{manifest['source']}: {len(manifest['firmware_sits'])} SITs, "
+                          f"{len(manifest['firmware_cues'])} cues and "
+                          f"{len(manifest['firmware_continuous'])} continuous tones exported")
             return
         codec = args.codec or "alaw-unmasked"
+        if args.card_playback:
+            firmware = parse_firmware_sit(args.card_playback.read_bytes(), args.sit_selector or 0x4040)
+            slots = sorted(set(args.slot)) if args.slot else None
+            manifests = [export_card_playback(path, args.output, firmware, args.first_bank or 0, slots, codec,
+                                              inspect=args.inspect, overwrite=args.overwrite) for path in paths]
+            if args.inspect:
+                for manifest in manifests:
+                    print(json.dumps(manifest))
+            else:
+                write_browser(args.output, manifests)
+                for manifest in manifests:
+                    available = sum(s["status"] == "exported" for s in manifest["card_slots"])
+                    print(f"{manifest['source']}: {available}/{len(manifest['card_slots'])} card slots exported")
+            return
         manifests = []
         for path in paths:
             if args.inspect:

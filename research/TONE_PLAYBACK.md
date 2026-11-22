@@ -46,6 +46,10 @@ The final page of the low middle sustain (`0x1900`) repeats a 64-byte block with
 
 In `FSTD0BA`, bank 1 has a byte-identical copy of bank 0's SIT submenus and sample pages. The three misaligned directory entries and the fourth entry that lands on the previous SIT's last word have verified replacements. Use the [explicit repair](../FORMAT.md#malformed-references) to export the four corrected SITs from bank 1.
 
+## Firmware startup waveforms
+
+A completed firmware download calls `0x0418`, which initializes the protected RAM pages and copies the two sets of companded waveforms. A successful announcement load preserves that protected window in its first bank. Factory bank types then select built-in SIT and continuous descriptors at playback. The two 750 Hz cues read the same absolute page under both tested selectors. The `0x5050` selector switches the initial waveform address by `0x80000`, including each continuous slot and the first pitch of a SIT. The later SIT pitches keep their stored addresses. Loaded milliwatt and howler records use the standalone tone bank. [Verified startup and RAM layout](EDRAM_FIRMWARE_EVIDENCE.md#firmware-download-and-startup)
+
 ## Built-in firmware SITs
 
 The two recovered 68k loads contain a separate three-component SIT directory. Under the tested `0x4040` profile, each descriptor addresses a waveform record whose samples loop for 2,192 or 3,040 frames. Under `0x5050`, the first record comes from the second embedded waveform table. The second and third records use the stored addresses. Both profiles were run through the native stage routine for all 32 SITs on both firmware builds with runtime byte `[0x000001] = 1`. [Firmware evidence](EDRAM_FIRMWARE_EVIDENCE.md) and [raw byte vectors](../data/xacore/firmware/playback-vectors.json)
@@ -56,7 +60,7 @@ The 68 checked-in firmware WAVs were compared sample for sample with FFmpeg's G.
 
 ### Built-in 750 Hz cues
 
-Firmware slot 1 repeats the 256 sample bytes at `0x400800` five times. The page consists of eight identical 32-sample blocks. Each block expands to three 750 Hz cycles. The 160 ms output measures about -19.0 dBFS RMS throughout. Slot 2 uses that page for each of three 96 ms bursts, with pauses from the startup-cleared page. Both binaries and selectors gave identical raw cue hashes. The 32 dB attack-to-sustain drop belongs to the archived announcement load's corresponding cue. [OEM firmware player](../data/xacore/firmware/audio/4040/listen.html)
+Firmware slot 1 repeats the 256 sample bytes at `0x400800` five times. The page consists of eight identical 32-sample blocks. Each block expands to three 750 Hz cycles. The 160 ms output measures about -19.0 dBFS RMS throughout. Slot 2 uses that page for each of three 96 ms bursts, with pauses from the startup-cleared page. Both binaries and selectors gave identical raw cue hashes. The archived page-menu cue remains available for reproducing the stored load and its original attack and sustain levels. [OEM firmware player](../data/xacore/firmware/audio/4040/listen.html)
 
 ## Standalone records
 

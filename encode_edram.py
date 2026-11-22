@@ -77,8 +77,8 @@ def find_bank_tone(component, cache):
 def stored_tone(component, cache):
     if cue := re.fullmatch(r"cue:(page:)?(test|prompt)", component):
         if not cue[1]:
-            raise ValueError(f"{component}: native firmware cue uses mu-law; use cue:page:{cue[2]} "
-                             "for the archived A-law announcement cue")
+            raise ValueError(f"{component}: the card plays this mu-law cue from built-in slot {CUE_SLOTS[cue[2]]}; "
+                             f"cue:page:{cue[2]} selects the archived A-law waveform")
         return template_phrase(cache, CUE_SLOTS[cue[2]])
     if match := re.fullmatch(r"sit:(page|firmware):([0-9]+)(?::(4040|5050))?", component):
         number = int(match[2])
@@ -86,7 +86,8 @@ def stored_tone(component, cache):
             raise ValueError("SIT number must be from 1 to 32")
         if match[1] == "firmware":
             raise ValueError(f"{component}: native firmware SIT includes mu-law codes; "
-                             f"use sit:page:{number} for the archived A-law announcement SIT")
+                             f"factory bank type 1 plays it from slot {number + 7}; "
+                             f"sit:page:{number} selects the archived A-law waveform")
         if match[3]:
             raise ValueError(f"{component}: page-based SIT has no firmware selector")
         return template_phrase(cache, number + 7)
@@ -204,7 +205,8 @@ def build_load(name, phrases, transport, *, repeats=None):
     image = edram.Image.read(TEMPLATE)
     source_phrases = image.phrases()
     retained = [p for p in source_phrases if p.bank == 0 and p.number < FIRST_VOICE_PHRASE]
-    # Reuse the known voice header, phrase tables and tone region of ESTD0AA.
+    # Preserve template bytes in the transport. Startup owns protected RAM, and
+    # authored phrases start beyond the protected and reserved pages.
     data = bytearray(image.read_bytes(0, FIRST_VOICE_ADDRESS))
     present = bytearray(image.coverage[:FIRST_VOICE_ADDRESS])
     submenu = max(p.menu_address + 4 * len(p.segments) for p in retained)

@@ -20,6 +20,7 @@ ROOT = FIRMWARE.parents[2]
 sys.path.insert(0, str(ROOT))
 import edram
 import encode_edram
+import firmware_sit
 import tone_bank
 
 VARIANTS = {
@@ -111,6 +112,18 @@ class Machine:
         self.put(self.addr["entry"], directory + slot * 4)
         self.call(self.addr["start"])
 
+    def select_slot(self, index, slot):
+        self.events.clear()
+        playlist = bytes((0x80 + index, slot))
+        self.uc.mem_write(CONTEXT, playlist.ljust(0x68, bytes(1)))
+        self.put(CONTEXT + 0x28, CONTEXT)
+        self.put(CONTEXT + 0x2E, len(playlist))
+        self.trap_advance = False
+        try:
+            self.call(self.addr["advance"])
+        finally:
+            self.trap_advance = True
+
     def page(self):
         self.uc.mem_write(STAGING, b"\xA5" * PAGE_SIZE)
         self.call(self.addr["emit"])
@@ -156,6 +169,62 @@ def builtin_machine(name, selector, low_memory_byte):
     machine.put(machine.addr["builtin"], directory)
     machine.put(machine.addr["selector"], selector, 2)
     return machine
+
+
+def verify_startup(name, firmware):
+    for scenario in ("valid checksum", "invalid checksum", "CB header"):
+        machine = Machine(name)
+        for bank in range(firmware_sit.STARTUP_BANKS):
+            base = BANK + bank * BANK_SIZE
+            machine.uc.mem_write(base + 0x6FF, b"\xA5" * 0x902)
+        # Prior setup in the primary entry and the already-received executive prefix.
+        machine.put(0xE468, 1, 1)
+        machine.uc.mem_write(0x1D000, machine.read(0xE800, 0x2C00))
+        if scenario == "CB header":
+            machine.put(0x404, 0x4342, 2)
+        source = (FIRMWARE.parent / "srecords" / f"{name}.srec").read_bytes()
+        footer = int(source.split()[-1][4:12], 16)
+        supplied = footer if scenario == "valid checksum" else footer ^ 1
+        packets = iter(((0x7D, bytes(13)), (0x77, bytes(9) + supplied.to_bytes(4, "big"))))
+        events = []
+
+        def receive():
+            opcode, message = next(packets)
+            machine.uc.mem_write(MESSAGE, message)
+            machine.put(0xE222, MESSAGE)
+            machine.uc.reg_write(UC_M68K_REG_D0, opcode)
+            machine.return_now()
+
+        def service_return():
+            machine.uc.reg_write(UC_M68K_REG_D0, 0)
+            machine.return_now()
+
+        def stop(outcome):
+            events.append(outcome)
+            machine.uc.reg_write(UC_M68K_REG_PC, RETURN_ADDRESS)
+
+        machine.hooks.update({0xFE56: receive, 0xFE8C: service_return, 0x3F106: service_return,
+                              0x418: lambda: events.append("initialize"),
+                              0xE900: lambda: stop("handoff"), 0xFED4: lambda: stop("reject")})
+        machine.call(0x10106, budget=2_000_000)
+        assert machine.get(0x52E) == footer, (name, scenario)
+        accepted = scenario != "invalid checksum"
+        assert events == (["initialize", "handoff"] if accepted else ["reject"]), (name, scenario, events)
+        assert machine.get(0x536) == (0x12345678 if accepted else 0)
+        for bank, protected in enumerate(firmware.protected):
+            expected = bytes(protected) if accepted else b"\xA5" * len(protected)
+            assert machine.read(BANK + bank * BANK_SIZE + 0x6FF, 0x902) == b"\xA5" + expected + b"\xA5"
+
+
+def verify_continuous(name, firmware):
+    machine = builtin_machine(name, firmware.selector, firmware_sit.LOW_MEMORY_BYTE)
+    for slot in firmware_sit.CONTINUOUS_SLOTS:
+        machine.start_phrase(machine.addr["directory"], slot)
+        tone = firmware.continuous(slot)
+        assert machine.get(CONTEXT + 0x58) == tone.components[0].record_address
+        actual = b"".join(machine.page() for _ in range(10))
+        expected = (tone.codes * ((len(actual) + len(tone.codes) - 1) // len(tone.codes)))[:len(actual)]
+        assert actual == expected and not machine.events, (name, firmware.selector, slot)
 
 
 def trace_cue(name, slot, selector):
@@ -259,18 +328,19 @@ def trace_load(name, case):
     return result
 
 
-def verify_native_tone_bank(name, bank, replacements=None):
-    machine = builtin_machine(name, 0x4040, 1)
+def verify_native_tone_bank(name, bank, replacements=None, *, selector=0x4040):
+    machine = builtin_machine(name, selector, 1)
     rebuilt = encode_edram.build_tone_bank(bank, replacements)
     image = edram.Image(edram.parse_srec(rebuilt))
     footer = int(rebuilt.split()[-1][4:12], 16)
-    bank_number = 2
-    index = bank_number - 1
+    index = 2 if selector == 0x5050 else 1
+    bank_number = index + 1
     base = BANK + index * BANK_SIZE
     writes = ((r.address, r.data) for r in image.records)
     replies, returned = load_announcement(machine, bank_number, bank.upper(), writes, footer)
     assert replies == [0x70] * (len(image.records) + 2) and returned == index, (name, bank)
     assert machine.get(0x1CD70 + index * 32, 1) == (2 if bank == "mwttone" else 3)
+    playback = edram.CardPlayback(image, firmware_model(name, selector), index)
     entries = {}
     for entry, raw in tone_bank.records(image):
         offset = entry["header_address"]
@@ -289,15 +359,9 @@ def verify_native_tone_bank(name, bank, replacements=None):
             continue
         tone_index, raw = entries[offset]
         selected[slot] = tone_index
-        playlist = bytes((0x80 + index, slot))
-        machine.uc.mem_write(CONTEXT, playlist.ljust(0x68, bytes(1)))
-        machine.put(CONTEXT + 0x28, CONTEXT)
-        machine.put(CONTEXT + 0x2E, len(playlist))
-        machine.trap_advance = False
-        try:
-            machine.call(machine.addr["advance"])
-        finally:
-            machine.trap_advance = True
+        machine.select_slot(index, slot)
+        tone = playback.phrase(index, slot)
+        assert tone.codes == raw and tone.components[0].record_address == base + offset
         assert machine.get(CONTEXT + 0x58) == base + offset, (name, bank, slot)
         pages = (3 * len(raw) + PAGE_SIZE - 1) // PAGE_SIZE
         actual = b"".join(machine.page() for _ in range(pages))
@@ -332,6 +396,31 @@ def trace_request(name, frame):
     }
 
 
+def firmware_model(name, selector):
+    return edram.parse_firmware_sit((FIRMWARE / f"{name}.base-000400.bin").read_bytes(), selector)
+
+
+def verify_voice_load(name, firmware, raw, parse, checksum, load_name, slots, *, expected_type):
+    index = 1
+    image = edram.Image(parse(raw))
+    playback = edram.CardPlayback(image, firmware, index)
+    machine = builtin_machine(name, firmware.selector, firmware_sit.LOW_MEMORY_BYTE)
+    writes = ((r.address, r.data) for r in image.records)
+    replies, returned = load_announcement(machine, index + 1, load_name, writes, checksum)
+    assert replies == [0x70] * (len(image.records) + 2) and returned == index
+    assert machine.get(0x1CD70 + index * 32, 1) == playback.bank_type == expected_type
+    for bank in range(index, index + playback.bank_count):
+        base = BANK + bank * BANK_SIZE
+        assert machine.read(base, BANK_SIZE) == playback.read(base, BANK_SIZE)
+    for slot in slots:
+        machine.select_slot(index, slot)
+        tone = playback.phrase(index, slot)
+        samples = len(tone.codes)
+        expected = tone.codes.ljust(samples + (-samples % PAGE_SIZE), b"\0")
+        actual = b"".join(machine.page() for _ in range(len(expected) // PAGE_SIZE))
+        assert actual == expected and machine.events == PLAYBACK_DONE, (name, firmware.selector, slot)
+
+
 def verify(vectors):
     synthetic = vectors["ordinary"]["synthetic"]
     bank = synthetic_bank(synthetic["descriptors"], synthetic["page_values"])
@@ -344,6 +433,20 @@ def verify(vectors):
 
     for name, digest in vectors["firmware_sha256"].items():
         assert sha256((FIRMWARE / f"{name}.base-000400.bin").read_bytes()) == digest
+        firmware = firmware_model(name, 0x4040)
+        verify_startup(name, firmware)
+        for selector in firmware_sit.SELECTORS:
+            verify_continuous(name, firmware_model(name, selector))
+
+        original = encode_edram.TEMPLATE.read_bytes()
+        verify_voice_load(name, firmware, original, edram.parse_bin44,
+                          int.from_bytes(original[-41:-37], "big"), "ESTD0AA", (1, 8, 40), expected_type=1)
+        for transport, parse in (("bin44", edram.parse_bin44), ("txt80", edram.parse_srec)):
+            authored = encode_edram.build_load("LABANN", {40: encode_edram.read_tone("sit:page:1")}, transport)
+            checksum = (int.from_bytes(authored[-41:-37], "big") if transport == "bin44"
+                        else int(authored.split()[-1][4:12], 16))
+            verify_voice_load(name, firmware, authored, parse, checksum, "LABANN", (1, 8, 40), expected_type=0)
+        print(f"{name}: startup checksum gate, RAM copies, continuous slots and card-context voice loads matched")
         stream, pages, events = trace_voice(name, bank, synthetic["slot"])
         assert (len(stream), sha256(stream), pages, events) == (
             synthetic["staged_bytes"], synthetic["staged_sha256"],
@@ -388,7 +491,8 @@ def verify(vectors):
             verify_native_tone_bank(name, bank, replacements)
             for bank, replacements in (("mwttone", None), ("edrmtone", None), ("edrmtone", {9: "edrmtone:14"}))
         )
-        print(f"{name}: three native tone banks loaded, {playback_cases} continuous slot cases matched")
+        playback_cases += verify_native_tone_bank(name, "edrmtone", selector=0x5050)
+        print(f"{name}: four native tone banks loaded, {playback_cases} continuous slot cases matched")
 
 
 if __name__ == "__main__":

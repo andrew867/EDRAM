@@ -13,10 +13,7 @@
       "slot": 8,
       "label": "Built-in SIT 01",
       "samples": 6576,
-      "duration_seconds": 0.822,
-      "staged_samples": 6656,
       "active_sha256": "1c34a97b5d679b40d550dbbf51219341a19e45b32938e9493f86bbab6eaf4df0",
-      "staged_sha256": "039b3c07cbe3ff1d8bc015fd5334a3a9bcc68a6924657311eeb7d9fc9fc1e0aa",
       "pcm_sha256": "01b1b8b6f796623523b7ad30dcb8e967dbcaa44d19e2e9810614d222ac2866ed",
       "components": [
         {
@@ -41,6 +38,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 0.822,
+      "staged_samples": 6656,
+      "staged_sha256": "039b3c07cbe3ff1d8bc015fd5334a3a9bcc68a6924657311eeb7d9fc9fc1e0aa",
       "wav": "sit_01.wav",
       "raw": "sit_01.staged.bin",
       "number": 1
@@ -49,10 +49,7 @@
       "slot": 9,
       "label": "Built-in SIT 02",
       "samples": 7424,
-      "duration_seconds": 0.928,
-      "staged_samples": 7424,
       "active_sha256": "f3194c8b2f036ae14f42917d9c7be00e2f9d2a459a2b106f4714ed942673e566",
-      "staged_sha256": "f3194c8b2f036ae14f42917d9c7be00e2f9d2a459a2b106f4714ed942673e566",
       "pcm_sha256": "cdaa918cfba67e34c59dec6681d928269688fa27b7b4534c471879d171d861b8",
       "components": [
         {
@@ -77,6 +74,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 0.928,
+      "staged_samples": 7424,
+      "staged_sha256": "f3194c8b2f036ae14f42917d9c7be00e2f9d2a459a2b106f4714ed942673e566",
       "wav": "sit_02.wav",
       "raw": "sit_02.staged.bin",
       "number": 2
@@ -85,10 +85,7 @@
       "slot": 10,
       "label": "Built-in SIT 03",
       "samples": 7424,
-      "duration_seconds": 0.928,
-      "staged_samples": 7424,
       "active_sha256": "39e90b95450bf472c678ef66d8b7278ddf8aafec8fd453745a4b8d56189681ce",
-      "staged_sha256": "39e90b95450bf472c678ef66d8b7278ddf8aafec8fd453745a4b8d56189681ce",
       "pcm_sha256": "b643b36c6b9ffedb4ff9d363323dc546e524521e21f26682bc90369586bbad2e",
       "components": [
         {
@@ -113,6 +110,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 0.928,
+      "staged_samples": 7424,
+      "staged_sha256": "39e90b95450bf472c678ef66d8b7278ddf8aafec8fd453745a4b8d56189681ce",
       "wav": "sit_03.wav",
       "raw": "sit_03.staged.bin",
       "number": 3
@@ -121,10 +121,7 @@
       "slot": 11,
       "label": "Built-in SIT 04",
       "samples": 8272,
-      "duration_seconds": 1.034,
-      "staged_samples": 8448,
       "active_sha256": "37d693729d482e12d003ad780a64b31c5c102260ffa64e59d23ebf75ad36d85e",
-      "staged_sha256": "dfbeb8206204f247dc22836258b6857919a8d1996a0307a255ac182d82a9a659",
       "pcm_sha256": "d01089f3c3225ea8770df7bd9106128f301667228aee243800608a82f6be913f",
       "components": [
         {
@@ -149,6 +146,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 1.034,
+      "staged_samples": 8448,
+      "staged_sha256": "dfbeb8206204f247dc22836258b6857919a8d1996a0307a255ac182d82a9a659",
       "wav": "sit_04.wav",
       "raw": "sit_04.staged.bin",
       "number": 4
@@ -157,10 +157,7 @@
       "slot": 12,
       "label": "Built-in SIT 05",
       "samples": 6576,
-      "duration_seconds": 0.822,
-      "staged_samples": 6656,
       "active_sha256": "caa66db90e553ccdf18a8be1d4ab83ba5b821c7df4fcdf4da9a19caf3f45d59e",
-      "staged_sha256": "7089f900ee007ac2ab2135b920cbbb9a6d58d1a3afc20aba01a252f52b2d57c9",
       "pcm_sha256": "f3947a41535f1eee1f09f5e036205df1b99be4303b4c8bd3d42ef8518db65374",
       "components": [
         {
@@ -185,6 +182,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 0.822,
+      "staged_samples": 6656,
+      "staged_sha256": "7089f900ee007ac2ab2135b920cbbb9a6d58d1a3afc20aba01a252f52b2d57c9",
       "wav": "sit_05.wav",
       "raw": "sit_05.staged.bin",
       "number": 5
@@ -193,10 +193,7 @@
       "slot": 13,
       "label": "Built-in SIT 06",
       "samples": 7424,
-      "duration_seconds": 0.928,
-      "staged_samples": 7424,
       "active_sha256": "83b3b3dd5e19889c416a7edc28d32e5ea3963b1d4c837ede1e7b0d9e3e115e6d",
-      "staged_sha256": "83b3b3dd5e19889c416a7edc28d32e5ea3963b1d4c837ede1e7b0d9e3e115e6d",
       "pcm_sha256": "1a536806b304ed6280f77b9a37b9418080153c0e669bedb8de7c03f483fc7fc1",
       "components": [
         {
@@ -221,6 +218,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 0.928,
+      "staged_samples": 7424,
+      "staged_sha256": "83b3b3dd5e19889c416a7edc28d32e5ea3963b1d4c837ede1e7b0d9e3e115e6d",
       "wav": "sit_06.wav",
       "raw": "sit_06.staged.bin",
       "number": 6
@@ -229,10 +229,7 @@
       "slot": 14,
       "label": "Built-in SIT 07",
       "samples": 7424,
-      "duration_seconds": 0.928,
-      "staged_samples": 7424,
       "active_sha256": "e0ace09c60c7c0cee0659658877d2b295372a71b90fc1e6d75cfc4cec1a1a14b",
-      "staged_sha256": "e0ace09c60c7c0cee0659658877d2b295372a71b90fc1e6d75cfc4cec1a1a14b",
       "pcm_sha256": "148d090467958fa255f6707d041007d0d7d1887dece5ae736cdbc7ae6cea7818",
       "components": [
         {
@@ -257,6 +254,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 0.928,
+      "staged_samples": 7424,
+      "staged_sha256": "e0ace09c60c7c0cee0659658877d2b295372a71b90fc1e6d75cfc4cec1a1a14b",
       "wav": "sit_07.wav",
       "raw": "sit_07.staged.bin",
       "number": 7
@@ -265,10 +265,7 @@
       "slot": 15,
       "label": "Built-in SIT 08",
       "samples": 8272,
-      "duration_seconds": 1.034,
-      "staged_samples": 8448,
       "active_sha256": "f6ca90fefcb0aaeb7bd6a077e84644a7fea42660e341e7a3ee16f5389692bb09",
-      "staged_sha256": "a198445c3f10d3ab3dadf72e25e98f17d19bfed7ad2499d9d3a2212ec44fca2a",
       "pcm_sha256": "3d8b8ee940f803d5de0b2fc95ccaa8865718c06ed8bd36a984d0bc5fc0cc298a",
       "components": [
         {
@@ -293,6 +290,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 1.034,
+      "staged_samples": 8448,
+      "staged_sha256": "a198445c3f10d3ab3dadf72e25e98f17d19bfed7ad2499d9d3a2212ec44fca2a",
       "wav": "sit_08.wav",
       "raw": "sit_08.staged.bin",
       "number": 8
@@ -301,10 +301,7 @@
       "slot": 16,
       "label": "Built-in SIT 09",
       "samples": 7424,
-      "duration_seconds": 0.928,
-      "staged_samples": 7424,
       "active_sha256": "388021d1b22062e9a96acf0d9a262828f7b291a97babf493ed447afb515d7956",
-      "staged_sha256": "388021d1b22062e9a96acf0d9a262828f7b291a97babf493ed447afb515d7956",
       "pcm_sha256": "50edf5e38b5e95c0e37f78fa8f5ba9689ffedc8c0a62290287126e6719274207",
       "components": [
         {
@@ -329,6 +326,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 0.928,
+      "staged_samples": 7424,
+      "staged_sha256": "388021d1b22062e9a96acf0d9a262828f7b291a97babf493ed447afb515d7956",
       "wav": "sit_09.wav",
       "raw": "sit_09.staged.bin",
       "number": 9
@@ -337,10 +337,7 @@
       "slot": 17,
       "label": "Built-in SIT 10",
       "samples": 8272,
-      "duration_seconds": 1.034,
-      "staged_samples": 8448,
       "active_sha256": "21c477468e1be9aa5522229abf16ffe0917dee5a988f1ee63d78e4edf27b21e6",
-      "staged_sha256": "438e38989814f8315f9b271860a6f62f32826faf3541e92af1dba67bea5ea2ec",
       "pcm_sha256": "e0e60a566f8f77041f74a72545991c75b60f005569f84e54ab37215f20280ddc",
       "components": [
         {
@@ -365,6 +362,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 1.034,
+      "staged_samples": 8448,
+      "staged_sha256": "438e38989814f8315f9b271860a6f62f32826faf3541e92af1dba67bea5ea2ec",
       "wav": "sit_10.wav",
       "raw": "sit_10.staged.bin",
       "number": 10
@@ -373,10 +373,7 @@
       "slot": 18,
       "label": "Built-in SIT 11",
       "samples": 8272,
-      "duration_seconds": 1.034,
-      "staged_samples": 8448,
       "active_sha256": "40e79fe26c47f1c4ab7050a92afbecd6d7584be3994fcbb69191256526ea2a46",
-      "staged_sha256": "f26aa3dad803647d1cd312c93bed645439db342102651f1a760fa70f7b2dd59d",
       "pcm_sha256": "9c90c329516b7513ebaa1a9c4ad508c78b85f54708d998a5fafb8f4d359ad1c4",
       "components": [
         {
@@ -401,6 +398,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 1.034,
+      "staged_samples": 8448,
+      "staged_sha256": "f26aa3dad803647d1cd312c93bed645439db342102651f1a760fa70f7b2dd59d",
       "wav": "sit_11.wav",
       "raw": "sit_11.staged.bin",
       "number": 11
@@ -409,10 +409,7 @@
       "slot": 19,
       "label": "Built-in SIT 12",
       "samples": 9120,
-      "duration_seconds": 1.14,
-      "staged_samples": 9216,
       "active_sha256": "b92ac5f32fbac1fa61ff18b2dc1c40ac4c74ac8d42e7da0e94010d10d85538ea",
-      "staged_sha256": "245baecf46a5040e4b53497531505f2123089167b7d23418f271376e58f2d80e",
       "pcm_sha256": "60aa918d8a790916f7c4dd66ee46b7ec5299d0a31430310626d907a69ae4bc4e",
       "components": [
         {
@@ -437,6 +434,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 1.14,
+      "staged_samples": 9216,
+      "staged_sha256": "245baecf46a5040e4b53497531505f2123089167b7d23418f271376e58f2d80e",
       "wav": "sit_12.wav",
       "raw": "sit_12.staged.bin",
       "number": 12
@@ -445,10 +445,7 @@
       "slot": 20,
       "label": "Built-in SIT 13",
       "samples": 7424,
-      "duration_seconds": 0.928,
-      "staged_samples": 7424,
       "active_sha256": "eb7f71b9701db8f9b4798347c94b1fdf3683081cc4ad6af05f1f661f32165ba1",
-      "staged_sha256": "eb7f71b9701db8f9b4798347c94b1fdf3683081cc4ad6af05f1f661f32165ba1",
       "pcm_sha256": "a21a07616823bb7ed17d99467173cbee366da05f923f06861ecd5c0902c9c61f",
       "components": [
         {
@@ -473,6 +470,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 0.928,
+      "staged_samples": 7424,
+      "staged_sha256": "eb7f71b9701db8f9b4798347c94b1fdf3683081cc4ad6af05f1f661f32165ba1",
       "wav": "sit_13.wav",
       "raw": "sit_13.staged.bin",
       "number": 13
@@ -481,10 +481,7 @@
       "slot": 21,
       "label": "Built-in SIT 14",
       "samples": 8272,
-      "duration_seconds": 1.034,
-      "staged_samples": 8448,
       "active_sha256": "2486a9134374ffc66a0f0cf6584755e104a745501bfe2f640ac617908ca5ff8e",
-      "staged_sha256": "139417adfd093985549279688f06c4655bd88d7504190c0346a6c13baa2e0492",
       "pcm_sha256": "e64d270291cec0d374338955dae07f6119239804101340f92aef16230dd60cec",
       "components": [
         {
@@ -509,6 +506,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 1.034,
+      "staged_samples": 8448,
+      "staged_sha256": "139417adfd093985549279688f06c4655bd88d7504190c0346a6c13baa2e0492",
       "wav": "sit_14.wav",
       "raw": "sit_14.staged.bin",
       "number": 14
@@ -517,10 +517,7 @@
       "slot": 22,
       "label": "Built-in SIT 15",
       "samples": 8272,
-      "duration_seconds": 1.034,
-      "staged_samples": 8448,
       "active_sha256": "5f5795f16728bc4b6293212cee62b80370508519426ac3ce96216087036b8701",
-      "staged_sha256": "b68309b34f5c684b6585ae2cabb4de315a5fe0bf24eb7cd7fcbe7861d053b810",
       "pcm_sha256": "0f99420b6e4bda404ef3d86b8111020ef4adc81ff902fbfe1e3360410a47e8e2",
       "components": [
         {
@@ -545,6 +542,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 1.034,
+      "staged_samples": 8448,
+      "staged_sha256": "b68309b34f5c684b6585ae2cabb4de315a5fe0bf24eb7cd7fcbe7861d053b810",
       "wav": "sit_15.wav",
       "raw": "sit_15.staged.bin",
       "number": 15
@@ -553,10 +553,7 @@
       "slot": 23,
       "label": "Built-in SIT 16",
       "samples": 9120,
-      "duration_seconds": 1.14,
-      "staged_samples": 9216,
       "active_sha256": "8794ad3b7ba5b1365dfec0cfd319bd916e5d92de93fc1391cf4a7b07bd3f3843",
-      "staged_sha256": "e1f80ba4bbeaae5d71aa4f3c48031e948fba80510e9a03ab5f3b633113cb203b",
       "pcm_sha256": "0d3d6bef6c705ff53f47100f09933d7b4e492cf4649935405dceee4dbeb0e961",
       "components": [
         {
@@ -581,6 +578,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 1.14,
+      "staged_samples": 9216,
+      "staged_sha256": "e1f80ba4bbeaae5d71aa4f3c48031e948fba80510e9a03ab5f3b633113cb203b",
       "wav": "sit_16.wav",
       "raw": "sit_16.staged.bin",
       "number": 16
@@ -589,10 +589,7 @@
       "slot": 24,
       "label": "Built-in SIT 17",
       "samples": 6576,
-      "duration_seconds": 0.822,
-      "staged_samples": 6656,
       "active_sha256": "8d6d202afd4ff794f6209593b96f8832284cebede31423d7e4451e0e6e76da76",
-      "staged_sha256": "329682c97a7bfcdf3c523c09687702844afdc213f0002b4b639feaa1947be4d8",
       "pcm_sha256": "a95340e014babc56e9bf8dd361e5a1d1df5ab43debdda361e9ba87d9042fab63",
       "components": [
         {
@@ -617,6 +614,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 0.822,
+      "staged_samples": 6656,
+      "staged_sha256": "329682c97a7bfcdf3c523c09687702844afdc213f0002b4b639feaa1947be4d8",
       "wav": "sit_17.wav",
       "raw": "sit_17.staged.bin",
       "number": 17
@@ -625,10 +625,7 @@
       "slot": 25,
       "label": "Built-in SIT 18",
       "samples": 7424,
-      "duration_seconds": 0.928,
-      "staged_samples": 7424,
       "active_sha256": "0d00838eec5f9a01ea8fdc90b1d085dac8b6c6265d6327ac876104c313b2c619",
-      "staged_sha256": "0d00838eec5f9a01ea8fdc90b1d085dac8b6c6265d6327ac876104c313b2c619",
       "pcm_sha256": "2368aeb88f87bf77ed3d525a9084cacc68c67751a79fceea264c00282acbdd19",
       "components": [
         {
@@ -653,6 +650,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 0.928,
+      "staged_samples": 7424,
+      "staged_sha256": "0d00838eec5f9a01ea8fdc90b1d085dac8b6c6265d6327ac876104c313b2c619",
       "wav": "sit_18.wav",
       "raw": "sit_18.staged.bin",
       "number": 18
@@ -661,10 +661,7 @@
       "slot": 26,
       "label": "Built-in SIT 19",
       "samples": 7424,
-      "duration_seconds": 0.928,
-      "staged_samples": 7424,
       "active_sha256": "4d435b6989b8a647e87f1776b05219e09a6d504df6c87fdf1e5d1f1fdb053d02",
-      "staged_sha256": "4d435b6989b8a647e87f1776b05219e09a6d504df6c87fdf1e5d1f1fdb053d02",
       "pcm_sha256": "0b563f0a9c1b405db299671b28c67a6cb1f036c69d88253118717575a75407ba",
       "components": [
         {
@@ -689,6 +686,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 0.928,
+      "staged_samples": 7424,
+      "staged_sha256": "4d435b6989b8a647e87f1776b05219e09a6d504df6c87fdf1e5d1f1fdb053d02",
       "wav": "sit_19.wav",
       "raw": "sit_19.staged.bin",
       "number": 19
@@ -697,10 +697,7 @@
       "slot": 27,
       "label": "Built-in SIT 20",
       "samples": 8272,
-      "duration_seconds": 1.034,
-      "staged_samples": 8448,
       "active_sha256": "5d4d504857bc977765c7580a431d938251a8fc0bddbe988edcac735c02d2f70e",
-      "staged_sha256": "ee0bfe10b37c38ab3e488a6da75d6cec189f34b9e17eb87434bbd79c69a28645",
       "pcm_sha256": "103e37eefe7be842b376b8474893d94a8154dd89e122934678b6d7a67243889a",
       "components": [
         {
@@ -725,6 +722,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 1.034,
+      "staged_samples": 8448,
+      "staged_sha256": "ee0bfe10b37c38ab3e488a6da75d6cec189f34b9e17eb87434bbd79c69a28645",
       "wav": "sit_20.wav",
       "raw": "sit_20.staged.bin",
       "number": 20
@@ -733,10 +733,7 @@
       "slot": 28,
       "label": "Built-in SIT 21",
       "samples": 6576,
-      "duration_seconds": 0.822,
-      "staged_samples": 6656,
       "active_sha256": "a7526b1bd7d6b9b41431eb44d077eeb5d78437078d52e138951915ace6d071f1",
-      "staged_sha256": "289c70279f6c7ed52c927ee3df615bdbb5933778a7dea9fe6cf4a2462b46a3b0",
       "pcm_sha256": "c0c8fb3db571bbc72febe89809c226cb5d09adf2f1d4a5ac9045141b44e14240",
       "components": [
         {
@@ -761,6 +758,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 0.822,
+      "staged_samples": 6656,
+      "staged_sha256": "289c70279f6c7ed52c927ee3df615bdbb5933778a7dea9fe6cf4a2462b46a3b0",
       "wav": "sit_21.wav",
       "raw": "sit_21.staged.bin",
       "number": 21
@@ -769,10 +769,7 @@
       "slot": 29,
       "label": "Built-in SIT 22",
       "samples": 7424,
-      "duration_seconds": 0.928,
-      "staged_samples": 7424,
       "active_sha256": "5a272da10b862c3f6509a10bb8fcb62bd4aa64d6ce3f6051ff1266cc940d4da8",
-      "staged_sha256": "5a272da10b862c3f6509a10bb8fcb62bd4aa64d6ce3f6051ff1266cc940d4da8",
       "pcm_sha256": "2a3cf7ab03d01b5bf5885b62867a722fcb47f111011d3cb7944aef7fcde156d3",
       "components": [
         {
@@ -797,6 +794,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 0.928,
+      "staged_samples": 7424,
+      "staged_sha256": "5a272da10b862c3f6509a10bb8fcb62bd4aa64d6ce3f6051ff1266cc940d4da8",
       "wav": "sit_22.wav",
       "raw": "sit_22.staged.bin",
       "number": 22
@@ -805,10 +805,7 @@
       "slot": 30,
       "label": "Built-in SIT 23",
       "samples": 7424,
-      "duration_seconds": 0.928,
-      "staged_samples": 7424,
       "active_sha256": "eeef11965c0a7f794e8eaf0170bef653972e4ab9f6b99a3a9cbf14ca90a20c84",
-      "staged_sha256": "eeef11965c0a7f794e8eaf0170bef653972e4ab9f6b99a3a9cbf14ca90a20c84",
       "pcm_sha256": "cdb1e1a07f64a7502f6dd315d17869453b9f2e61f74ae969001ac3d6f26585a0",
       "components": [
         {
@@ -833,6 +830,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 0.928,
+      "staged_samples": 7424,
+      "staged_sha256": "eeef11965c0a7f794e8eaf0170bef653972e4ab9f6b99a3a9cbf14ca90a20c84",
       "wav": "sit_23.wav",
       "raw": "sit_23.staged.bin",
       "number": 23
@@ -841,10 +841,7 @@
       "slot": 31,
       "label": "Built-in SIT 24",
       "samples": 8272,
-      "duration_seconds": 1.034,
-      "staged_samples": 8448,
       "active_sha256": "42ff58f8b68229e3241e3e40bca79831449393ee5b6d01dbd594a382e58954cb",
-      "staged_sha256": "deaa72ffe824fb791fbc17c54971fc23635aaca66157eb7ecdb20535edbeb9bb",
       "pcm_sha256": "ea10dd7a3cb534875f2ecfc3b83b1dc17f60e14541cbdf57515bb163c71906d1",
       "components": [
         {
@@ -869,6 +866,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 1.034,
+      "staged_samples": 8448,
+      "staged_sha256": "deaa72ffe824fb791fbc17c54971fc23635aaca66157eb7ecdb20535edbeb9bb",
       "wav": "sit_24.wav",
       "raw": "sit_24.staged.bin",
       "number": 24
@@ -877,10 +877,7 @@
       "slot": 32,
       "label": "Built-in SIT 25",
       "samples": 7424,
-      "duration_seconds": 0.928,
-      "staged_samples": 7424,
       "active_sha256": "564a2461366be350702509ab610d74580fedb177d84bd1051bda4e38d3514c94",
-      "staged_sha256": "564a2461366be350702509ab610d74580fedb177d84bd1051bda4e38d3514c94",
       "pcm_sha256": "f5ac93ac497e2f4369e0fcf27f4e2e85bfda08a7f519412cba963982df6d7219",
       "components": [
         {
@@ -905,6 +902,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 0.928,
+      "staged_samples": 7424,
+      "staged_sha256": "564a2461366be350702509ab610d74580fedb177d84bd1051bda4e38d3514c94",
       "wav": "sit_25.wav",
       "raw": "sit_25.staged.bin",
       "number": 25
@@ -913,10 +913,7 @@
       "slot": 33,
       "label": "Built-in SIT 26",
       "samples": 8272,
-      "duration_seconds": 1.034,
-      "staged_samples": 8448,
       "active_sha256": "4271a28a0594c871e8a856e84b1adbbda24a9723a2d5e96513b407de6933c511",
-      "staged_sha256": "7dfc09058c668b9e78ea05c8d75b079011f821580aba2884a82f1cc99996d1d3",
       "pcm_sha256": "dfc3dc9017a4f6d986b3d6a9a1b6ba27e5c0c64ef8129413452ea00fc04f4fcd",
       "components": [
         {
@@ -941,6 +938,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 1.034,
+      "staged_samples": 8448,
+      "staged_sha256": "7dfc09058c668b9e78ea05c8d75b079011f821580aba2884a82f1cc99996d1d3",
       "wav": "sit_26.wav",
       "raw": "sit_26.staged.bin",
       "number": 26
@@ -949,10 +949,7 @@
       "slot": 34,
       "label": "Built-in SIT 27",
       "samples": 8272,
-      "duration_seconds": 1.034,
-      "staged_samples": 8448,
       "active_sha256": "1137790d0dc8e3ff4f2264884b454fe57c5a98515ec82d06554ed58988d643e5",
-      "staged_sha256": "a3823ff55682ee268bd801ea7d375fcd6535b39c0e1b41395064294f5ca91ada",
       "pcm_sha256": "e70c241b784e65fb9f2e6f99da6b001b43336ff43b929614380e4cdc96a49f0d",
       "components": [
         {
@@ -977,6 +974,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 1.034,
+      "staged_samples": 8448,
+      "staged_sha256": "a3823ff55682ee268bd801ea7d375fcd6535b39c0e1b41395064294f5ca91ada",
       "wav": "sit_27.wav",
       "raw": "sit_27.staged.bin",
       "number": 27
@@ -985,10 +985,7 @@
       "slot": 35,
       "label": "Built-in SIT 28",
       "samples": 9120,
-      "duration_seconds": 1.14,
-      "staged_samples": 9216,
       "active_sha256": "4c3a19eca711f3682bec19e7357b524646a54d926697eee2b967101b4d453ed4",
-      "staged_sha256": "b2b9cd01f4b4afff47884fe7654560f4120560813d63f011a171c6752ee235f3",
       "pcm_sha256": "4abceafaf69fe086957974c65f1b7c54860f896ef4d41fd96b78c2c2493b1ab7",
       "components": [
         {
@@ -1013,6 +1010,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 1.14,
+      "staged_samples": 9216,
+      "staged_sha256": "b2b9cd01f4b4afff47884fe7654560f4120560813d63f011a171c6752ee235f3",
       "wav": "sit_28.wav",
       "raw": "sit_28.staged.bin",
       "number": 28
@@ -1021,10 +1021,7 @@
       "slot": 36,
       "label": "Built-in SIT 29",
       "samples": 7424,
-      "duration_seconds": 0.928,
-      "staged_samples": 7424,
       "active_sha256": "aef24eb312125e302f20600b9b8e202bf54a93dfe036011fc46a93b836e5f368",
-      "staged_sha256": "aef24eb312125e302f20600b9b8e202bf54a93dfe036011fc46a93b836e5f368",
       "pcm_sha256": "6cf50e13a8101011c336f081040cfd5f259baa9fd8f8abcd6566b6cd6efaf817",
       "components": [
         {
@@ -1049,6 +1046,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 0.928,
+      "staged_samples": 7424,
+      "staged_sha256": "aef24eb312125e302f20600b9b8e202bf54a93dfe036011fc46a93b836e5f368",
       "wav": "sit_29.wav",
       "raw": "sit_29.staged.bin",
       "number": 29
@@ -1057,10 +1057,7 @@
       "slot": 37,
       "label": "Built-in SIT 30",
       "samples": 8272,
-      "duration_seconds": 1.034,
-      "staged_samples": 8448,
       "active_sha256": "f1aec89b3fe2e5cd4df2f8d66c78e6ada1aeb5cad20c2ceb042e67770ec338ed",
-      "staged_sha256": "d387a34bcb96a3f43a8edaab693d74076b9acce758452ecebcb643db9c1bc7ac",
       "pcm_sha256": "7b4a992ee835d17c1e0d6e6c58f2f22f3b668324392ddaec97bd1e41579af176",
       "components": [
         {
@@ -1085,6 +1082,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 1.034,
+      "staged_samples": 8448,
+      "staged_sha256": "d387a34bcb96a3f43a8edaab693d74076b9acce758452ecebcb643db9c1bc7ac",
       "wav": "sit_30.wav",
       "raw": "sit_30.staged.bin",
       "number": 30
@@ -1093,10 +1093,7 @@
       "slot": 38,
       "label": "Built-in SIT 31",
       "samples": 8272,
-      "duration_seconds": 1.034,
-      "staged_samples": 8448,
       "active_sha256": "026bebb44e02f0dbc81e872fcb9302a80d343d97428899297682b331e4dde02e",
-      "staged_sha256": "ad4124ad7ca2bbe61c30f38dff8f19895247af36463fda8ab016488ab6a2b7d2",
       "pcm_sha256": "b379c97b3c067a9d82d9c4a19e3223fa33b539da4e13033e8257be6b54ef0258",
       "components": [
         {
@@ -1121,6 +1118,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 1.034,
+      "staged_samples": 8448,
+      "staged_sha256": "ad4124ad7ca2bbe61c30f38dff8f19895247af36463fda8ab016488ab6a2b7d2",
       "wav": "sit_31.wav",
       "raw": "sit_31.staged.bin",
       "number": 31
@@ -1129,10 +1129,7 @@
       "slot": 39,
       "label": "Built-in SIT 32",
       "samples": 9120,
-      "duration_seconds": 1.14,
-      "staged_samples": 9216,
       "active_sha256": "51554de7c75741aa30d2480ebfe4b10e6a04b9d0bdd0bdd4ed444e767812b538",
-      "staged_sha256": "71f1ab5b0a76f6ebdf775de2159d12b9ed366054d25ca38280a849e525891b59",
       "pcm_sha256": "12426cb64c026009b3a5b8ff85bdc02db42903c3365e028f12211043cb6fd4bf",
       "components": [
         {
@@ -1157,6 +1154,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 1.14,
+      "staged_samples": 9216,
+      "staged_sha256": "71f1ab5b0a76f6ebdf775de2159d12b9ed366054d25ca38280a849e525891b59",
       "wav": "sit_32.wav",
       "raw": "sit_32.staged.bin",
       "number": 32
@@ -1167,10 +1167,7 @@
       "slot": 1,
       "label": "750 Hz test tone",
       "samples": 1280,
-      "duration_seconds": 0.16,
-      "staged_samples": 1280,
       "active_sha256": "74f561e49ee5cc1d77a8ec3f2dc9d9cf1c8f115bd51fdc4b70b2e2ccdb6e82c2",
-      "staged_sha256": "74f561e49ee5cc1d77a8ec3f2dc9d9cf1c8f115bd51fdc4b70b2e2ccdb6e82c2",
       "pcm_sha256": "68387de992300076e5bb4b208cf6000adcfcb60a303781d3013da55ab9ce0b97",
       "components": [
         {
@@ -1181,6 +1178,9 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 0.16,
+      "staged_samples": 1280,
+      "staged_sha256": "74f561e49ee5cc1d77a8ec3f2dc9d9cf1c8f115bd51fdc4b70b2e2ccdb6e82c2",
       "wav": "cue_01.wav",
       "raw": "cue_01.staged.bin"
     },
@@ -1188,10 +1188,7 @@
       "slot": 2,
       "label": "Three-burst 750 Hz prompt",
       "samples": 7936,
-      "duration_seconds": 0.992,
-      "staged_samples": 7936,
       "active_sha256": "951b926ed06482ed664c8664f311fad72062ae9fcee23b05f5d54d60a62d4f5d",
-      "staged_sha256": "951b926ed06482ed664c8664f311fad72062ae9fcee23b05f5d54d60a62d4f5d",
       "pcm_sha256": "d9564fac722adf258fcb172b7bd7c9628649c17258c45c137ecd53c85a0340bf",
       "components": [
         {
@@ -1244,8 +1241,119 @@
           "codec": "mulaw-unmasked"
         }
       ],
+      "duration_seconds": 0.992,
+      "staged_samples": 7936,
+      "staged_sha256": "951b926ed06482ed664c8664f311fad72062ae9fcee23b05f5d54d60a62d4f5d",
       "wav": "cue_02.wav",
       "raw": "cue_02.staged.bin"
+    }
+  ],
+  "firmware_continuous": [
+    {
+      "slot": 4,
+      "label": "Built-in continuous tone 4",
+      "samples": 420,
+      "active_sha256": "6746fef2229a3a8b3a4c46f8ff9449004c4d9d1d0a2522b0b574fb5770f9afb9",
+      "pcm_sha256": "8b647cb4b4fe00762ab1df9c02756eb1a759288a70450cde71a2f8e3ddfe12ac",
+      "components": [
+        {
+          "stored_address": 4196608,
+          "record_address": 4196608,
+          "record_words": 210,
+          "samples": 420,
+          "codec": "mulaw-unmasked"
+        }
+      ],
+      "continuous": true,
+      "preview_seconds": 0.0525,
+      "record_sha256": "64d03919449405feee30ccbd5f17ab688c5db702a2876ad68ab5e608f20463d9",
+      "wav": "loop_04.wav",
+      "raw": "loop_04.record.bin"
+    },
+    {
+      "slot": 5,
+      "label": "Built-in continuous tone 5",
+      "samples": 406,
+      "active_sha256": "8c7e04ed7ad4b4275ef576156c3bdd9c4adb03ef4ed856cd04514c1fbb893885",
+      "pcm_sha256": "1f8690d9dc365c2437c963475c3f9eecf695e1e26d09310d0e8d14126a8d9de8",
+      "components": [
+        {
+          "stored_address": 4197032,
+          "record_address": 4197032,
+          "record_words": 203,
+          "samples": 406,
+          "codec": "mulaw-unmasked"
+        }
+      ],
+      "continuous": true,
+      "preview_seconds": 0.05075,
+      "record_sha256": "6e1bd3838ff31fae7ecdcdcc75759a5898bb9eb52dbf990590487c5ad698bdb0",
+      "wav": "loop_05.wav",
+      "raw": "loop_05.record.bin"
+    },
+    {
+      "slot": 6,
+      "label": "Built-in continuous tone 6",
+      "samples": 508,
+      "active_sha256": "3ec35026f8def06a527c722ba16c78ddd2d5389ef98b547d4179fb31cbb38ae4",
+      "pcm_sha256": "d6ce11871f830f037234697bd25d2e3333e2bff4f0948ec60a1b0205a8c2b10f",
+      "components": [
+        {
+          "stored_address": 4197442,
+          "record_address": 4197442,
+          "record_words": 254,
+          "samples": 508,
+          "codec": "mulaw-unmasked"
+        }
+      ],
+      "continuous": true,
+      "preview_seconds": 0.0635,
+      "record_sha256": "62a8ebd2db0e17f38d2b10fd292f488fa127429fb89ec9dccaf1a32fa67fa848",
+      "wav": "loop_06.wav",
+      "raw": "loop_06.record.bin"
+    },
+    {
+      "slot": 7,
+      "label": "Built-in continuous tone 7",
+      "samples": 280,
+      "active_sha256": "7a35d411a5e75159fc2e3781c9e453411815d88a197aa25f0f75eb24c1ab1999",
+      "pcm_sha256": "543ecb5279cd93303d1a61eecf14bfddffb4afc90e6db15dbbdd27b80b9bf934",
+      "components": [
+        {
+          "stored_address": 4458240,
+          "record_address": 4458240,
+          "record_words": 140,
+          "samples": 280,
+          "codec": "mulaw-unmasked"
+        }
+      ],
+      "continuous": true,
+      "preview_seconds": 0.035,
+      "record_sha256": "f1e9845554cdd24bce972a589295072f925755db3d4a54f393870a8b5402a7ff",
+      "wav": "loop_07.wav",
+      "raw": "loop_07.record.bin"
+    }
+  ],
+  "startup_copies": [
+    {
+      "source": 112128,
+      "address": 4196352,
+      "words": 801
+    },
+    {
+      "source": 113730,
+      "address": 4458240,
+      "words": 394
+    },
+    {
+      "source": 114688,
+      "address": 4720640,
+      "words": 801
+    },
+    {
+      "source": 116290,
+      "address": 4982528,
+      "words": 394
     }
   ]
 }

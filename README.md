@@ -6,7 +6,7 @@ Decode speech and tones directly from the sample bytes in Nortel DMS-100 and SL-
 
 ## Listen to the firmware tones
 
-The firmware players contain 32 SITs and both 750 Hz cues decoded from the Nortel waveform bytes. Download the repository and open the player locally. Both players include raw sample-code downloads and WAVs decoded with the law identified for each waveform.
+Each firmware player contains 32 SITs, two 750 Hz cues, and four continuous tones decoded from the Nortel startup tables. Download the repository and open the player locally. Both players include raw sample-code downloads and WAVs decoded with the law identified for each waveform.
 
 - [Firmware player with selector 0x4040](data/xacore/firmware/audio/4040/listen.html)
 - [Firmware player with selector 0x5050](data/xacore/firmware/audio/5050/listen.html)
@@ -19,7 +19,7 @@ This player presents the bytes and menus of the archived announcement and tone l
 
 The [XA-Core player](data/xacore/audio/listen.html) covers the recovered PTSI Cellular announcements and DTM test recordings, and links to both firmware players. The [phrase catalog](data/xacore/audio/catalog.csv) identifies the load, slot, and source of each clip.
 
-## Decode a load
+## Decode a load as stored
 
 ~~~sh
 python edram.py data/original/estd0aa.bin44 -o decoded --segments
@@ -41,6 +41,15 @@ Pass a directory to decode all supported loads inside it. The `--segments` optio
 | Test a new load on an NT1X80 card | [Bench checklist](BENCH_STATUS.md) |
 | Earlier experiments and superseded interpretations | [Archive](archive/README.md) |
 
+## Preview a load on the card
+
+~~~sh
+python edram.py --card-playback data/xacore/srecords/ED16AA07.srec --slot 1 --slot 8 data/original/estd0aa.bin44 -o card-voice
+python edram.py --card-playback data/xacore/srecords/ED16AA07.srec --first-bank 1 --slot 42 --slot 49 data/original/mwttone.txt80 -o card-tones
+~~~
+
+The card preview models an accepted load. It seeds RAM banks 0 through 7, applies the load writes, and follows the slot routing selected by the loaded bank's internal tag. Each input file is previewed as a separate load. `--first-bank` uses zero-based physical RAM numbering. `--playback-selector` defaults to `0x4040`. At `0x5050` the first waveform reference moves two banks above the address in the firmware descriptor. The preview reports unavailable records when its input lacks the resolved waveform. The manifest includes addresses, sample laws, and the firmware digest. [Firmware startup and playback routing](research/EDRAM_BEHAVIOR_SPEC.md#firmware-download-and-startup)
+
 ## Decode built-in firmware SITs
 
 ~~~sh
@@ -48,7 +57,7 @@ python edram.py --firmware-tones data/xacore/srecords/ED16AA07.srec -o decoded-f
 python edram.py --firmware-tones --sit-selector 0x5050 data/xacore/srecords/EDRMAE11.srec -o decoded-selector-5050
 ~~~
 
-Each export includes 34 WAVs, the raw staged codes, a manifest with sample counts, per-component laws and SHA-256 hashes, and a player. Both recovered firmware builds are supported as S-records or mapped flat binaries. Use `--inspect` for JSON output. The announcement-load decoder follows the stored page menus. [Firmware SIT format](FORMAT.md#built-in-firmware-sits)
+Each firmware export includes 38 WAVs and a manifest with startup addresses, sample laws and hashes. Finite clips include the padded staged bytes. Continuous clips include the complete length-prefixed waveform record and play as loops. Both firmware builds are supported as S-records or flat binaries. Use `--inspect` for JSON output. [Firmware SIT format](FORMAT.md#built-in-firmware-sits)
 
 ## Verify an extraction
 

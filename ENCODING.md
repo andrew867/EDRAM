@@ -11,7 +11,7 @@ python edram.py LABANN.bin44 -o preview
 
 Repeat `--phrase ID WAV` for other entries in the same load. The internal name defaults to the uppercase output stem and can be set with `--name`. The encoder writes a new output file and reports an error if that path already exists. Voice samples are unmasked G.711 A-law and padded to 256-sample pages. The encoder writes both record and file checksums and reads the complete result back through the decoder.
 
-The output targets the factory-style announcement load path. Hardware acceptance on SL-100 and DMS-100 releases remains untested. `DRAMREC` can also record directly into RAM. Its `UPLOAD` format needs a switch-produced sample before it can be encoded faithfully.
+Both recovered firmware builds accepted new `.bin44` and `.txt80` loads and staged their authored sample bytes in the correct order. At startup the card supplies its own built-in samples in protected RAM. An ordinary load leaves that window in place. Full switch delivery and on-wire playback still need bench verification. `DRAMREC` can also record directly into RAM. Its `UPLOAD` format needs a switch-produced sample before it can be encoded faithfully.
 
 ## Encode tone phrases
 
@@ -29,7 +29,7 @@ python encode_edram.py LABRPT.txt80 --tone 40 cue:page:test --repeat 40 4
 | `dtmf:5:2` | Key 5 from the A-law DTMF set. This embeds the waveform in an ordinary phrase with page padding. |
 | `edrmtone:47` | An A-law tone-bank waveform by its one-based record index. |
 
-The voice bank format uses A-law. The encoder rejects μ-law and mixed-law tone sources, including `howler`, `milliwatt`, `cue:test` and `sit:firmware:1`. The [firmware exporter](README.md#decode-built-in-firmware-sits) provides the original built-in tone bytes. For native milliwatt and howler loads, use `--tone-bank` below.
+The voice bank format uses A-law. The encoder rejects μ-law and mixed-law tone sources, including `howler`, `milliwatt`, `cue:test` and `sit:firmware:1`. The [firmware exporter](README.md#decode-built-in-firmware-sits) provides the original built-in tone bytes. The card plays its built-in slot 1 cue directly after a custom announcement is loaded. Factory type 1 banks also dispatch slots 4 through 39 through the firmware directory. In a custom bank with an ordinary name, those higher reserved slots follow the bank-local menus. The encoded custom slots 40 through 63 carry their stored A-law sample codes in writable pages. Use [card playback](README.md#preview-a-load-on-the-card) to check which address and law a slot will use. For native milliwatt and howler loads, use `--tone-bank` below.
 
 `--repeat ID COUNT` stores one range and writes its native repeat count. A two-page range AB with count 4 emits ABABABAB. Padding belongs to each repetition. The count is 1 through 255 and a repeated range may span up to 255 pages.
 

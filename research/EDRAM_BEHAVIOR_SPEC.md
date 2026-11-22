@@ -1,6 +1,6 @@
 # EDRAM behavior specification
 
-This specification describes the announcement loader, phrase sequencer, and sample staging of Nortel `ED16AA07` and `EDRMAE11`. It is a handoff for a fresh implementation. The [C reference](../reference/edram/playback.c) models the two tested playback paths. The [evidence notes](EDRAM_FIRMWARE_EVIDENCE.md) give the binary addresses, test setup, and unresolved dependencies.
+This specification describes the announcement loader, phrase sequencer, and sample staging of Nortel `ED16AA07` and `EDRMAE11`. It is a handoff for a fresh implementation. The [C reference](../reference/edram/playback.c) models ordinary page playback and finite waveform playback. The [evidence notes](EDRAM_FIRMWARE_EVIDENCE.md) give the binary addresses, test setup, and unresolved dependencies.
 
 ## Compatibility boundary
 
@@ -8,12 +8,16 @@ An implementation accepts an incoming load or playback request, maintains announ
 
 The load messages below begin at the firmware's decoded receive buffer. The playback request layout begins at the application queue. The DMS switch supplies routing, CLLI resolution, and the outer command transport. The firmware also relies on resident 68k services for task scheduling, queues, timers, and interrupt return. An application-level model can supply those services through callbacks.
 
+## Firmware download and startup
+
+The primary application stub at `0x0412` runs the firmware-download handshake at `0x010106` when internal marker `0x0536` lacks `0x12345678`. After the `0x7D` start message and any `0x7E` data, the `0x77` finish compares the supplied sum with the sum of the executive prefix and application image. A match calls the stub at `0x0418`. Header word `0x0404 == 0x4342` also takes that branch. A mismatch without the header value rejects the transfer. In both recovered builds the `0x0418` path is reached during a successful ordinary firmware download. It clears nine pages at bank-relative `0x0700` in banks 0 through 7, copies the four nonempty entries in the eight-entry table, clears transfer workspace, sets the marker, and enters the executive handoff. On a subsequent primary entry the marker skips the download handshake. The resident continuation beyond `0x020D20` is outside the supplied image. [Trace and copy table](EDRAM_FIRMWARE_EVIDENCE.md#firmware-download-and-startup)
+
 ## Memory and file loading
 
 - Each bank holds `0x40000` bytes. Physical bank index zero starts at `0x400000`, with the same stride for each successive bank.
 - File records carry offsets within the load. A load starts at the selected bank and can cover consecutive banks. The protected region within the bank is `[0x0700, 0x1000)`.
 - The firmware clears `[0, 0x0700)` and `[0x1000, 0x40000)` within the bank selected by the transaction high-water mark when its clear flag is unset. The payload copy clips against `[0x0700, 0x1000)` relative to the start of the load. In a packet crossing an edge, the payload index still corresponds to the original destination offset. The clear flag is part of each bank's directory state.
-- Cold and alternate startup have their own initialization path. The alternate entry clears the protected area in the first eight banks and copies four embedded waveform ranges into it. Preserve the preexisting protected bytes when implementing an ordinary load transaction.
+- The successful firmware download initializes the first eight protected RAM windows before announcement-bank loading. Keep the startup bytes when applying the first bank's protected write exclusion. Subsequent banks' payload addresses remain relative to the start of the transaction.
 
 All byte positions in this table are zero-based within the receive buffer. Codes are hexadecimal.
 
@@ -26,7 +30,7 @@ All byte positions in this table are zero-based within the receive buffer. Codes
 
 The reply helper receives the reply code followed by `3, 12`. The mode used by the test returns the selected zero-based bank number after successful registration. `G0/G2/G6` records, S-record text, and the FTFS record wrapper belong to the host file layer. [File formats](../FORMAT.md)
 
-For the verified even-length packets, compute the payload sum by adding unsigned big-endian 16-bit words, modulo `2^32`. Add all data bytes before clipping the write. Runtime code uses a word-read loop and can read the following byte on an odd-length payload. The observed file suite should use aligned, complete records. For a new implementation, validate lengths, indices, and the packet span at the transport boundary. The write tests cover ordered writes in one bank. Out-of-order, sparse multi-bank uploads need independent validation.
+For the verified even-length packets, compute the payload sum by adding unsigned big-endian 16-bit words, modulo `2^32`. Add all data bytes before clipping the write. Runtime code uses a word-read loop and can read the following byte on an odd-length payload. The observed file suite should use aligned, complete records. For a new implementation, validate lengths, indices, and the packet span at the transport boundary. The write tests cover protected-window crossings and a factory load spanning multiple banks. The behavior of sparse out-of-order uploads still needs an independent trace.
 
 ```c
 apply_data(session, relative_offset, payload, length)
@@ -77,7 +81,17 @@ The firmware substitutes a zero page at bank-relative `0x0D00`, even if it conta
 
 ## Built-in tone playback
 
-The built-in directory can be chosen instead of the installed bank's menu. Its slots 0-3 use ordinary page descriptors at absolute sample addresses. Slots 8-39 dispatch to three consecutive **eight-byte** descriptors. The leading zero word selects the alternate format. Each descriptor consumes two of the directory's four-byte units.
+The sequencer uses the loaded bank's type and the requested slot to pick its directory. The table below covers successfully loaded PROM-style banks. RAM uploads also depend on runtime bank mappings.
+
+| Loaded bank type | Firmware directory slots | Other slots |
+| --- | --- | --- |
+| Ordinary announcement type 0 | 0 through 3 | Bank-local page menus |
+| Recognized factory announcement type 1 | 0 through 39 | Bank-local page menus from 40 |
+| `TONE00AA10` or `TONE00AB10`, types 2 and 3 | 0 through 63 | Use the applicable descriptor and selected RAM address |
+
+The loader classifies the bank from bytes `0x0670–0x067B` after loading it. For the `.bin` branch, the suffix at `0x0674` selects type 1 when it is `0AA `, `0AB `, `0BA `, or `S0CA`. The other branch recognizes the `TONE` and `U1X7` tags with `6AA0`, `6AB0`, `6BA0`, or `6CA0` for type 1 and `00AA` or `00AB` for types 2 and 3. The registration applies the type to all banks in the load.
+
+Slots 0 through 3 use absolute page ranges. Slots 4 through 7 use continuous waveform records. Slots 8 through 39 have three consecutive eight-byte descriptors. Tone-service slots 40 through 63 use continuous descriptors. A leading zero word identifies the waveform-record format.
 
 | Offset | Width | Meaning |
 | --- | ---: | --- |
@@ -98,7 +112,7 @@ zero_pad_final_block();
 advance_to_next_phrase_or_control_token();
 ```
 
-The tested profile uses selector `0x4040` and runtime memory byte `[0x000001] = 1`. That byte is read by the repeat branch. With it set to zero in the harness, fixture slot 8 still filled the same number of blocks but produced different sample bytes. The actual value on a running target must be measured or recovered from the resident software. Selector `0x5050` adds `0x80000` to the first record address. The in-buffer transition uses the next two addresses as stored. Both selectors were tested with bank-specific waveform overrides disabled. Continuous records use duration `0xFFFFFF`. When selector `0x4040` selects a type 2 or type 3 bank, the first descriptor's address is relocated by `0x40000 * bank_index`. Stream the selected record's payload cyclically across staging-block boundaries until interrupted. In both builds slot 42 uses the howler at bank offset `0x3BCA` and slot 49 uses the milliwatt at `0x379E`.
+The tested profile uses selector `0x4040` and runtime memory byte `[0x000001] = 1`. That byte is read by the repeat branch. With it set to zero in the harness, fixture slot 8 still filled the same number of blocks but produced different sample bytes. The actual value on a running target must be measured or recovered from the resident software. Selector `0x5050` adds `0x80000` to the first record address. Under `0x4040`, a type 2 or type 3 tone bank instead adds its physical bank offset to that address. In-buffer transitions use subsequent descriptor addresses as stored. Absolute-page cues use the same addresses under both tested selectors. Both applications derive the playback selector from `RAM[0xDEC0] & 0x87`. Values `0x81`, `0x83`, `0x85`, and `0x87` select `0x1010`, `0x2020`, `0x3030`, and `0x5050` respectively. The fallback is `0x4040`. The playback model covers the two selectors verified against the native routines. Continuous records use duration `0xFFFFFF`. When selector `0x4040` selects a type 2 or type 3 bank, the first descriptor's address is relocated by `0x40000 * bank_index`. Stream the selected record's payload cyclically across staging-block boundaries until interrupted. In both builds slot 42 uses the howler at bank offset `0x3BCA` and slot 49 uses the milliwatt at `0x379E`.
 
 | Tone length | Descriptor value | Active codes | Nominal time |
 | --- | ---: | ---: | ---: |
@@ -160,4 +174,4 @@ The [measured vectors](../data/xacore/firmware/playback-vectors.json) contain ex
 - **Built-in cues.** Run slots 1 and 2 with each tested selector. Compare the ordered absolute page addresses, the output hashes, and 1,280 and 7,936 staged codes, respectively.
 - **Built-in SITs.** Run slots 8-39 with each tested selector and the finite-cycle profile. Compare the active length and the full sequence of zero-padded staging blocks.
 
-The remaining hardware acceptance cases are the live serial framing, interrupt timing, law and gain on the wire, recording completion, service timing on the line, and additional bank types and alternate selectors. Those cases need a card trace or the resident runtime.
+The remaining hardware acceptance cases include the resident boot handoff, live framing and interrupt timing, law and gain on the wire, RAM uploads, and service timing. DTMF records are verified in RAM. Their dispatch still needs a trace. Those cases need a card trace or the resident runtime.

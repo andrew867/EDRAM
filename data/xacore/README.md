@@ -40,7 +40,7 @@ All 35 speech slots differ from the decoded reference waveforms in the repositor
 
 ANN1 through ANN8 contain a set of PTSI Cellular recordings for the Oklahoma Panhandle. The prompts cover the mobile service area, 611, toll billing, emergency dialing, follow-me roaming and automatic call delivery. ANN7 slot 09 explicitly names PTSI Cellular and the Oklahoma Panhandle. A [contemporary Panhandle newspaper](https://newspapers.swco.ttu.edu/server/api/core/bitstreams/899cb423-d31d-4b93-a334-6ff15049a416/content) connects that service name with the Guymon cellular switch. The recordings' dates are unknown. DTM_BK3 slot 09 begins with a spoken test announcement. Slot 16 contains another short spoken test fragment. The unreferenced pages include more recorded audio.
 
-The menus for slots 01 and 02 reference pages 14 and 15, which all nine backups omit. The [firmware player](firmware/audio/4040/listen.html) contains the 750 Hz test tone and three-burst prompt decoded from the built-in sample page at `0x400800`. Both recovered firmware builds produce the same cue bytes.
+The menus for slots 01 and 02 reference pages 14 and 15, which all nine backups omit. The [firmware player](firmware/audio/4040/listen.html) contains the 750 Hz test tone and three-burst prompt decoded from the built-in sample page at `0x400800`. Both recovered firmware builds produce the same cue bytes. The card dispatches slots 1 and 2 to the firmware directory before consulting the backup's bank-local menus.
 
 Each phrase WAV expands the stored unmasked A-law codes at 8,000 samples/s and applies the menu repeats. The unreferenced fragments concatenate the surviving pages in address order. The exact original offsets are in [audio/extra-audio.json](audio/extra-audio.json).
 

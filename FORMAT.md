@@ -54,6 +54,10 @@ The native player emits 256 zero codes for page 13 even when source bytes are pr
 
 Standard SIT menus 8 through 39 combine attack pages 17, 20, 23, 26 and 29 with repeated two-page components beginning at 18, 21, 24, 27 and 30. IDs are bank-local, and phrase 8 in another pack may contain speech. SIT labels require the corresponding menu structure.
 
+## Firmware startup RAM
+
+The `0x0418` entry is part of the verified successful firmware-download sequence. It clears the nine protected pages in each of the first eight banks before copying the firmware's 750 Hz pages and length-prefixed waveform records. The standard announcement loader excludes write offsets `0x0700–0x0FFF` relative to the start of the load transaction. For live slot selection, replay the initialized RAM and bank type rather than reading those offsets straight from the archival load. [Startup and slot selection](research/EDRAM_BEHAVIOR_SPEC.md#firmware-download-and-startup)
+
 ## Built-in firmware SITs
 
 The firmware directories in `ED16AA07` and `EDRMAE11` have built-in SIT slots 8 through 39, shown by the decoder as SITs 1 through 32. Each entry points to three eight-byte descriptors. Each descriptor starts with a zero word, a big-endian 24-bit waveform address, and a big-endian 24-bit duration in eight-sample units. Its waveform record starts with a big-endian word count. The sample payload is twice that count in bytes.
@@ -69,7 +73,7 @@ The waveform records at their stored addresses expand as unmasked G.711 mu-law. 
 
 The firmware's two 750 Hz cues use ordinary absolute page descriptors. Slot 1 plays page `0x400800` five times for 160 ms. Slot 2 uses the same waveform for all three bursts, with silence from startup-cleared page `0x400700`. The waveform expands as unmasked mu-law. Both recovered builds stage identical cue bytes under the tested selectors.
 
-Use `edram.py --firmware-tones` to export the cues and SITs. Each raw `.staged.bin` contains the exact padded codes. The WAV contains active samples with the recorded levels. A forced `--codec` applies just to WAV expansion for diagnostic comparisons. The on-wire law and gain need a card capture. [Usage](README.md#decode-built-in-firmware-sits)
+Use `edram.py --firmware-tones` to export the cues, continuous slots and SITs. Each finite clip's `.staged.bin` contains the exact padded codes. A continuous clip's `.record.bin` contains its original word count and payload, and its WAV contains one waveform cycle record. Use `--card-playback` with a load to apply startup RAM, the protected write exclusion, and bank-type routing. The on-wire law and gain need a card capture. [Usage](README.md#decode-built-in-firmware-sits)
 
 ## Standalone tone banks
 

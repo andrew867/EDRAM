@@ -129,6 +129,8 @@ The 501 bytes from the coverage audit are another quantity. They were explicitly
 
 ## Why a page can be missing from `segments`
 
+Offsets in this section describe the addressed load file. At runtime the completed firmware download seeds protected RAM. The announcement writer skips offsets `0x0700–0x0FFF` relative to the load start, and the firmware can select its own directory. Use [card playback](README.md#preview-a-load-on-the-card) to resolve a slot after those steps.
+
 `--segments` exports one single-pass WAV for each distinct referenced `(bank, starting page, page count)` range. In `bank_00_page_0012_pages_002.wav`, `0012` is **hexadecimal**, and `002` is a **decimal page count**. That file contains pages `0x12` and `0x13` together. Repeat counts live in the phrase submenus and are applied when building the full phrase. [ESTD0AA segment WAVs](audio/estd0aa/segments) · [Segment and phrase manifest](audio/estd0aa/manifest.json)
 
 | Page in `ESTD0AA`, bank 0 | Image range | Reason for the export result |

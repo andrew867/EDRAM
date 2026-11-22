@@ -51,6 +51,8 @@ class FirmwareSITTests(unittest.TestCase):
             folder = root / path.stem
             manifest = json.loads((folder / "manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(len(manifest["firmware_sits"]), 32)
+            self.assertEqual([t["slot"] for t in manifest["firmware_continuous"]], [4, 5, 6, 7])
+            self.assertEqual(len(manifest["startup_copies"]), 4)
             self.assertEqual(manifest["selector"], 0x5050)
             first = manifest["firmware_sits"][0]
             self.assertEqual([p["samples"] for p in first["components"]], [2192] * 3)
@@ -121,6 +123,48 @@ class FirmwareSITTests(unittest.TestCase):
                 self.assertEqual(encode_edram.word_checksum(r.data for r in load.records),
                                  int.from_bytes(raw[-41:-37], "big") if transport == "bin44"
                                  else int(raw.splitlines()[-1][4:12], 16))
+
+
+    def test_card_playback_selects_firmware_or_bank_by_type(self):
+        firmware = edram.parse_firmware_sit((XA_CORE / "srecords" / "ED16AA07.srec").read_bytes(), 0x5050)
+        archived = edram.Image.read(encode_edram.TEMPLATE)
+        factory = edram.CardPlayback(archived, firmware, first_bank=1)
+        self.assertEqual(factory.bank_type, 1)
+        self.assertEqual(factory.phrase(1, 1), firmware.cue(1))
+        self.assertEqual(factory.phrase(1, 8), firmware.sit(1))
+        self.assertEqual(factory.phrase(1, 7).components[0].record_address, 0x4C0700)
+        self.assertEqual(factory.phrase(1, 7).components[0].codec, firmware_sit.ALAW)
+
+        codes = encode_edram.read_tone("cue:page:test")
+        authored = encode_edram.build_load("LABANN", {40: codes}, "bin44")
+        custom = edram.CardPlayback(edram.Image(edram.parse_bin44(authored)), firmware, first_bank=1)
+        self.assertEqual(custom.bank_type, 0)
+        self.assertEqual(custom.phrase(1, 1), firmware.cue(1))
+        self.assertEqual(custom.phrase(1, 8).codes, encode_edram.read_tone("sit:page:1"))
+        self.assertEqual(custom.phrase(1, 40).codes, codes)
+        self.assertEqual(custom.read(0x440700, 0x900), firmware.startup_read(0x440700, 0x900))
+
+    def test_card_cli_exports_native_continuous_records(self):
+        firmware = XA_CORE / "srecords" / "ED16AA07.srec"
+        path = encode_edram.DATA / "original" / "mwttone.txt80"
+        with tempfile.TemporaryDirectory() as tmp:
+            edram.main(["--card-playback", str(firmware), "--first-bank", "1", "--slot", "42",
+                        "--slot", "49", str(path), "-o", tmp])
+            folder = Path(tmp) / path.stem
+            manifest = json.loads((folder / "manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest["bank_type"], 2)
+            self.assertEqual(len(manifest["startup_copies"]), 4)
+            for part, address, samples in zip(manifest["card_slots"], (0x3BCA, 0x379E), (2000, 996), strict=True):
+                entry, = part["components"]
+                self.assertEqual(entry["record_address"], 0x440000 + address)
+                self.assertEqual(entry["codec"], firmware_sit.MULAW)
+                self.assertTrue(part["continuous"])
+                self.assertNotIn("duration_seconds", part)
+                raw = edram.Image.read(path).read_bytes(address, samples + 2, required=True)
+                self.assertEqual((folder / part["raw"]).read_bytes(), raw)
+                with wave.open(str(folder / part["wav"])) as wav:
+                    self.assertEqual(wav.getnframes(), samples)
+                    self.assertEqual(wav.readframes(samples), edram.decode(raw[2:], firmware_sit.MULAW))
 
     def test_repeat_rejects_unaddressable_ranges(self):
         for codes, repeats, error in ((b"\x82", {41: 2}, "refer to an authored phrase"),

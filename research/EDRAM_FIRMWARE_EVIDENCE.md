@@ -29,14 +29,22 @@ Addresses are absolute 68k byte addresses. Names describe the observed operation
 | Embedded startup copy table | `0x01A7F2` | `0x01A7C4` |
 | Built-in phrase directory | `0x01A842` | `0x01A814` |
 
-Both images refer to the staging-base table at `0x010A4E` and the control-address table at `0x010D3A`. Examples for the first active channel are staging at `0x200100` or `0x202100` and control at `0x300602`. The channel service iterates over channel indices 1 through 30. The alternate entry clears the protected pages of the first eight banks and runs a table with four nonempty copy entries.
+Both images refer to the staging-base table at `0x010A4E` and the control-address table at `0x010D3A`. Examples for the first active channel are staging at `0x200100` or `0x202100` and control at `0x300602`. The channel service iterates over channel indices 1 through 30.
 
-| Source | Destination | 16-bit words |
-| ---: | ---: | ---: |
-| `0x01B600` | `0x400800` | `0x0321` |
-| `0x01BC42` | `0x440700` | `0x018A` |
-| `0x01C000` | `0x480800` | `0x0321` |
-| `0x01C642` | `0x4C0700` | `0x018A` |
+## Firmware download and startup
+
+Both binaries enter the primary stub at `0x0412` for application startup. When the initialization marker is absent, the handshake routine at `0x010106` waits for `0x7D` and processes `0x7E` payloads until finish opcode `0x77`. The assembly at `0x010308` through `0x010322` compares the sum or accepts header word `0x4342` and calls `0x0418`. At that entry, both builds clear `0x0700–0x0FFF` in the first eight banks, seed the embedded data, clear transfer workspace, set `0x0536` to `0x12345678` and call `0x00E900`. The copy table contains eight positions, four with nonzero lengths.
+
+The verifier exercises a matching checksum, mismatching checksum, and the `0x4342` header branch with the executive prefix already staged. It compares all eight protected windows against the codec's startup model, including bytes on both sides of each window. The two firmware sums are `0x1DC65AF5` and `0x1DAC0413`, matching their archived S6 values. The verifier stops at the executive handoff and uses the recovered loader and sequencer separately to test the loaded voice files.
+
+| Source | Destination | Words | Stored waveform data |
+| ---: | ---: | ---: | --- |
+| `0x01B600` | `0x400800` | `0x0321` | μ-law 750 Hz cue page and records near 914, 985 and 1370 Hz |
+| `0x01BC42` | `0x440700` | `0x018A` | μ-law records near 1429 and 1776 Hz |
+| `0x01C000` | `0x480800` | `0x0321` | A-law counterparts to the first group |
+| `0x01C642` | `0x4C0700` | `0x018A` | A-law counterparts to the second group |
+
+All four ranges are identical across the two firmware builds. Slot 1 uses the first 750 Hz page under both tested selectors. Slots 4 through 7 resolve to `0x400900`, `0x400AA8`, `0x400C42`, and `0x440700` under `0x4040`. Under `0x5050` each address increases by `0x80000`. Both builds looped the stored sample records byte for byte. The preview's law follows the record's identified storage law.
 
 ## How to reproduce
 
@@ -62,8 +70,8 @@ The instruction at `0x01A582` in ED16AA07 compares a register byte with absolute
 
 The verifier rebuilds MWTTONE and EDRMTONE and feeds their parsed S2 payloads through the OEM load loop at the decoded message boundary. It uses one-based bank number 2 to test address relocation. Both builds acknowledge the native S6 values and register the original bank types. The PM application's `TONE` branch accepts the archived MWTTONE footer without a comparison to the incoming word sum. Host-side validation of changed MWTTONE images needs a verified checksum rule.
 
-The harness executes the actual playlist sequencer, which selects a built-in duration-`0xFFFFFF` descriptor and applies the loaded bank offset. It observes howler slot 42 at `0x443BCA` and milliwatt slot 49 at `0x44379E` for bank number 2. At selector `0x4040` with low-memory byte `1`, each 256-byte staging block follows the original waveform continuously across record boundaries. Both original banks and a regenerated EDRMTONE with record 14 copied to record 9 were tested across every available continuous slot from 40 through 63. Both DTMF sets retain their sample bytes in RAM. The service routing that selects the DTMF records remains unresolved.
+The harness executes the actual playlist sequencer, which selects a built-in duration-`0xFFFFFF` descriptor and applies the loaded bank offset. It observes howler slot 42 at `0x443BCA` and milliwatt slot 49 at `0x44379E` for bank number 2. At selector `0x4040` with low-memory byte `1`, each 256-byte staging block follows the original waveform continuously across record boundaries. Both original banks and a regenerated EDRMTONE with record 14 copied to record 9 were tested across every available continuous slot from 40 through 63. A second EDRMTONE test uses selector `0x5050` and loads the bank at physical index 2, where the relocated descriptor addresses resolve. Both DTMF sets retain their sample bytes in RAM. The service routing that selects the DTMF records remains unresolved.
 
 ## Hardware evidence still needed
 
-The S-records supply the application and its executive prefix. The listings also call resident service entries near `0x03F000` and jump to code at `0x020D20`, outside the supplied ranges. A card trace or resident image would establish the real boot-time selector and low-memory byte, command transport and interrupt timing, control-register meanings, sample law and level at the network interface, capture and recording behavior, and service timing on the line. The test boundary is the sequence of 256-byte staging writes and the loader and request-decoder state transitions.
+The S-records supply the application and its executive prefix. The listings also call resident service entries near `0x03F000` and jump to code at `0x020D20`, outside the supplied ranges. A card trace or resident image would establish the initial hardware entry, the provisioned playback selector and low-memory byte, command transport and interrupt timing, control-register meanings, sample law and level at the network interface, capture and recording behavior, and service timing on the line. The test boundary is the sequence of 256-byte staging writes and the loader and request-decoder state transitions.
