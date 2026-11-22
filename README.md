@@ -26,6 +26,7 @@ Pass a directory to decode all supported loads inside it. The `--segments` optio
 | Stored tone levels and SIT timing | [Tone measurements](research/TONE_PLAYBACK.md) |
 | Create a custom single-bank voice load | [Encoder guide](ENCODING.md) |
 | Pack or inspect a tape image | [SLM tape guide](SLM_TAPE.md) and [nine-track and IOM DAT comparison](SLM_TAPE.md#ibm-tape-labels-and-the-observed-slm-format) |
+| Extract an XA-Core disk or inspect recovered loads | [XA-Core disk extraction and EDRAM files](data/xacore/README.md) |
 | Test a new load on an NT1X80 card | [Bench checklist](BENCH_STATUS.md) |
 | Earlier experiments and superseded interpretations | [Archive](archive/README.md) |
 

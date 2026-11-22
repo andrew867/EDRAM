@@ -5,3 +5,6 @@
 *.bin44 binary
 *.txt80 binary
 *.wav binary
+data/xacore/original/* binary
+data/xacore/srecords/*.srec text eol=lf
+data/xacore/SHA256SUMS text eol=lf
